@@ -1,0 +1,15 @@
+[meta]
+name = "Better Matchmaking"
+author = "Greep"
+category = "Match"
+perms = "paid"
+siteid = 424
+
+version = "1.0.0"
+
+[script]
+dependencies = [ "NadeoServices" ]
+
+#defines = [ "LOCAL_API" ]
+# LOCAL_API : Forces to the local API (localhost:3000)
+# FORCE_API_DOWN : Forces the API to be "down" after loading for tags and seasons.
