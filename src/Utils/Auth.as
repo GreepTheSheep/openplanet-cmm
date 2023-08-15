@@ -25,6 +25,7 @@ namespace Auth
         serverJson["token"] = AccountToken;
         serverJson["displayName"] = displayName;
         serverJson["accountId"] = accountId;
+        serverJson["pluginVersion"] = Meta::ExecutingPlugin().Version;
 
         Json::Value@ serverRes = API::PostAsync(Setting_BaseURL + "/auth/login", Json::Write(serverJson));
 
