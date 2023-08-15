@@ -2,6 +2,7 @@ bool isServerAlive = false;
 bool isCheckingServer = true;
 MainWindow@ bmmMainWindow;
 DevWindow@ bmmDevWindow;
+uint g_connectedPlayers;
 
 void RenderMenu()
 {
@@ -22,6 +23,7 @@ void Main()
     Auth::Login();
     @bmmMainWindow = MainWindow();
     @bmmDevWindow = DevWindow();
+    startnew(CheckServerLoop);
     print("ready");
 }
 
@@ -47,7 +49,15 @@ bool CheckServer()
         Log::Error("Server seems not responding.\nThe plugin will not load.");
         throw("Server seems not responding");
     } else if (res.GetType() == Json::Type::Object) {
+        g_connectedPlayers = res["connectedPlayers"];
         return true;
     }
     return false;
+}
+
+void CheckServerLoop() {
+    while(true) {
+        sleep(5 * 60 * 1000);
+        isServerAlive = CheckServer();
+    }
 }

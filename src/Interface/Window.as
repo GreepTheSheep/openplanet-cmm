@@ -22,22 +22,21 @@ class Window {
         tabs.RemoveAt(tabs.FindByRef(tab));
     }
 
+    void RenderHeader() {}
+    void RenderFooter() {}
+
     void Render(){
         if(!isOpened) return;
 
-        UI::PushStyleColor(UI::Col::WindowBg,vec4(.1,.1,.1,1));
-        UI::PushStyleVar(UI::StyleVar::WindowPadding, vec2(10, 10));
-        UI::PushStyleVar(UI::StyleVar::WindowRounding, 10.0);
-        UI::PushStyleVar(UI::StyleVar::FramePadding, vec2(10, 6));
-        UI::PushStyleVar(UI::StyleVar::WindowTitleAlign, vec2(.5, .5));
-        UI::SetNextWindowSize(820, 500);
+        UI::SetNextWindowSize(520,360, UI::Cond::Once);
         if(UI::Begin(GetWindowName()+"###"+GetWindowId(), isOpened)){
+            RenderHeader();
             // Push the last active tab style so that the separator line is colored (this is drawn in BeginTabBar)
             auto lastActiveTab = c_lastActiveTab;
             if (lastActiveTab !is null) {
                 lastActiveTab.PushTabStyle();
             }
-            UI::BeginTabBar("Tabs", UI::TabBarFlags::TabListPopupButton);
+            UI::BeginTabBar("Tabs");
 
             for(uint i = 0; i < tabs.Length; i++){
                 auto tab = tabs[i];
@@ -60,7 +59,7 @@ class Window {
                     if (beginTabClosable){
                         @c_lastActiveTab = tab;
 
-                        UI::BeginChild("Tab");
+                        UI::BeginChild("Tab", vec2(UI::GetWindowSize().x - 12, UI::GetWindowSize().y - UI::GetCursorPos().y - 38));
                         @selectedTab = tab;
                         tab.Render();
                         UI::EndChild();
@@ -76,7 +75,7 @@ class Window {
                     if (beginTab){
                         @c_lastActiveTab = tab;
 
-                        UI::BeginChild("Tab");
+                        UI::BeginChild("Tab", vec2(UI::GetWindowSize().x - 12, UI::GetWindowSize().y - UI::GetCursorPos().y - 38));
                         @selectedTab = tab;
                         tab.Render();
                         UI::EndChild();
@@ -89,6 +88,8 @@ class Window {
 
                 UI::PopID();
 
+                RenderFooter();
+
             }
 
             UI::EndTabBar();
@@ -99,8 +100,6 @@ class Window {
             }
         }
         UI::End();
-        UI::PopStyleVar(4);
-        UI::PopStyleColor(1);
     }
 
 }
