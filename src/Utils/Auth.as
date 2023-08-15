@@ -31,12 +31,17 @@ namespace Auth
         if (serverRes.HasKey("error")) {
             string errMsg = serverRes["error"]["message"];
             int errCode = serverRes["error"]["code"];
-            if (retriesNumber <= 3) {
-                Log::Warn(errMsg + "\nRetrying... ("+retriesNumber+"/3 attempts)");
-                sleep(2000);
-                Auth::Login();
-            } else {
-                Log::Error(errMsg + "\nThe plugin will not load.");
+            if (errCode == 502) {
+                if (retriesNumber <= 3) {
+                    Log::Warn(errMsg + "\nRetrying... ("+retriesNumber+"/3 attempts)");
+                    sleep(2000);
+                    Auth::Login();
+                } else {
+                    Log::Error(errMsg + "\nThe plugin will not load.");
+                    throw(errMsg);
+                }
+            } else if (errCode == 403) {
+                Log::Error(errMsg, true);
                 throw(errMsg);
             }
         }

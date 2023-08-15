@@ -1,0 +1,165 @@
+class ConnectedPlayersDevTab : Tab {
+    Net::HttpRequest@ m_request;
+    Net::HttpRequest@ m_disconnectRequest;
+    bool isError = false;
+    string errorMsg = "";
+    bool isLoading = false;
+    array<ConnectedPlayerInfo@> connectedPlayers;
+
+    string GetLabel() override { return "Connected Players"; }
+
+    void StartRequest()
+    {
+        isLoading = true;
+        string url = Setting_BaseURL+"/dev/players";
+
+        @m_request = API::Get(url);
+    }
+
+    void CheckStartRequest()
+    {
+        // If there's not already a request and the window is appearing, we start a new request
+        if (m_request is null && UI::IsWindowAppearing()) {
+            StartRequest();
+        }
+    }
+
+    void CheckRequest()
+    {
+        CheckStartRequest();
+
+        // If there's a request, check if it has finished
+        if (m_request !is null && m_request.Finished()) {
+            isLoading = false;
+            // Parse the response
+            string res = m_request.String();
+            if (Meta::IsDeveloperMode()) trace("ConnectedPlayersDevTab::CheckRequest: " + res);
+            @m_request = null;
+            auto json = Json::Parse(res);
+
+            if (json.GetType() == Json::Type::Null) {
+                isError = true;
+                errorMsg = "Error while loading players list";
+                Log::Error(errorMsg);
+                return;
+            }
+
+            if (json.HasKey("error")) {
+                isError = true;
+                errorMsg = json["error"]["message"];
+                Log::Error(errorMsg);
+                return;
+            }
+
+            for (uint i = 0; i < json["connected"].Length; i++) {
+                ConnectedPlayerInfo@ player = ConnectedPlayerInfo(json["connected"][i]);
+                connectedPlayers.InsertLast(player);
+            }
+        }
+    }
+
+    void DisconnectPlayer(ConnectedPlayerInfo@ player) {
+        string url = Setting_BaseURL+"/dev/player/disconnect";
+        Json::Value@ postJson = Json::Object();
+        postJson["accountId"] = player.accountId;
+
+        @m_disconnectRequest = API::Post(url, Json::Write(postJson));
+    }
+
+    void CheckDisconnectPlayerRequest()
+    {
+        // If there's a request, check if it has finished
+        if (m_disconnectRequest !is null && m_disconnectRequest.Finished()) {
+            isLoading = false;
+            // Parse the response
+            string res = m_disconnectRequest.String();
+            if (Meta::IsDeveloperMode()) trace("ConnectedPlayersDevTab::CheckDisconnectPlayerRequest: " + res);
+            @m_disconnectRequest = null;
+            Reload();
+        }
+    }
+
+    void Reload() override {
+        connectedPlayers.RemoveRange(0, connectedPlayers.Length);
+        StartRequest();
+    }
+
+    void Render() override
+    {
+        CheckRequest();
+
+        if (isLoading) {
+            int HourGlassValue = Time::Stamp % 3;
+            string Hourglass = (HourGlassValue == 0 ? Icons::HourglassStart : (HourGlassValue == 1 ? Icons::HourglassHalf : Icons::HourglassEnd));
+            UI::Text(Hourglass + " Loading...");
+            return;
+        }
+
+        if (isError) {
+            UI::Text("\\$f00" + Icons::ExclamationTriangle + " \\$z" + errorMsg);
+            return;
+        }
+
+        if (UI::Button(Icons::Refresh)) Reload();
+
+        if (connectedPlayers.Length == 0) {
+            UI::Text("\\$f00" + Icons::ExclamationTriangle + " \\$zConnected players list is empty");
+            return;
+        }
+
+        CheckDisconnectPlayerRequest();
+        if (UI::BeginTable("ConnectedPlayersList", 4)) {
+            UI::TableSetupScrollFreeze(0, 1);
+            PushTabStyle();
+            UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthStretch);
+            UI::TableSetupColumn("Connexion Date", UI::TableColumnFlags::WidthStretch);
+            UI::TableSetupColumn("IP", UI::TableColumnFlags::WidthStretch);
+            UI::TableSetupColumn("Actions", UI::TableColumnFlags::WidthFixed, 80);
+            UI::TableHeadersRow();
+            PopTabStyle();
+
+            UI::ListClipper clipper(connectedPlayers.Length);
+            while(clipper.Step()) {
+                for(int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
+                {
+                    UI::PushID("ResCoPlayer"+i);
+                    ConnectedPlayerInfo@ player = connectedPlayers[i];
+                    UI::TableNextRow();
+
+                    UI::TableSetColumnIndex(0);
+                    UI::Text(player.displayName);
+                    UI::SetPreviousTooltip(player.accountId);
+
+                    UI::TableSetColumnIndex(1);
+                    UI::Text(Time::FormatString("%F %X", player.connectedTimestamp));
+
+                    UI::TableSetColumnIndex(2);
+                    UI::Text(player.ipAddr);
+
+                    UI::TableSetColumnIndex(3);
+                    if (UI::RedButton(Icons::Times)) {
+                        DisconnectPlayer(player);
+                    }
+                    UI::SetPreviousTooltip("Disconnect Player");
+
+                    UI::PopID();
+                }
+            }
+            UI::EndTable();
+        }
+    }
+}
+
+class ConnectedPlayerInfo {
+    string displayName;
+    string accountId;
+    int64 connectedTimestamp;
+    string ipAddr;
+
+    ConnectedPlayerInfo(const Json::Value &in json) {
+        displayName = json["displayName"];
+        accountId = json["accountId"];
+        connectedTimestamp = json["connectedTimestamp"];
+        ipAddr = json["ipAddr"];
+    }
+}

@@ -5,6 +5,9 @@ namespace API
         auto ret = Net::HttpRequest();
         ret.Method = Net::HttpMethod::Get;
         ret.Url = url;
+        if (url.StartsWith(Setting_BaseURL) && Auth::connected && Auth::AccountToken.Length > 0) {
+            ret.Headers.Set("Authorization", "Bearer " + Auth::AccountToken);
+        }
         if (Meta::IsDeveloperMode()) Log::Trace("Get: " + url);
         ret.Start();
         return ret;
@@ -28,6 +31,9 @@ namespace API
         ret.Url = url;
         ret.Body = body;
         ret.Headers.Set("Content-Type", "application/json");
+        if (url.StartsWith(Setting_BaseURL) && Auth::connected && Auth::AccountToken.Length > 0) {
+            ret.Headers.Set("Authorization", "Bearer " + Auth::AccountToken);
+        }
         if (Meta::IsDeveloperMode()) Log::Trace("Post: " + url);
         if (Meta::IsDeveloperMode()) Log::Trace("Body: " + body);
         ret.Start();
