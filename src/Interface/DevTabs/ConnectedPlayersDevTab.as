@@ -16,11 +16,16 @@ class ConnectedPlayersDevTab : Tab {
         @m_request = API::Get(url);
     }
 
+    void Reload() override {
+        connectedPlayers.RemoveRange(0, connectedPlayers.Length);
+        StartRequest();
+    }
+
     void CheckStartRequest()
     {
         // If there's not already a request and the window is appearing, we start a new request
         if (m_request is null && UI::IsWindowAppearing()) {
-            StartRequest();
+            Reload();
         }
     }
 
@@ -77,11 +82,6 @@ class ConnectedPlayersDevTab : Tab {
             @m_disconnectRequest = null;
             Reload();
         }
-    }
-
-    void Reload() override {
-        connectedPlayers.RemoveRange(0, connectedPlayers.Length);
-        StartRequest();
     }
 
     void Render() override
