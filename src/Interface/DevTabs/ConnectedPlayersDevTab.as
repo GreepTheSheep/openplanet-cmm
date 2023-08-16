@@ -141,6 +141,11 @@ class ConnectedPlayersDevTab : Tab {
                         DisconnectPlayer(player);
                     }
                     UI::SetPreviousTooltip("Disconnect Player");
+                    UI::SameLine();
+                    if (UI::RedButton(Icons::Ban)) {
+                        Renderables::Add(DevBanPlayerModalDialog(player));
+                    }
+                    UI::SetPreviousTooltip("Ban Player");
 
                     UI::PopID();
                 }

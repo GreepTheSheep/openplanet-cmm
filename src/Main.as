@@ -39,6 +39,11 @@ void RenderInterface(){
     if (yammDevWindow !is null) yammDevWindow.Render();
 }
 
+void Render()
+{
+    Renderables::Render();
+}
+
 bool CheckServer()
 {
     isCheckingServer = true;
