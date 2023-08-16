@@ -1,17 +1,17 @@
 bool isServerAlive = false;
 bool isCheckingServer = true;
-MainWindow@ bmmMainWindow;
-DevWindow@ bmmDevWindow;
+MainWindow@ yammMainWindow;
+DevWindow@ yammDevWindow;
 uint g_connectedPlayers;
 
 void RenderMenu()
 {
     if (isCheckingServer || !isServerAlive || !Auth::connected) return;
-    if (Meta::IsDeveloperMode() && bmmDevWindow !is null && UI::MenuItem("TMBMM Superadmin Interface", "", bmmDevWindow.isOpened)) {
-        bmmDevWindow.isOpened = !bmmDevWindow.isOpened;
+    if (Meta::IsDeveloperMode() && yammDevWindow !is null && UI::MenuItem("YAMM Superadmin Interface", "", yammDevWindow.isOpened)) {
+        yammDevWindow.isOpened = !yammDevWindow.isOpened;
     }
-    if (bmmMainWindow !is null && UI::MenuItem(ICON_COL + PLUGIN_NAME, "", bmmMainWindow.isOpened)) {
-        bmmMainWindow.isOpened = !bmmMainWindow.isOpened;
+    if (yammMainWindow !is null && UI::MenuItem(ICON_COL + PLUGIN_NAME, "", yammMainWindow.isOpened)) {
+        yammMainWindow.isOpened = !yammMainWindow.isOpened;
     }
 }
 
@@ -21,8 +21,8 @@ void Main()
     isServerAlive = CheckServer();
     if (!isServerAlive) return;
     Auth::Login();
-    @bmmMainWindow = MainWindow();
-    @bmmDevWindow = DevWindow();
+    @yammMainWindow = MainWindow();
+    @yammDevWindow = DevWindow();
     startnew(CheckServerLoop);
     print("ready");
 }
@@ -35,8 +35,8 @@ void OnDestroyed() {
 }
 
 void RenderInterface(){
-    if (bmmMainWindow !is null) bmmMainWindow.Render();
-    if (bmmDevWindow !is null) bmmDevWindow.Render();
+    if (yammMainWindow !is null) yammMainWindow.Render();
+    if (yammDevWindow !is null) yammDevWindow.Render();
 }
 
 bool CheckServer()

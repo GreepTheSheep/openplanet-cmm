@@ -1,5 +1,5 @@
 [meta]
-name = "Better Matchmaking"
+name = "Yet Another Matchmaking"
 author = "Greep"
 category = "Match"
 perms = "paid"
@@ -8,4 +8,4 @@ siteid = 424
 version = "1.0.0"
 
 [script]
-dependencies = [ "NadeoServices" ]
+module = "YAMM"

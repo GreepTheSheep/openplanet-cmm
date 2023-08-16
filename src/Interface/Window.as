@@ -7,7 +7,7 @@ class Window {
     Tab@ c_lastActiveTab;
     // Tab@ m_YourProfileTab;
 
-    string GetWindowId() { return "BMMDefaultWindow"; }
+    string GetWindowId() { return "YAMMDefaultWindow"; }
     string GetWindowName() { return ICON_COL + PLUGIN_NAME + " \\$666v"+Meta::ExecutingPlugin().Version; }
 
     void AddTab(Tab@ tab, bool select = false, int index = -1){

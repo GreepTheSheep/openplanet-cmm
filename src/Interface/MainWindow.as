@@ -59,7 +59,7 @@ class MainWindow : Window {
         }
     }
 
-    string GetWindowId() override { return "BMMMainWindow"; }
+    string GetWindowId() override { return "YAMMMainWindow"; }
 
     void RenderHeader() override {
         CheckRequest();
@@ -90,6 +90,6 @@ class MainWindow : Window {
         UI::Separator();
 
         UI::Text(Icons::Users + " " + g_connectedPlayers);
-        UI::SetPreviousTooltip("Number of players connected into TMBMM");
+        UI::SetPreviousTooltip("Number of players connected into " + PLUGIN_NAME_SHORT);
     }
 }
