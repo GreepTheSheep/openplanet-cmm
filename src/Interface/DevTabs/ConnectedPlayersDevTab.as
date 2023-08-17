@@ -4,7 +4,7 @@ class ConnectedPlayersDevTab : Tab {
     bool isError = false;
     string errorMsg = "";
     bool isLoading = false;
-    array<ConnectedPlayerInfo@> connectedPlayers;
+    array<Player@> connectedPlayers;
 
     string GetLabel() override { return "Connected Players"; }
 
@@ -57,13 +57,13 @@ class ConnectedPlayersDevTab : Tab {
             }
 
             for (uint i = 0; i < json["connected"].Length; i++) {
-                ConnectedPlayerInfo@ player = ConnectedPlayerInfo(json["connected"][i]);
+                Player@ player = Player(json["connected"][i]);
                 connectedPlayers.InsertLast(player);
             }
         }
     }
 
-    void DisconnectPlayer(ConnectedPlayerInfo@ player) {
+    void DisconnectPlayer(Player@ player) {
         string url = Setting_BaseURL+"/dev/player/disconnect";
         Json::Value@ postJson = Json::Object();
         postJson["accountId"] = player.accountId;
@@ -123,7 +123,7 @@ class ConnectedPlayersDevTab : Tab {
                 for(int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
                 {
                     UI::PushID("ResCoPlayer"+i);
-                    ConnectedPlayerInfo@ player = connectedPlayers[i];
+                    Player@ player = connectedPlayers[i];
                     UI::TableNextRow();
 
                     UI::TableSetColumnIndex(0);
@@ -131,10 +131,10 @@ class ConnectedPlayersDevTab : Tab {
                     UI::SetPreviousTooltip(player.accountId);
 
                     UI::TableSetColumnIndex(1);
-                    UI::Text(Time::FormatString("%F %X", player.connectedTimestamp));
+                    UI::Text(Time::FormatString("%F %X", player.lastLogonTimestamp));
 
                     UI::TableSetColumnIndex(2);
-                    UI::Text(player.ipAddr);
+                    UI::Text(player.lastIpAddress);
 
                     UI::TableSetColumnIndex(3);
                     if (UI::RedButton(Icons::Times)) {
@@ -152,19 +152,5 @@ class ConnectedPlayersDevTab : Tab {
             }
             UI::EndTable();
         }
-    }
-}
-
-class ConnectedPlayerInfo {
-    string displayName;
-    string accountId;
-    int64 connectedTimestamp;
-    string ipAddr;
-
-    ConnectedPlayerInfo(const Json::Value &in json) {
-        displayName = json["displayName"];
-        accountId = json["accountId"];
-        connectedTimestamp = json["connectedTimestamp"];
-        ipAddr = json["ipAddr"];
     }
 }

@@ -3,11 +3,11 @@ class DevBanPlayerModalDialog : ModalDialog
     Net::HttpRequest@ m_request;
     bool m_requestError = false;
     string resErrorString;
-    ConnectedPlayerInfo@ playerToBan;
+    Player@ playerToBan;
     string banTimeMin = "0";
     bool banOk = false;
 
-    DevBanPlayerModalDialog(ConnectedPlayerInfo@ player)
+    DevBanPlayerModalDialog(Player@ player)
     {
         super("\\$f90" + Icons::Ban + " \\$zBan "+player.displayName+"###DevBanPlayerModalDialog");
         @playerToBan = player;

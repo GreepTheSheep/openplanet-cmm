@@ -3,6 +3,7 @@ class MainWindow : Window {
     // Tab@ m_YourProfileTab;
     Net::HttpRequest@ m_request;
     Player@ m_player;
+    string m_totalPlayers;
     bool isError = false;
     string errorMsg = "";
     bool isLoading = false;
@@ -56,6 +57,7 @@ class MainWindow : Window {
             }
 
             @m_player = Player(json);
+            m_totalPlayers = json["totalPlayers"];
         }
     }
 
@@ -78,7 +80,7 @@ class MainWindow : Window {
 
         vec2 BasePos = UI::GetCursorPos();
         UI::Text("Points: " + m_player.points);
-        UI::Text("Rank: " + m_player.rank + " / " + m_player.totalPlayers);
+        UI::Text("Rank: " + m_player.rank + " / " + m_totalPlayers);
         vec2 BottomPos = UI::GetCursorPos();
 
         // UI::SetCursorPos(vec2(BasePos.x + 100, BasePos.y));
