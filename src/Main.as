@@ -6,7 +6,21 @@ uint g_connectedPlayers;
 
 void RenderMenu()
 {
-    if (isCheckingServer || !isServerAlive || !Auth::connected) return;
+    if (!isServerAlive) {
+        if (UI::MenuItem("\\$f00" + Icons::TimesCircle + " \\$zYAMM: Server Unavailable")) {
+            startnew(Main);
+        }
+        UI::SetPreviousTooltip("Click to retry");
+        return;
+    }
+    if (Auth::connectionError && !Auth::connectionInProgress) {
+        if (UI::MenuItem("\\$f00" + Icons::TimesCircle + " \\$zYAMM: Connection Error")) {
+            startnew(Main);
+        }
+        UI::SetPreviousTooltip("Click to retry");
+        return;
+    }
+    if (isCheckingServer || !Auth::connected || Auth::connectionInProgress) return;
     if (Meta::IsDeveloperMode() && yammDevWindow !is null && UI::MenuItem("YAMM Superadmin Interface", "", yammDevWindow.isOpened)) {
         yammDevWindow.isOpened = !yammDevWindow.isOpened;
     }

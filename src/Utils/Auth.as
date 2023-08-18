@@ -2,10 +2,13 @@ namespace Auth
 {
     int retriesNumber = 0;
     bool connected = false;
+    bool connectionError = false;
+    bool connectionInProgress = false;
     string AccountToken = "";
 
     void Login() {
         retriesNumber++;
+        connectionInProgress = true;
         Log::Log("Starting Auth...");
 
         Auth::PluginAuthTask@ tokenTask = Auth::GetToken();
@@ -39,20 +42,22 @@ namespace Auth
                     Auth::Login();
                 } else {
                     Log::Error(errMsg + "\nThe plugin will not load.");
-                    throw(errMsg);
+                    connectionError = true;
                 }
             } else if (errCode == 403) {
                 Log::Error(errMsg, true);
-                throw(errMsg);
+                connectionError = true;
             }
         }
 
         bool srvConnected = serverRes["connected"];
+        connectionInProgress = false;
 
         if (srvConnected) {
             string srvDisplayName = serverRes["displayName"];
             Log::Log("Connected! Display name: " + srvDisplayName, Meta::IsDeveloperMode());
             g_connectedPlayers++;
+            connectionError = false;
             connected = true;
         }
     }
