@@ -112,7 +112,7 @@ class ConnectedPlayersDevTab : Tab {
             UI::TableSetupScrollFreeze(0, 1);
             PushTabStyle();
             UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthStretch);
-            UI::TableSetupColumn("Rank", UI::TableColumnFlags::WidthFixed, 50);
+            UI::TableSetupColumn("Points", UI::TableColumnFlags::WidthFixed, 50);
             UI::TableSetupColumn("Connexion Date", UI::TableColumnFlags::WidthFixed, 150);
             UI::TableSetupColumn("Plugin Version", UI::TableColumnFlags::WidthFixed, 60);
             UI::TableSetupColumn("IP", UI::TableColumnFlags::WidthStretch);
@@ -134,7 +134,7 @@ class ConnectedPlayersDevTab : Tab {
                     UI::SetPreviousTooltip(player.accountId);
 
                     UI::TableSetColumnIndex(1);
-                    UI::Text(player.points);
+                    UI::Text(tostring(player.points));
                     UI::SetPreviousTooltip("Rank: " + player.rank);
 
                     UI::TableSetColumnIndex(2);
