@@ -38,7 +38,6 @@ void Main()
     @yammMainWindow = MainWindow();
     @yammDevWindow = DevWindow();
     startnew(CheckServerLoop);
-    print("ready");
 }
 
 void OnDisabled() {
@@ -60,18 +59,22 @@ void Render()
 
 bool CheckServer()
 {
+#if FORCE_API_DOWN
+    Log::Error("Force API Down Enabled.\nThe plugin will not load.", true);
+    return false;
+#else
     isCheckingServer = true;
     Json::Value@ res = API::GetAsync(Setting_BaseURL);
     isCheckingServer = false;
 
     if (res.GetType() == Json::Type::Null) {
-        Log::Error("Server seems not responding.\nThe plugin will not load.");
-        throw("Server seems not responding");
+        Log::Error("Server seems not responding.\nThe plugin will not load.", true);
     } else if (res.GetType() == Json::Type::Object) {
         g_connectedPlayers = res["connectedPlayers"];
         return true;
     }
     return false;
+#endif
 }
 
 void CheckServerLoop() {
