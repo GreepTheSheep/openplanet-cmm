@@ -108,12 +108,15 @@ class ConnectedPlayersDevTab : Tab {
         }
 
         CheckDisconnectPlayerRequest();
-        if (UI::BeginTable("ConnectedPlayersList", 4)) {
+        if (UI::BeginTable("ConnectedPlayersList", 7, UI::TableFlags::Resizable | UI::TableFlags::Sortable | UI::TableFlags::NoSavedSettings | UI::TableFlags::SizingStretchProp | UI::TableFlags::ScrollY)) {
             UI::TableSetupScrollFreeze(0, 1);
             PushTabStyle();
             UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthStretch);
-            UI::TableSetupColumn("Connexion Date", UI::TableColumnFlags::WidthStretch);
+            UI::TableSetupColumn("Rank", UI::TableColumnFlags::WidthFixed, 50);
+            UI::TableSetupColumn("Connexion Date", UI::TableColumnFlags::WidthFixed, 150);
+            UI::TableSetupColumn("Plugin Version", UI::TableColumnFlags::WidthFixed, 60);
             UI::TableSetupColumn("IP", UI::TableColumnFlags::WidthStretch);
+            UI::TableSetupColumn("Group", UI::TableColumnFlags::WidthStretch);
             UI::TableSetupColumn("Actions", UI::TableColumnFlags::WidthFixed, 80);
             UI::TableHeadersRow();
             PopTabStyle();
@@ -131,12 +134,28 @@ class ConnectedPlayersDevTab : Tab {
                     UI::SetPreviousTooltip(player.accountId);
 
                     UI::TableSetColumnIndex(1);
-                    UI::Text(Time::FormatString("%F %X", player.lastLogonTimestamp));
+                    UI::Text(player.points);
+                    UI::SetPreviousTooltip("Rank: " + player.rank);
 
                     UI::TableSetColumnIndex(2);
-                    UI::Text(player.lastIpAddress);
+                    UI::Text(Time::FormatString("%F %X", player.lastLogonTimestamp));
 
                     UI::TableSetColumnIndex(3);
+                    UI::Text(player.lastPluginVersion);
+
+                    UI::TableSetColumnIndex(4);
+                    UI::Text(player.lastIpAddress);
+
+                    UI::TableSetColumnIndex(5);
+                    UI::Text(player.group.name);
+                    string permsStr;
+                    for (uint p = 0; p < player.group.permissions.Length; p++) {
+                        permsStr += "- " + player.group.permissions[p].name + " (" + player.group.permissions[p].description + ")";
+                        if (p != player.group.permissions.Length) permsStr += "\n";
+                    }
+                    UI::SetPreviousTooltip("ID: " + player.group.id + "\nPermissions:\n" + permsStr);
+
+                    UI::TableSetColumnIndex(6);
                     if (UI::RedButton(Icons::Times)) {
                         DisconnectPlayer(player);
                     }
