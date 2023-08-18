@@ -49,7 +49,7 @@ class DevBanPlayerModalDialog : ModalDialog
 
     void StartBanRequest()
     {
-        string url = Setting_BaseURL + "/dev/player/ban";
+        string url = Setting_BaseURL + "/admin/player/ban";
         Json::Value@ postJson = Json::Object();
         postJson["accountId"] = playerToBan.accountId;
         postJson["time"] = banTimeMin;

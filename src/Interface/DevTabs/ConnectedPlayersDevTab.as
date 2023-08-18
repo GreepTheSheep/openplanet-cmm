@@ -11,7 +11,7 @@ class ConnectedPlayersDevTab : Tab {
     void StartRequest()
     {
         isLoading = true;
-        string url = Setting_BaseURL+"/dev/players";
+        string url = Setting_BaseURL+"/admin/players";
 
         @m_request = API::Get(url);
     }
@@ -64,7 +64,7 @@ class ConnectedPlayersDevTab : Tab {
     }
 
     void DisconnectPlayer(Player@ player) {
-        string url = Setting_BaseURL+"/dev/player/disconnect";
+        string url = Setting_BaseURL+"/admin/player/disconnect";
         Json::Value@ postJson = Json::Object();
         postJson["accountId"] = player.accountId;
 
