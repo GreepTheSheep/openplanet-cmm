@@ -3,6 +3,7 @@ class DevWindow : Window {
     DevWindow(){
         AddTab(ConnectedPlayersDevTab());
         AddTab(AllPlayersDevTab());
+        AddTab(GroupsDevTab());
     }
 
     string GetWindowId() override { return "YAMMDevWindow"; }
