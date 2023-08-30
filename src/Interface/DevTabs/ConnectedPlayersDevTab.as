@@ -151,13 +151,15 @@ class ConnectedPlayersDevTab : Tab {
                     UI::Text(player.lastIpAddress);
 
                     UI::TableSetColumnIndex(5);
-                    UI::Text(player.group.name);
-                    string permsStr;
-                    for (uint p = 0; p < player.group.permissions.Length; p++) {
-                        permsStr += "- " + player.group.permissions[p].name + " (" + player.group.permissions[p].description + ")";
-                        if (p != player.group.permissions.Length) permsStr += "\n";
-                    }
-                    UI::SetPreviousTooltip("ID: " + player.group.id + "\nPermissions:\n" + permsStr);
+                    if (player.group !is null) {
+                        UI::Text(player.group.name);
+                        string permsStr;
+                        for (uint p = 0; p < player.group.permissions.Length; p++) {
+                            permsStr += "- " + player.group.permissions[p].name + " (" + player.group.permissions[p].description + ")";
+                            if (p != player.group.permissions.Length) permsStr += "\n";
+                        }
+                        UI::SetPreviousTooltip("ID: " + player.group.id + "\nPermissions:\n" + permsStr);
+                    } else UI::Text("ID: " + player.groupId);
 
                     UI::TableSetColumnIndex(6);
                     if (UI::RedButton(Icons::Times)) {
