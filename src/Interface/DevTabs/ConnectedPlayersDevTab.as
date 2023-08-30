@@ -152,7 +152,7 @@ class ConnectedPlayersDevTab : Tab {
 
                     UI::TableSetColumnIndex(5);
                     if (player.group !is null) {
-                        UI::Text(player.group.name);
+                        UI::Text(player.group.nameWithColor);
                         string permsStr;
                         for (uint p = 0; p < player.group.permissions.Length; p++) {
                             permsStr += "- " + player.group.permissions[p].name + " (" + player.group.permissions[p].description + ")";
