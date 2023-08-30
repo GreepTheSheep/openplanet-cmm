@@ -132,6 +132,10 @@ class ConnectedPlayersDevTab : Tab {
                     UI::TableSetColumnIndex(0);
                     UI::Text(player.displayName);
                     UI::SetPreviousTooltip(player.accountId);
+                    if (UI::IsItemClicked()) {
+                        IO::SetClipboard(player.accountId);
+                        UI::ShowNotification(Icons::Clipboard + " Account ID copied to clipboard");
+                    }
 
                     UI::TableSetColumnIndex(1);
                     UI::Text(tostring(player.points));
