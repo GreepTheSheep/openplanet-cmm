@@ -22,6 +22,6 @@ class Player {
         lastLogonTimestamp = json["lastLogonTimestamp"];
         lastPluginVersion = json["lastPluginVersion"]["fullVersion"];
         lastIpAddress = json["lastIpAddress"];
-        @group = Group(json["group"]);
+        if (json.HasKey("group") && json["group"].GetType() != Json::Type::Null) @group = Group(json["group"]);
     }
 }
