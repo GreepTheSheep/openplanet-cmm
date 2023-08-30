@@ -100,7 +100,7 @@ class ConnectedPlayersDevTab : Tab {
             return;
         }
 
-        if (UI::Button(Icons::Refresh)) Reload();
+        if (UI::BlueButton(Icons::Refresh)) Reload();
 
         if (connectedPlayers.Length == 0) {
             UI::Text("\\$f00" + Icons::ExclamationTriangle + " \\$zConnected players list is empty");

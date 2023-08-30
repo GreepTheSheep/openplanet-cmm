@@ -114,7 +114,7 @@ class AllPlayersDevTab : Tab {
             return;
         }
 
-        if (UI::Button(Icons::Refresh)) Reload();
+        if (UI::BlueButton(Icons::Refresh)) Reload();
 
         UI::SameLine();
         UI::Text("Search:");

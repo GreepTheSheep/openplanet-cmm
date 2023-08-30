@@ -10,6 +10,7 @@ namespace UI
     }
 
     bool RedButton(const string &in text) { return ButtonColored(text, 0.0f); }
+    bool BlueButton(const string &in text) { return ButtonColored(text, 0.6f); }
     bool GreenButton(const string &in text) { return ButtonColored(text, 0.33f); }
     bool OrangeButton(const string &in text) { return ButtonColored(text, 0.1f); }
     bool CyanButton(const string &in text) { return ButtonColored(text, 0.5f); }
