@@ -108,7 +108,7 @@ class ConnectedPlayersDevTab : Tab {
         }
 
         CheckDisconnectPlayerRequest();
-        if (UI::BeginTable("ConnectedPlayersList", 7, UI::TableFlags::Resizable | UI::TableFlags::Sortable | UI::TableFlags::NoSavedSettings | UI::TableFlags::SizingStretchProp | UI::TableFlags::ScrollY)) {
+        if (UI::BeginTable("ConnectedPlayersList", 7, UI::TableFlags(UI::TableFlags::Resizable | UI::TableFlags::NoSavedSettings | UI::TableFlags::SizingStretchProp | UI::TableFlags::ScrollY))) {
             UI::TableSetupScrollFreeze(0, 1);
             PushTabStyle();
             UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthStretch);
