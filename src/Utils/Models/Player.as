@@ -24,4 +24,12 @@ class Player {
         lastIpAddress = json["lastIpAddress"];
         if (json.HasKey("group") && json["group"].GetType() != Json::Type::Null) @group = Group(json["group"]);
     }
+
+    bool hasPermission(const string &in permissionName) {
+        if (group is null) return false;
+        for (uint i = 0; i < group.permissions.Length; i++) {
+            if (group.permissions[i].name == permissionName) return true;
+        }
+        return false;
+    }
 }

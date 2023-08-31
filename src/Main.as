@@ -2,7 +2,8 @@ bool isServerAlive = false;
 bool isCheckingServer = true;
 MainWindow@ yammMainWindow;
 DevWindow@ yammDevWindow;
-uint g_connectedPlayers;
+Player@ g_connectedPlayer;
+uint g_connectedPlayerCount;
 
 void RenderMenu()
 {
@@ -70,7 +71,7 @@ bool CheckServer()
     if (res.GetType() == Json::Type::Null) {
         Log::Error("Server seems not responding.\nThe plugin will not load.", true);
     } else if (res.GetType() == Json::Type::Object) {
-        g_connectedPlayers = res["connectedPlayers"];
+        g_connectedPlayerCount = res["connectedPlayers"];
         return true;
     }
     return false;

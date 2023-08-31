@@ -57,6 +57,7 @@ class MainWindow : Window {
             }
 
             @m_player = Player(json);
+            @g_connectedPlayer = m_player;
             m_totalPlayers = json["totalPlayers"];
         }
     }
@@ -91,7 +92,7 @@ class MainWindow : Window {
     void RenderFooter() override {
         UI::Separator();
 
-        UI::Text(Icons::Users + " " + g_connectedPlayers);
+        UI::Text(Icons::Users + " " + g_connectedPlayerCount);
         UI::SetPreviousTooltip("Number of players connected into " + PLUGIN_NAME_SHORT);
     }
 }

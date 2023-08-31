@@ -24,7 +24,7 @@ namespace API
         return Json::Parse(resStr);
     }
 
-    Net::HttpRequest@ Post(const string &in url, const string &in body)
+    Net::HttpRequest@ Post(const string &in url, const string &in body = "")
     {
         auto ret = Net::HttpRequest();
         ret.Method = Net::HttpMethod::Post;
@@ -40,7 +40,7 @@ namespace API
         return ret;
     }
 
-    Json::Value PostAsync(const string &in url, const string &in body)
+    Json::Value PostAsync(const string &in url, const string &in body = "")
     {
         auto req = Post(url, body);
         while (!req.Finished()) {
@@ -51,7 +51,7 @@ namespace API
         return Json::Parse(resStr);
     }
 
-    Net::HttpRequest@ Put(const string &in url, const string &in body)
+    Net::HttpRequest@ Put(const string &in url, const string &in body = "")
     {
         auto ret = Net::HttpRequest();
         ret.Method = Net::HttpMethod::Put;
@@ -67,7 +67,7 @@ namespace API
         return ret;
     }
 
-    Json::Value PutAsync(const string &in url, const string &in body)
+    Json::Value PutAsync(const string &in url, const string &in body = "")
     {
         auto req = Put(url, body);
         while (!req.Finished()) {

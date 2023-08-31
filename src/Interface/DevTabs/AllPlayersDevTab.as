@@ -9,6 +9,7 @@ class AllPlayersDevTab : Tab {
     int resLength = 0;
 
     string GetLabel() override { return "All Players"; }
+    bool IsVisible() override { return g_connectedPlayer.hasPermission("list_all_players"); }
 
     void StartRequest()
     {

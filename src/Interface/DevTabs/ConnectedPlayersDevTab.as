@@ -7,6 +7,7 @@ class ConnectedPlayersDevTab : Tab {
     array<Player@> connectedPlayers;
 
     string GetLabel() override { return "Connected Players"; }
+    bool IsVisible() override { return g_connectedPlayer.hasPermission("list_players"); }
 
     void StartRequest()
     {

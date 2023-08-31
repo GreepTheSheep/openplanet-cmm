@@ -6,6 +6,6 @@ class Permission {
     Permission(const Json::Value &in json) {
         id = json["id"];
         name = json["name"];
-        description = json["description"];
+        if (json.HasKey("description") && json["description"].GetType() != Json::Type::Null) description = json["description"];
     }
 }
