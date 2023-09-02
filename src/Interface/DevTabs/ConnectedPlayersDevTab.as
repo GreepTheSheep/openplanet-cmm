@@ -163,15 +163,19 @@ class ConnectedPlayersDevTab : Tab {
                     } else UI::Text("ID: " + player.groupId);
 
                     UI::TableSetColumnIndex(6);
-                    if (UI::RedButton(Icons::Times)) {
-                        DisconnectPlayer(player);
+                    if (g_connectedPlayer.hasPermission("disconnect_player")) {
+                        if (UI::RedButton(Icons::Times)) {
+                            DisconnectPlayer(player);
+                        }
+                        UI::SetPreviousTooltip("Disconnect Player");
+                        UI::SameLine();
                     }
-                    UI::SetPreviousTooltip("Disconnect Player");
-                    UI::SameLine();
-                    if (UI::RedButton(Icons::Ban)) {
-                        Renderables::Add(DevBanPlayerModalDialog(player));
+                    if (g_connectedPlayer.hasPermission("ban_player")) {
+                        if (UI::RedButton(Icons::Ban)) {
+                            Renderables::Add(DevBanPlayerModalDialog(player));
+                        }
+                        UI::SetPreviousTooltip("Ban Player");
                     }
-                    UI::SetPreviousTooltip("Ban Player");
 
                     UI::PopID();
                 }
