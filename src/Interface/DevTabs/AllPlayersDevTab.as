@@ -1,12 +1,16 @@
 class AllPlayersDevTab : Tab {
     Net::HttpRequest@ m_request;
+    Net::HttpRequest@ m_groupRequest;
     bool isError = false;
     string errorMsg = "";
     bool isLoading = false;
+    array<Group@> allGroups;
     array<Player@> allPlayers;
     string u_search;
     uint64 u_typingStart;
     int resLength = 0;
+    Player@ selectPlayer;
+    Group@ selectGroup;
 
     string GetLabel() override { return "All Players"; }
     bool IsVisible() override { return g_connectedPlayer.hasPermission("list_all_players"); }
@@ -35,10 +39,12 @@ class AllPlayersDevTab : Tab {
         }
 
         @m_request = API::Get(url + urlParams);
+        @m_groupRequest = API::Get(Setting_BaseURL+"/admin/groups");
     }
 
     void Reload() override {
         allPlayers.RemoveRange(0, allPlayers.Length);
+        allGroups.RemoveRange(0, allGroups.Length);
         StartRequest();
     }
 
@@ -97,6 +103,46 @@ class AllPlayersDevTab : Tab {
 
             resLength = json["length"];
         }
+
+        if (m_groupRequest !is null && m_groupRequest.Finished()) {
+            isLoading = false;
+            // Parse the response
+            string res = m_groupRequest.String();
+            if (Meta::IsDeveloperMode()) trace("AllPlayersDevTab::CheckRequest: " + res);
+            @m_groupRequest = null;
+            auto json = Json::Parse(res);
+
+            if (json.GetType() == Json::Type::Null) {
+                isError = true;
+                errorMsg = "Error while loading groups list";
+                Log::Error(errorMsg);
+                return;
+            }
+
+            if (json.HasKey("error")) {
+                isError = true;
+                errorMsg = json["error"]["message"];
+                Log::Error(errorMsg);
+                return;
+            }
+
+            for (uint i = 0; i < json["groups"].Length; i++) {
+                Group@ group = Group(json["groups"][i]);
+                allGroups.InsertLast(group);
+            }
+        }
+    }
+
+    void SetPlayerGroup() {
+        int playersIndex = allPlayers.FindByRef(selectPlayer);
+        Json::Value@ putJson = Json::Object();
+        putJson["id"] = selectPlayer.accountId;
+        putJson["group"] = selectGroup.id;
+
+        Json::Value@ resPut = API::PutAsync(Setting_BaseURL+"/admin/player/group", Json::Write(putJson));
+        Player@ newPlayer = Player(resPut);
+        allPlayers.RemoveAt(playersIndex);
+        allPlayers.InsertAt(playersIndex, newPlayer);
     }
 
     void Render() override
@@ -137,7 +183,7 @@ class AllPlayersDevTab : Tab {
             return;
         }
 
-        if (UI::BeginTable("allPlayersList", 6, UI::TableFlags(UI::TableFlags::Resizable | UI::TableFlags::NoSavedSettings | UI::TableFlags::SizingStretchProp | UI::TableFlags::ScrollY))) {
+        if (UI::BeginTable("allPlayersList", 7, UI::TableFlags(UI::TableFlags::Resizable | UI::TableFlags::NoSavedSettings | UI::TableFlags::SizingStretchProp | UI::TableFlags::ScrollY))) {
             UI::TableSetupScrollFreeze(0, 1);
             PushTabStyle();
             UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthStretch);
@@ -145,6 +191,7 @@ class AllPlayersDevTab : Tab {
             UI::TableSetupColumn("Connexion Date", UI::TableColumnFlags::WidthFixed, 150);
             UI::TableSetupColumn("Plugin Version", UI::TableColumnFlags::WidthFixed, 60);
             UI::TableSetupColumn("IP", UI::TableColumnFlags::WidthStretch);
+            UI::TableSetupColumn("Group", UI::TableColumnFlags::WidthFixed, 200);
             UI::TableSetupColumn("Actions", UI::TableColumnFlags::WidthFixed, 80);
             UI::TableHeadersRow();
             PopTabStyle();
@@ -179,10 +226,39 @@ class AllPlayersDevTab : Tab {
                     UI::Text(player.lastIpAddress);
 
                     UI::TableSetColumnIndex(5);
-                    if (UI::RedButton(Icons::Ban)) {
-                        Renderables::Add(DevBanPlayerModalDialog(player));
+                    if (player.group !is null) {
+                        if (g_connectedPlayer.hasPermission("edit_player_group")) {
+                            UI::SetNextItemWidth(200 - 8);
+                            if (UI::BeginCombo("##PlayerGroupSelect", player.group.nameWithIconColor)) {
+                                for (uint j = 0; j < allGroups.Length; j++) {
+                                    bool groupSelectChanged = false;
+                                    groupSelectChanged = UI::Selectable(allGroups[j].nameWithIconColor+"##"+allGroups[j].id, groupSelectChanged);
+                                    if (groupSelectChanged) {
+                                        @selectPlayer = player;
+                                        @selectGroup = allGroups[j];
+                                        startnew(CoroutineFunc(SetPlayerGroup));
+                                    }
+                                }
+                                UI::EndCombo();
+                            }
+                        } else {
+                            UI::Text(player.group.nameWithIconColor);
+                            string permsStr;
+                            for (uint p = 0; p < player.group.permissions.Length; p++) {
+                                permsStr += "- " + player.group.permissions[p].name + " (" + player.group.permissions[p].description + ")";
+                                if (p != player.group.permissions.Length) permsStr += "\n";
+                            }
+                            UI::SetPreviousTooltip("ID: " + player.group.id + "\nPermissions:\n" + permsStr);
+                        }
+                    } else UI::Text("ID: " + player.groupId);
+
+                    UI::TableSetColumnIndex(6);
+                    if (g_connectedPlayer.hasPermission("ban_player")) {
+                        if (UI::RedButton(Icons::Ban)) {
+                            Renderables::Add(DevBanPlayerModalDialog(player));
+                        }
+                        UI::SetPreviousTooltip("Ban Player");
                     }
-                    UI::SetPreviousTooltip("Ban Player");
 
                     UI::PopID();
                 }
