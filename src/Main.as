@@ -4,6 +4,7 @@ MainWindow@ yammMainWindow;
 DevWindow@ yammDevWindow;
 Player@ g_connectedPlayer;
 array<MatchmakingType@> g_matchmakingTypes;
+Squad@ g_activeSquad;
 uint g_connectedPlayerCount;
 
 void RenderMenu()

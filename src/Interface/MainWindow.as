@@ -14,6 +14,7 @@ class MainWindow : Window {
     MainWindow(){
         @m_homePageTab = QueueTab();
         AddTab(m_homePageTab);
+        AddTab(SquadTab());
     }
 
     void StartRequest()
