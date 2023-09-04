@@ -2,8 +2,7 @@ class Player {
     uint id;
     string accountId;
     string displayName;
-    uint points;
-    int64 rank;
+    array<PlayerMatchmakingType@> matchmakingTypes;
     int groupId;
     string lastLogon;
     int64 lastLogonTimestamp;
@@ -15,8 +14,10 @@ class Player {
         id = json["id"];
         accountId = json["accountId"];
         displayName = json["displayName"];
-        points = json["points"];
-        if (json.HasKey("rank") && json["rank"].GetType() != Json::Type::Null) rank = json["rank"];
+        for (uint mt = 0; mt < json["matchmakingTypes"].Length; mt++){
+            PlayerMatchmakingType@ matchmakingType = PlayerMatchmakingType(json["matchmakingTypes"][mt]);
+            matchmakingTypes.InsertLast(matchmakingType);
+        }
         groupId = json["groupId"];
         lastLogon = json["lastLogon"];
         lastLogonTimestamp = json["lastLogonTimestamp"];

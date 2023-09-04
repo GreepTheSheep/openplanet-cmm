@@ -88,11 +88,11 @@ class Window {
 
                 UI::PopID();
 
-                RenderFooter();
-
             }
 
             UI::EndTabBar();
+
+            RenderFooter();
 
             // Pop the tab style (for the separator line) only after EndTabBar, to satisfy the stack unroller
             if (lastActiveTab !is null) {

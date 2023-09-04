@@ -183,11 +183,10 @@ class AllPlayersDevTab : Tab {
             return;
         }
 
-        if (UI::BeginTable("allPlayersList", 7, UI::TableFlags(UI::TableFlags::Resizable | UI::TableFlags::NoSavedSettings | UI::TableFlags::SizingStretchProp | UI::TableFlags::ScrollY))) {
+        if (UI::BeginTable("allPlayersList", 6, UI::TableFlags(UI::TableFlags::Resizable | UI::TableFlags::NoSavedSettings | UI::TableFlags::SizingStretchProp | UI::TableFlags::ScrollY))) {
             UI::TableSetupScrollFreeze(0, 1);
             PushTabStyle();
             UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthStretch);
-            UI::TableSetupColumn("Points", UI::TableColumnFlags::WidthFixed, 50);
             UI::TableSetupColumn("Connexion Date", UI::TableColumnFlags::WidthFixed, 150);
             UI::TableSetupColumn("Plugin Version", UI::TableColumnFlags::WidthFixed, 60);
             UI::TableSetupColumn("IP", UI::TableColumnFlags::WidthStretch);
@@ -213,19 +212,15 @@ class AllPlayersDevTab : Tab {
                     }
 
                     UI::TableSetColumnIndex(1);
-                    UI::Text(tostring(player.points));
-                    UI::SetPreviousTooltip("Rank: " + player.rank);
-
-                    UI::TableSetColumnIndex(2);
                     UI::Text(Time::FormatString("%F %X", player.lastLogonTimestamp));
 
-                    UI::TableSetColumnIndex(3);
+                    UI::TableSetColumnIndex(2);
                     UI::Text(player.lastPluginVersion);
 
-                    UI::TableSetColumnIndex(4);
+                    UI::TableSetColumnIndex(3);
                     UI::Text(player.lastIpAddress);
 
-                    UI::TableSetColumnIndex(5);
+                    UI::TableSetColumnIndex(4);
                     if (player.group !is null) {
                         if (g_connectedPlayer.hasPermission("edit_player_group")) {
                             UI::SetNextItemWidth(200 - 8);
@@ -252,7 +247,7 @@ class AllPlayersDevTab : Tab {
                         }
                     } else UI::Text("ID: " + player.groupId);
 
-                    UI::TableSetColumnIndex(6);
+                    UI::TableSetColumnIndex(5);
                     if (g_connectedPlayer.hasPermission("ban_player")) {
                         if (UI::RedButton(Icons::Ban)) {
                             Renderables::Add(DevBanPlayerModalDialog(player));

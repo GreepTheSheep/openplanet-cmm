@@ -3,6 +3,7 @@ bool isCheckingServer = true;
 MainWindow@ yammMainWindow;
 DevWindow@ yammDevWindow;
 Player@ g_connectedPlayer;
+array<MatchmakingType@> g_matchmakingTypes;
 uint g_connectedPlayerCount;
 
 void RenderMenu()
@@ -36,6 +37,7 @@ void Main()
     isServerAlive = CheckServer();
     if (!isServerAlive) return;
     Auth::Login();
+    Matchmaking::getMatchmakingTypes();
     @yammMainWindow = MainWindow();
     @yammDevWindow = DevWindow();
     startnew(CheckServerLoop);

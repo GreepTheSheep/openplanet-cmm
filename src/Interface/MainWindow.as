@@ -3,10 +3,13 @@ class MainWindow : Window {
     // Tab@ m_YourProfileTab;
     Net::HttpRequest@ m_request;
     Player@ m_player;
+    MatchmakingType@ selectedMatchmakingType;
+    PlayerMatchmakingType@ selectedPlayerMatchmakingType;
     string m_totalPlayers;
     bool isError = false;
     string errorMsg = "";
     bool isLoading = false;
+    bool matchmakingTypeSelectChanged = false;
 
     MainWindow(){
         @m_homePageTab = QueueTab();
@@ -59,6 +62,7 @@ class MainWindow : Window {
             @m_player = Player(json);
             @g_connectedPlayer = m_player;
             m_totalPlayers = json["totalPlayers"];
+            SelectMatchmakingType(g_matchmakingTypes[0]);
         }
     }
 
@@ -80,11 +84,20 @@ class MainWindow : Window {
         }
 
         vec2 BasePos = UI::GetCursorPos();
-        UI::Text("Points: " + m_player.points);
-        UI::Text("Rank: " + m_player.rank + " / " + m_totalPlayers);
+        UI::Text("Points: " + selectedPlayerMatchmakingType.points);
+        UI::Text("Rank: " + selectedPlayerMatchmakingType.rank + " / " + m_totalPlayers);
         vec2 BottomPos = UI::GetCursorPos();
 
-        // UI::SetCursorPos(vec2(BasePos.x + 100, BasePos.y));
+        UI::SetCursorPos(vec2(UI::GetWindowSize().x - 215, BasePos.y + 12));
+
+        UI::SetNextItemWidth(200);
+        if (UI::BeginCombo("##MatchmakingTypeSelect", selectedMatchmakingType.name)) {
+            for (uint i = 0; i < g_matchmakingTypes.Length; i++) {
+                matchmakingTypeSelectChanged = UI::Selectable(g_matchmakingTypes[i].name+"##"+g_matchmakingTypes[i].id, matchmakingTypeSelectChanged);
+                if (matchmakingTypeSelectChanged) SelectMatchmakingType(g_matchmakingTypes[i]);
+            }
+            UI::EndCombo();
+        }
 
         UI::SetCursorPos(BottomPos);
     }
@@ -94,5 +107,16 @@ class MainWindow : Window {
 
         UI::Text(Icons::Users + " " + g_connectedPlayerCount);
         UI::SetPreviousTooltip("Number of players connected into " + PLUGIN_NAME_SHORT);
+    }
+
+    void SelectMatchmakingType(MatchmakingType@ matchmakingType) {
+        @selectedMatchmakingType = matchmakingType;
+
+        for (uint p = 0; p < m_player.matchmakingTypes.Length; p++) {
+            if (m_player.matchmakingTypes[p].matchmakingTypeId == selectedMatchmakingType.id) {
+                @selectedPlayerMatchmakingType = m_player.matchmakingTypes[p];
+                break;
+            }
+        }
     }
 }
