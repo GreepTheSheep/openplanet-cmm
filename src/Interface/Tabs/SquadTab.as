@@ -2,12 +2,12 @@ class SquadTab : Tab {
     Net::HttpRequest@ m_squadGetRequest;
     bool isLoading = false;
     bool isError = false;
-    bool hideInviteCode = false;
+    bool hideInviteCode = true;
     string errorMsg = "";
     string newSquadName = g_connectedPlayer.displayName + "'s squad";
     string squadChatMessage = "";
     string squadJoinCode = "";
-    Meta::PluginCoroutine@ squadFetchLoopCoroutine;
+    string playerAccountIdActions = "";
 
     string GetLabel() override { return Icons::Kenney::Users + " Squad"; }
     vec4 GetColor() override { return vec4(0.05f, 0.47f, 0, 1); }
@@ -53,17 +53,15 @@ class SquadTab : Tab {
             if (json.HasKey("error")) {
                 int errCode = json["error"]["code"];
                 errorMsg = json["error"]["message"];
-                if (errCode == 404) {
-                    Log::Log(errorMsg);
-                    return;
-                }
+                if (errCode == 404) return;
                 isError = true;
                 Log::Error(errorMsg);
                 return;
             }
 
+            isError = false;
             @g_activeSquad = Squad(json["squad"]);
-            if (squadFetchLoopCoroutine is null || !squadFetchLoopCoroutine.IsRunning()) @squadFetchLoopCoroutine = startnew(Squad::fetchSquadLoop);
+            if (Squad::squadFetchLoopCoroutine is null || !Squad::squadFetchLoopCoroutine.IsRunning()) @Squad::squadFetchLoopCoroutine = startnew(Squad::fetchSquadLoop);
         }
     }
 
@@ -74,14 +72,30 @@ class SquadTab : Tab {
         postJson["name"] = newSquadName;
         Json::Value@ newSquad = API::PostAsync(Setting_BaseURL+"/squad/new", Json::Write(postJson));
 
+        if (newSquad.GetType() == Json::Type::Null) {
+            isError = true;
+            errorMsg = "Error while loading squad";
+            Log::Error(errorMsg);
+            return;
+        }
+
+        if (newSquad.HasKey("error")) {
+            int errCode = newSquad["error"]["code"];
+            errorMsg = newSquad["error"]["message"];
+            isError = true;
+            Log::Error(errorMsg);
+            return;
+        }
+
+        isError = false;
         @g_activeSquad = Squad(newSquad["squad"]);
-        if (squadFetchLoopCoroutine is null || !squadFetchLoopCoroutine.IsRunning()) @squadFetchLoopCoroutine = startnew(Squad::fetchSquadLoop);
+        if (Squad::squadFetchLoopCoroutine is null || !Squad::squadFetchLoopCoroutine.IsRunning()) @Squad::squadFetchLoopCoroutine = startnew(Squad::fetchSquadLoop);
     }
 
     void LeaveSquad() {
         API::PostAsync(Setting_BaseURL+"/squad/leave");
         @g_activeSquad = null;
-        @squadFetchLoopCoroutine = null;
+        @Squad::squadFetchLoopCoroutine = null;
     }
 
     void JoinSquad() {
@@ -91,9 +105,25 @@ class SquadTab : Tab {
         postJson["code"] = squadJoinCode;
         Json::Value@ newSquad = API::PostAsync(Setting_BaseURL+"/squad/join", Json::Write(postJson));
 
+        if (newSquad.GetType() == Json::Type::Null) {
+            isError = true;
+            errorMsg = "Error while loading squad";
+            Log::Error(errorMsg);
+            return;
+        }
+
+        if (newSquad.HasKey("error")) {
+            int errCode = newSquad["error"]["code"];
+            errorMsg = newSquad["error"]["message"];
+            isError = true;
+            Log::Error(errorMsg);
+            return;
+        }
+
+        isError = false;
         @g_activeSquad = Squad(newSquad["squad"]);
         squadJoinCode = "";
-        if (squadFetchLoopCoroutine is null || !squadFetchLoopCoroutine.IsRunning()) @squadFetchLoopCoroutine = startnew(Squad::fetchSquadLoop);
+        if (Squad::squadFetchLoopCoroutine is null || !Squad::squadFetchLoopCoroutine.IsRunning()) @Squad::squadFetchLoopCoroutine = startnew(Squad::fetchSquadLoop);
     }
 
     void PostSquadMessage() {
@@ -103,8 +133,78 @@ class SquadTab : Tab {
         squadChatMessage = "";
         Json::Value@ newSquad = API::PostAsync(Setting_BaseURL+"/squad/chat", Json::Write(postJson));
 
+        if (newSquad.GetType() == Json::Type::Null) {
+            isError = true;
+            errorMsg = "Error while loading squad";
+            Log::Error(errorMsg);
+            return;
+        }
+
+        if (newSquad.HasKey("error")) {
+            int errCode = newSquad["error"]["code"];
+            errorMsg = newSquad["error"]["message"];
+            isError = true;
+            Log::Error(errorMsg);
+            return;
+        }
+
+        isError = false;
         @g_activeSquad = Squad(newSquad["squad"]);
-        if (squadFetchLoopCoroutine is null || !squadFetchLoopCoroutine.IsRunning()) @squadFetchLoopCoroutine = startnew(Squad::fetchSquadLoop);
+        if (Squad::squadFetchLoopCoroutine is null || !Squad::squadFetchLoopCoroutine.IsRunning()) @Squad::squadFetchLoopCoroutine = startnew(Squad::fetchSquadLoop);
+    }
+
+    void SetPlayerSquadOwner() {
+        if (playerAccountIdActions.Length == 0) return;
+        Json::Value@ postJson = Json::Object();
+        postJson["accountId"] = playerAccountIdActions;
+        squadChatMessage = "";
+        Json::Value@ newSquad = API::PostAsync(Setting_BaseURL+"/squad/setowner", Json::Write(postJson));
+
+        if (newSquad.GetType() == Json::Type::Null) {
+            isError = true;
+            errorMsg = "Error while loading squad";
+            Log::Error(errorMsg);
+            return;
+        }
+
+        if (newSquad.HasKey("error")) {
+            int errCode = newSquad["error"]["code"];
+            errorMsg = newSquad["error"]["message"];
+            isError = true;
+            Log::Error(errorMsg);
+            return;
+        }
+
+        isError = false;
+        @g_activeSquad = Squad(newSquad["squad"]);
+        if (Squad::squadFetchLoopCoroutine is null || !Squad::squadFetchLoopCoroutine.IsRunning()) @Squad::squadFetchLoopCoroutine = startnew(Squad::fetchSquadLoop);
+    }
+
+    void KickPlayer() {
+        if (playerAccountIdActions.Length == 0) return;
+        Json::Value@ postJson = Json::Object();
+        postJson["accountId"] = playerAccountIdActions;
+        squadChatMessage = "";
+        Json::Value@ newSquad = API::PostAsync(Setting_BaseURL+"/squad/kick", Json::Write(postJson));
+
+        if (newSquad.GetType() == Json::Type::Null) {
+            isError = true;
+            errorMsg = "Error while loading squad";
+            Log::Error(errorMsg);
+            return;
+        }
+
+        if (newSquad.HasKey("error")) {
+            int errCode = newSquad["error"]["code"];
+            errorMsg = newSquad["error"]["message"];
+            isError = true;
+            Log::Error(errorMsg);
+            return;
+        }
+
+        isError = false;
+        @g_activeSquad = Squad(newSquad["squad"]);
+        if (Squad::squadFetchLoopCoroutine is null || !Squad::squadFetchLoopCoroutine.IsRunning()) @Squad::squadFetchLoopCoroutine = startnew(Squad::fetchSquadLoop);
     }
 
     void Render() override {
@@ -114,11 +214,6 @@ class SquadTab : Tab {
             int HourGlassValue = Time::Stamp % 3;
             string Hourglass = (HourGlassValue == 0 ? Icons::HourglassStart : (HourGlassValue == 1 ? Icons::HourglassHalf : Icons::HourglassEnd));
             UI::Text(Hourglass + " Loading...");
-            return;
-        }
-
-        if (isError) {
-            UI::Text("\\$f00" + Icons::ExclamationTriangle + " \\$z" + errorMsg);
             return;
         }
 
@@ -144,6 +239,11 @@ class SquadTab : Tab {
             UI::BeginDisabled(squadJoinCode.Length != 6);
             if (pressedEnterJoin || UI::GreenButton("Join Squad")) startnew(CoroutineFunc(JoinSquad));
             UI::EndDisabled();
+
+            if (isError) {
+                UI::Separator();
+                UI::Text("\\$f00" + Icons::ExclamationTriangle + " \\$z" + errorMsg);
+            }
         } else {
             float width = UI::GetWindowSize().x*0.4;
             vec2 posTop = UI::GetCursorPos();
@@ -163,14 +263,43 @@ class SquadTab : Tab {
             UI::NewLine();
             if (UI::RedButton("Leave Squad")) startnew(CoroutineFunc(LeaveSquad));
 
+            if (isError) {
+                UI::Separator();
+                UI::Text("\\$f00" + Icons::ExclamationTriangle + " \\$z" + errorMsg);
+            }
+
             UI::Separator();
-            UI::NewLine();
 
             UI::Text("Players:");
+            UI::NewLine();
             UI::BeginChild("SquadPlayers");
             for (uint p = 0; p < g_activeSquad.players.Length; p++) {
                 Player@ player = g_activeSquad.players[p];
                 UI::Text("- " + player.displayName);
+                if (UI::BeginPopupContextItem("SquadPlayer"+player.id)) {
+                    if (player.accountId == g_activeSquad.ownerPlayer)
+                        UI::Text("\\$ff0" + Icons::IdBadge + " \\$zSquad Owner");
+                    if (player.group.icon.Length > 0)
+                        UI::Text(player.group.iconWithColor + " " + player.group.nameWithColor);
+
+                    if (g_connectedPlayer.accountId == g_activeSquad.ownerPlayer && player.accountId != g_activeSquad.ownerPlayer) {
+                        UI::Separator();
+                        if (UI::MenuItem("\\$ff0" + Icons::IdBadge + " \\$zSet squad Owner")) {
+                            playerAccountIdActions = player.accountId;
+                            startnew(CoroutineFunc(SetPlayerSquadOwner));
+                        }
+                        if (UI::MenuItem("\\$f0" + Icons::Times + " \\$zKick player from squad")) {
+                            playerAccountIdActions = player.accountId;
+                            startnew(CoroutineFunc(KickPlayer));
+                        }
+                    }
+                    UI::EndPopup();
+                }
+                if (player.group.icon.Length > 0) {
+                    UI::SameLine();
+                    UI::Text(player.group.iconWithColor);
+                    UI::SetPreviousTooltip(player.group.name);
+                }
                 if (player.accountId == g_activeSquad.ownerPlayer) {
                     UI::SameLine();
                     UI::Text("\\$ff0" + Icons::IdBadge);

@@ -35,12 +35,6 @@ void RenderMenu()
 
 void Main()
 {
-    isServerAlive = CheckServer();
-    if (!isServerAlive) return;
-    Auth::Login();
-    Matchmaking::getMatchmakingTypes();
-    @yammMainWindow = MainWindow();
-    @yammDevWindow = DevWindow();
     startnew(CheckServerLoop);
 }
 
@@ -68,7 +62,7 @@ bool CheckServer()
     return false;
 #else
     isCheckingServer = true;
-    Json::Value@ res = API::GetAsync(Setting_BaseURL);
+    Json::Value@ res = API::GetAsync(Setting_BaseURL, false);
     isCheckingServer = false;
 
     if (res.GetType() == Json::Type::Null) {
@@ -83,7 +77,18 @@ bool CheckServer()
 
 void CheckServerLoop() {
     while(true) {
-        sleep(5 * 60 * 1000);
-        isServerAlive = CheckServer();
+        bool alive = CheckServer();
+        if (alive && !isServerAlive) {
+            Auth::Login();
+            Matchmaking::getMatchmakingTypes();
+            @yammMainWindow = MainWindow();
+            @yammDevWindow = DevWindow();
+        }
+        if (isServerAlive && !alive) {
+            @yammMainWindow = null;
+            @yammDevWindow = null;
+        }
+        isServerAlive = alive;
+        sleep(1 * 60 * 1000);
     }
 }

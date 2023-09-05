@@ -1,4 +1,6 @@
 namespace Squad {
+    Meta::PluginCoroutine@ squadFetchLoopCoroutine;
+
     void fetchSquadLoop() {
         while(g_activeSquad !is null) {
             sleep(1000);

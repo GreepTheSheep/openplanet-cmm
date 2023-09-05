@@ -59,8 +59,47 @@ namespace Auth
             g_connectedPlayerCount++;
             connectionError = false;
             connected = true;
-            @g_connectedPlayer = Player(API::GetAsync(Setting_BaseURL + "/user/me"));
+            checkPlayerAsync();
+            checkSquadAsync();
         }
+    }
+
+    void checkPlayerAsync() {
+        Json::Value@ playerJson = API::GetAsync(Setting_BaseURL + "/user/me");
+
+        if (playerJson.GetType() == Json::Type::Null) {
+            Log::Error("Error while loading player info");
+            return;
+        }
+
+        if (playerJson.HasKey("error")) {
+            int errCode = playerJson["error"]["code"];
+            string errorMsg = playerJson["error"]["message"];
+            Log::Error(errorMsg);
+            return;
+        }
+
+        @g_connectedPlayer = Player(playerJson);
+    }
+
+    void checkSquadAsync() {
+        Json::Value@ squadJson = API::GetAsync(Setting_BaseURL + "/squad");
+
+        if (squadJson.GetType() == Json::Type::Null) {
+            Log::Error("Error while loading squad info");
+            return;
+        }
+
+        if (squadJson.HasKey("error")) {
+            int errCode = squadJson["error"]["code"];
+            string errorMsg = squadJson["error"]["message"];
+            if (errCode == 404) return;
+            Log::Error(errorMsg);
+            return;
+        }
+
+        @g_activeSquad = Squad(squadJson["squad"]);
+        if (Squad::squadFetchLoopCoroutine is null || !Squad::squadFetchLoopCoroutine.IsRunning()) @Squad::squadFetchLoopCoroutine = startnew(Squad::fetchSquadLoop);
     }
 
     void Logoff() {
