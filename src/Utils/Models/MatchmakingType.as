@@ -1,8 +1,8 @@
 class MatchmakingType {
     int id;
     string name;
-    int teams;
-    int playersPerTeams;
+    uint teams;
+    uint playersPerTeams;
 
     MatchmakingType(const Json::Value &in json) {
         id = json["id"];

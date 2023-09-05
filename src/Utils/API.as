@@ -1,6 +1,6 @@
 namespace API
 {
-    Net::HttpRequest@ Get(const string &in url)
+    Net::HttpRequest@ Get(const string &in url, const bool &in postLog = true)
     {
         auto ret = Net::HttpRequest();
         ret.Method = Net::HttpMethod::Get;
@@ -8,23 +8,23 @@ namespace API
         if (url.StartsWith(Setting_BaseURL) && Auth::connected && Auth::AccountToken.Length > 0) {
             ret.Headers.Set("Authorization", "Bearer " + Auth::AccountToken);
         }
-        if (Meta::IsDeveloperMode()) Log::Trace("Get: " + url);
+        if (Meta::IsDeveloperMode() && postLog) Log::Trace("Get: " + url);
         ret.Start();
         return ret;
     }
 
-    Json::Value GetAsync(const string &in url)
+    Json::Value GetAsync(const string &in url, const bool &in postLog = true)
     {
-        auto req = Get(url);
+        auto req = Get(url, postLog);
         while (!req.Finished()) {
             yield();
         }
         string resStr = req.String();
-        if (Meta::IsDeveloperMode()) Log::Trace("GetAsync Res: " + resStr);
+        if (Meta::IsDeveloperMode() && postLog) Log::Trace("GetAsync Res: " + resStr);
         return Json::Parse(resStr);
     }
 
-    Net::HttpRequest@ Post(const string &in url, const string &in body = "")
+    Net::HttpRequest@ Post(const string &in url, const string &in body = "", const bool &in postLog = true)
     {
         auto ret = Net::HttpRequest();
         ret.Method = Net::HttpMethod::Post;
@@ -34,24 +34,24 @@ namespace API
         if (url.StartsWith(Setting_BaseURL) && Auth::connected && Auth::AccountToken.Length > 0) {
             ret.Headers.Set("Authorization", "Bearer " + Auth::AccountToken);
         }
-        if (Meta::IsDeveloperMode()) Log::Trace("Post: " + url);
-        if (Meta::IsDeveloperMode()) Log::Trace("Body: " + body);
+        if (Meta::IsDeveloperMode() && postLog) Log::Trace("Post: " + url);
+        if (Meta::IsDeveloperMode() && postLog) Log::Trace("Body: " + body);
         ret.Start();
         return ret;
     }
 
-    Json::Value PostAsync(const string &in url, const string &in body = "")
+    Json::Value PostAsync(const string &in url, const string &in body = "", const bool &in postLog = true)
     {
         auto req = Post(url, body);
         while (!req.Finished()) {
             yield();
         }
         string resStr = req.String();
-        if (Meta::IsDeveloperMode()) Log::Trace("PostAsync Res: " + resStr);
+        if (Meta::IsDeveloperMode() && postLog) Log::Trace("PostAsync Res: " + resStr);
         return Json::Parse(resStr);
     }
 
-    Net::HttpRequest@ Put(const string &in url, const string &in body = "")
+    Net::HttpRequest@ Put(const string &in url, const string &in body = "", const bool &in postLog = true)
     {
         auto ret = Net::HttpRequest();
         ret.Method = Net::HttpMethod::Put;
@@ -61,24 +61,24 @@ namespace API
         if (url.StartsWith(Setting_BaseURL) && Auth::connected && Auth::AccountToken.Length > 0) {
             ret.Headers.Set("Authorization", "Bearer " + Auth::AccountToken);
         }
-        if (Meta::IsDeveloperMode()) Log::Trace("Put: " + url);
-        if (Meta::IsDeveloperMode()) Log::Trace("Body: " + body);
+        if (Meta::IsDeveloperMode() && postLog) Log::Trace("Put: " + url);
+        if (Meta::IsDeveloperMode() && postLog) Log::Trace("Body: " + body);
         ret.Start();
         return ret;
     }
 
-    Json::Value PutAsync(const string &in url, const string &in body = "")
+    Json::Value PutAsync(const string &in url, const string &in body = "", const bool &in postLog = true)
     {
         auto req = Put(url, body);
         while (!req.Finished()) {
             yield();
         }
         string resStr = req.String();
-        if (Meta::IsDeveloperMode()) Log::Trace("PutAsync Res: " + resStr);
+        if (Meta::IsDeveloperMode() && postLog) Log::Trace("PutAsync Res: " + resStr);
         return Json::Parse(resStr);
     }
 
-    Net::HttpRequest@ Delete(const string &in url)
+    Net::HttpRequest@ Delete(const string &in url, const bool &in postLog = true)
     {
         auto ret = Net::HttpRequest();
         ret.Method = Net::HttpMethod::Delete;
@@ -86,19 +86,19 @@ namespace API
         if (url.StartsWith(Setting_BaseURL) && Auth::connected && Auth::AccountToken.Length > 0) {
             ret.Headers.Set("Authorization", "Bearer " + Auth::AccountToken);
         }
-        if (Meta::IsDeveloperMode()) Log::Trace("Delete: " + url);
+        if (Meta::IsDeveloperMode() && postLog) Log::Trace("Delete: " + url);
         ret.Start();
         return ret;
     }
 
-    Json::Value DeleteAsync(const string &in url)
+    Json::Value DeleteAsync(const string &in url, const bool &in postLog = true)
     {
         auto req = Delete(url);
         while (!req.Finished()) {
             yield();
         }
         string resStr = req.String();
-        if (Meta::IsDeveloperMode()) Log::Trace("DeleteAsync Res: " + resStr);
+        if (Meta::IsDeveloperMode() && postLog) Log::Trace("DeleteAsync Res: " + resStr);
         return Json::Parse(resStr);
     }
 }

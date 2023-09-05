@@ -108,6 +108,21 @@ class MainWindow : Window {
 
         UI::Text(Icons::Users + " " + g_connectedPlayerCount);
         UI::SetPreviousTooltip("Number of players connected into " + PLUGIN_NAME_SHORT);
+
+        UI::SameLine();
+
+        if (g_activeSquad !is null) {
+            if (selectedMatchmakingType !is null) {
+                string textColor = "\\$666";
+                if (selectedMatchmakingType.playersPerTeams > g_activeSquad.players.Length) textColor = "\\$f00";
+                if (selectedMatchmakingType.playersPerTeams == g_activeSquad.players.Length) textColor = "\\$060";
+                UI::Text(textColor + Icons::Kenney::Users + " " + g_activeSquad.players.Length + " / " + selectedMatchmakingType.playersPerTeams);
+            } else UI::Text("\\$666" + Icons::Kenney::Users + " " + g_activeSquad.players.Length);
+            UI::SetPreviousTooltip(g_activeSquad.name);
+        } else {
+            UI::Text("\\$666" + Icons::Kenney::Users + " N/A");
+            UI::SetPreviousTooltip("No active squad");
+        }
     }
 
     void SelectMatchmakingType(MatchmakingType@ matchmakingType) {

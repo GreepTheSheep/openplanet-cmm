@@ -1,6 +1,6 @@
 const string PLUGIN_NAME = "Yet Another Matchmaking";
 const string PLUGIN_NAME_SHORT = "YAMM";
-const string COLOR_STR = "\\$63c";
+const string COLOR_STR = "\\$63d";
 const vec4 COLOR_VEC = Text::ParseHexColor("#6232CE");
 const string PLUGIN_ICON = Icons::Globe;
 const string ICON_COL = COLOR_STR + PLUGIN_ICON + "\\$z ";
