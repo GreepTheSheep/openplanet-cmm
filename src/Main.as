@@ -10,13 +10,14 @@ int64 stampServerRetry = -1;
 
 void RenderMenu()
 {
-    string serverRefreshSeconds = Time::FormatString("%S", stampServerRetry - Time::Stamp);
+    string serverRefreshSeconds = Time::FormatString(" (next retry in %Ss)", stampServerRetry - Time::Stamp);
+    if (serverRefreshSeconds == "<invalid>") serverRefreshSeconds = "";
     if (!isServerAlive) {
-        UI::MenuItem("\\$f00" + Icons::TimesCircle + " \\$zYAMM: Server Unavailable (next retry in "+ serverRefreshSeconds +"s)");
+        UI::MenuItem("\\$f00" + Icons::TimesCircle + " \\$zYAMM: Server Unavailable"+ serverRefreshSeconds);
         return;
     }
     if (Auth::connectionError && !Auth::connectionInProgress) {
-        UI::MenuItem("\\$f00" + Icons::TimesCircle + " \\$zYAMM: Connection Error (next retry in "+ serverRefreshSeconds +"s)");
+        UI::MenuItem("\\$f00" + Icons::TimesCircle + " \\$zYAMM: Connection Error"+ serverRefreshSeconds);
         return;
     }
     if (isCheckingServer || !Auth::connected || Auth::connectionInProgress) return;
