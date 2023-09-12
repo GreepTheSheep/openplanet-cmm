@@ -17,7 +17,7 @@
         },
         {
             "type": "Openplanet Remote Build",
-            "pluginId": "MXRandom",
+            "pluginId": "YAMM",
             "openplanetPort": 30000,
             "problemMatcher": [
                 "$Openplanet Remote Build Problem Matcher: Angelscript Compiler"
