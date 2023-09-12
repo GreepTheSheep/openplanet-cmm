@@ -6,21 +6,17 @@ Player@ g_connectedPlayer;
 array<MatchmakingType@> g_matchmakingTypes;
 Squad@ g_activeSquad;
 uint g_connectedPlayerCount;
+int64 stampServerRetry = -1;
 
 void RenderMenu()
 {
+    string serverRefreshSeconds = Time::FormatString("%S", stampServerRetry - Time::Stamp);
     if (!isServerAlive) {
-        if (UI::MenuItem("\\$f00" + Icons::TimesCircle + " \\$zYAMM: Server Unavailable")) {
-            startnew(Main);
-        }
-        UI::SetPreviousTooltip("Click to retry");
+        UI::MenuItem("\\$f00" + Icons::TimesCircle + " \\$zYAMM: Server Unavailable (next retry in "+ serverRefreshSeconds +"s)");
         return;
     }
     if (Auth::connectionError && !Auth::connectionInProgress) {
-        if (UI::MenuItem("\\$f00" + Icons::TimesCircle + " \\$zYAMM: Connection Error")) {
-            startnew(Main);
-        }
-        UI::SetPreviousTooltip("Click to retry");
+        UI::MenuItem("\\$f00" + Icons::TimesCircle + " \\$zYAMM: Connection Error (next retry in "+ serverRefreshSeconds +"s)");
         return;
     }
     if (isCheckingServer || !Auth::connected || Auth::connectionInProgress) return;
@@ -58,15 +54,15 @@ void Render()
 bool CheckServer()
 {
 #if FORCE_API_DOWN
-    Log::Error("Force API Down Enabled.\nThe plugin will not load.", true);
-    return false;
+    Log::Error("Force API Down Enabled.");
+    return !isServerAlive;
 #else
     isCheckingServer = true;
     Json::Value@ res = API::GetAsync(Setting_BaseURL, false);
     isCheckingServer = false;
 
     if (res.GetType() == Json::Type::Null) {
-        Log::Error("Server seems not responding.\nThe plugin will not load.", true);
+        if (!isServerAlive) Log::Error("Server is not responding.", false);
     } else if (res.GetType() == Json::Type::Object) {
         g_connectedPlayerCount = res["connectedPlayers"];
         return true;
@@ -89,6 +85,7 @@ void CheckServerLoop() {
             @yammDevWindow = null;
         }
         isServerAlive = alive;
+        stampServerRetry = Time::Stamp + 60;
         sleep(1 * 60 * 1000);
     }
 }
