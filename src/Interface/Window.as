@@ -8,7 +8,7 @@ class Window {
     // Tab@ m_YourProfileTab;
 
     string GetWindowId() { return "YAMMDefaultWindow"; }
-    string GetWindowName() { return ICON_COL + PLUGIN_NAME + " \\$666v"+Meta::ExecutingPlugin().Version; }
+    string GetWindowName() { return ICON_COL + PLUGIN_NAME; }
 
     void AddTab(Tab@ tab, bool select = false, int index = -1){
         if (index == -1) tabs.InsertLast(tab);

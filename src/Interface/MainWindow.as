@@ -106,6 +106,7 @@ class MainWindow : Window {
     void RenderFooter() override {
         UI::Separator();
 
+        vec2 posOrig = UI::GetCursorPos();
         UI::Text(Icons::Users + " " + g_connectedPlayerCount);
         UI::SetPreviousTooltip("Number of players connected into " + PLUGIN_NAME_SHORT);
 
@@ -123,6 +124,10 @@ class MainWindow : Window {
             UI::Text("\\$666" + Icons::Kenney::Users + " N/A");
             UI::SetPreviousTooltip("No active squad");
         }
+
+        string versionString = "\\$666v"+Meta::ExecutingPlugin().Version;
+        UI::SetCursorPos(vec2(UI::GetWindowSize().x-Draw::MeasureString(versionString).x-10, posOrig.y));
+        UI::Text(versionString);
     }
 
     void SelectMatchmakingType(MatchmakingType@ matchmakingType) {
