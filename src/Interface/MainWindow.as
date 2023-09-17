@@ -3,8 +3,6 @@ class MainWindow : Window {
     // Tab@ m_YourProfileTab;
     Net::HttpRequest@ m_request;
     Player@ m_player;
-    MatchmakingType@ selectedMatchmakingType;
-    PlayerMatchmakingType@ selectedPlayerMatchmakingType;
     string m_totalPlayers;
     bool isError = false;
     string errorMsg = "";
@@ -85,20 +83,22 @@ class MainWindow : Window {
         }
 
         vec2 BasePos = UI::GetCursorPos();
-        UI::Text("Points: " + selectedPlayerMatchmakingType.points);
-        UI::Text("Rank: " + selectedPlayerMatchmakingType.rank + " / " + m_totalPlayers);
+        UI::Text("Points: " + g_selectedPlayerMatchmakingType.points);
+        UI::Text("Rank: " + g_selectedPlayerMatchmakingType.rank + " / " + m_totalPlayers);
         vec2 BottomPos = UI::GetCursorPos();
 
         UI::SetCursorPos(vec2(UI::GetWindowSize().x - 215, BasePos.y + 12));
 
+        UI::BeginDisabled(g_queueJoin || g_inMatch);
         UI::SetNextItemWidth(200);
-        if (UI::BeginCombo("##MatchmakingTypeSelect", selectedMatchmakingType.name)) {
+        if (UI::BeginCombo("##MatchmakingTypeSelect", g_selectedMatchmakingType.name)) {
             for (uint i = 0; i < g_matchmakingTypes.Length; i++) {
                 matchmakingTypeSelectChanged = UI::Selectable(g_matchmakingTypes[i].name+"##"+g_matchmakingTypes[i].id, matchmakingTypeSelectChanged);
                 if (matchmakingTypeSelectChanged) SelectMatchmakingType(g_matchmakingTypes[i]);
             }
             UI::EndCombo();
         }
+        UI::EndDisabled();
 
         UI::SetCursorPos(BottomPos);
     }
@@ -113,11 +113,11 @@ class MainWindow : Window {
         UI::SameLine();
 
         if (g_activeSquad !is null) {
-            if (selectedMatchmakingType !is null) {
+            if (g_selectedMatchmakingType !is null) {
                 string textColor = "\\$666";
-                if (g_activeSquad.players.Length > selectedMatchmakingType.playersPerTeams) textColor = "\\$f00";
-                if (g_activeSquad.players.Length == selectedMatchmakingType.playersPerTeams) textColor = "\\$060";
-                UI::Text(textColor + Icons::Kenney::Users + " " + g_activeSquad.players.Length + " / " + selectedMatchmakingType.playersPerTeams);
+                if (g_activeSquad.players.Length > g_selectedMatchmakingType.playersPerTeams) textColor = "\\$f00";
+                if (g_activeSquad.players.Length == g_selectedMatchmakingType.playersPerTeams) textColor = "\\$060";
+                UI::Text(textColor + Icons::Kenney::Users + " " + g_activeSquad.players.Length + " / " + g_selectedMatchmakingType.playersPerTeams);
             } else UI::Text("\\$666" + Icons::Kenney::Users + " " + g_activeSquad.players.Length);
             UI::SetPreviousTooltip(g_activeSquad.name);
         } else {
@@ -131,11 +131,11 @@ class MainWindow : Window {
     }
 
     void SelectMatchmakingType(MatchmakingType@ matchmakingType) {
-        @selectedMatchmakingType = matchmakingType;
+        @g_selectedMatchmakingType = matchmakingType;
 
         for (uint p = 0; p < m_player.matchmakingTypes.Length; p++) {
-            if (m_player.matchmakingTypes[p].matchmakingTypeId == selectedMatchmakingType.id) {
-                @selectedPlayerMatchmakingType = m_player.matchmakingTypes[p];
+            if (m_player.matchmakingTypes[p].matchmakingTypeId == g_selectedMatchmakingType.id) {
+                @g_selectedPlayerMatchmakingType = m_player.matchmakingTypes[p];
                 break;
             }
         }

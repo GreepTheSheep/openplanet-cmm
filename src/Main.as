@@ -5,8 +5,12 @@ DevWindow@ yammDevWindow;
 Player@ g_connectedPlayer;
 array<MatchmakingType@> g_matchmakingTypes;
 Squad@ g_activeSquad;
+MatchmakingType@ g_selectedMatchmakingType;
+PlayerMatchmakingType@ g_selectedPlayerMatchmakingType;
 uint g_connectedPlayerCount;
 int64 stampServerRetry = -1;
+bool g_queueJoin = false;
+bool g_inMatch = false;
 
 void RenderMenu()
 {
