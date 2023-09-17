@@ -94,3 +94,41 @@ void CheckServerLoop() {
         sleep(1 * 60 * 1000);
     }
 }
+
+void PingMatchmakingLoop() {
+    while (g_queueJoin) {
+        sleep(5000);
+        if (!g_queueJoin) return;
+
+        dictionary params;
+        params.Set("matchmakingId", tostring(g_selectedMatchmakingType.id));
+
+        string urlParams = "";
+        if (!params.IsEmpty()) {
+            auto keys = params.GetKeys();
+            for (uint i = 0; i < keys.Length; i++) {
+                string key = keys[i];
+                string value;
+                params.Get(key, value);
+
+                urlParams += (i == 0 ? "?" : "&");
+                urlParams += key + "=" + Net::UrlEncode(value);
+            }
+        }
+
+        Json::Value@ res = API::GetAsync(Setting_BaseURL+"/matchmaking/ping" + urlParams);
+
+        if (res.GetType() == Json::Type::Null) {
+            Log::Error("Error while loading matchmaking");
+            return;
+        }
+
+        if (res.HasKey("error")) {
+            string errorMsg = res["error"]["message"];
+            Log::Error(errorMsg);
+            return;
+        }
+
+        g_queueJoin = res["inQueue"];
+    }
+}

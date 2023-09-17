@@ -13,7 +13,7 @@ class QueueTab : Tab {
 
         if (res.GetType() == Json::Type::Null) {
             isError = true;
-            errorMsg = "Error while loading squad";
+            errorMsg = "Error while loading matchmaking";
             Log::Error(errorMsg);
             return;
         }
@@ -27,6 +27,7 @@ class QueueTab : Tab {
         }
 
         g_queueJoin = res["inQueue"];
+        startnew(PingMatchmakingLoop);
     }
 
     void LeaveQueueAsync() {
@@ -36,7 +37,7 @@ class QueueTab : Tab {
 
         if (res.GetType() == Json::Type::Null) {
             isError = true;
-            errorMsg = "Error while loading squad";
+            errorMsg = "Error while loading matchmaking";
             Log::Error(errorMsg);
             return;
         }
