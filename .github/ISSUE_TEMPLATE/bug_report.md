@@ -3,6 +3,7 @@ name: Bug report
 about: Create a report to help us improve
 title: ''
 labels: bug
+assignees: ''
 
 ---
 
@@ -23,9 +24,7 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Openplanet (please complete the following information):**
- - Version: [e.g 1.25.40]
- - Game: [e.g. TM2020, Maniaplanet]
- - (if Maniaplanet) Maniaplanet Titlepack: [e.g. Stadium, RPG, Lagoon etc...]
+ - Openplanet Version: [e.g 1.25.40]
 
 **Additional context**
 Add any other context about the problem here.
