@@ -8,6 +8,7 @@ Squad@ g_activeSquad;
 MatchmakingType@ g_selectedMatchmakingType;
 PlayerMatchmakingType@ g_selectedPlayerMatchmakingType;
 uint g_connectedPlayerCount;
+UserNotice@ g_userNotice;
 int64 stampServerRetry = -1;
 bool g_queueJoin = false;
 bool g_inMatch = false;
@@ -70,6 +71,7 @@ bool CheckServer()
         if (!isServerAlive) Log::Error("Server is not responding.", false);
     } else if (res.GetType() == Json::Type::Object) {
         g_connectedPlayerCount = res["connectedPlayers"];
+        @g_userNotice = UserNotice(res["notice"]);
         return true;
     }
     return false;

@@ -1,5 +1,6 @@
 class QueueTab : Tab {
     bool isError = false;
+    // UI::Font@ Header = UI::LoadFont("DroidSans.ttf", 20);
     string errorMsg;
 
     string GetLabel() override { return Icons::Play; }
@@ -54,11 +55,17 @@ class QueueTab : Tab {
     }
 
     void Render() override {
+        if (g_userNotice.isEnabled) {
+            UI::TextWrapped("\\$f90" + Icons::ExclamationTriangle + "\\$z " + g_userNotice.title);
+            UI::TextWrapped(g_userNotice.description);
+            UI::Separator();
+        }
+        UI::SetCursorPos(vec2(UI::GetWindowSize().x/2 - 25, UI::GetWindowSize().y - 25));
         if (!g_queueJoin && !g_inMatch) {
-            if (UI::GreenButton("Start")) startnew(CoroutineFunc(JoinQueueAsync));
+            if (UI::GreenButton(Icons::Play + " Enter queue")) startnew(CoroutineFunc(JoinQueueAsync));
         }
         if (g_queueJoin && !g_inMatch) {
-            if (UI::RedButton("Stop")) startnew(CoroutineFunc(LeaveQueueAsync));
+            if (UI::RedButton(Icons::Stop + " Leave queue")) startnew(CoroutineFunc(LeaveQueueAsync));
         }
     }
 }

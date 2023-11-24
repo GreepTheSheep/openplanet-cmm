@@ -4,6 +4,7 @@ class DevWindow : Window {
         AddTab(ConnectedPlayersDevTab());
         AddTab(AllPlayersDevTab());
         AddTab(GroupsDevTab());
+        AddTab(NoticeDevTab());
     }
 
     string GetWindowId() override { return "YAMMDevWindow"; }
