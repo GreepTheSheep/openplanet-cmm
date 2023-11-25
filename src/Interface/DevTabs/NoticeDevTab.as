@@ -4,6 +4,7 @@ class NoticeDevTab : Tab {
     string errorMsg = "";
     bool isLoading = false;
     bool noticeEnableEdit;
+    string noticeIconEdit;
     string noticeTitleEdit;
     string noticeDescriptionEdit;
 
@@ -12,6 +13,7 @@ class NoticeDevTab : Tab {
 
     void Reload() override {
         noticeEnableEdit =  g_userNotice.isEnabled;
+        noticeIconEdit =  g_userNotice.icon;
         noticeTitleEdit = g_userNotice.title;
         noticeDescriptionEdit = g_userNotice.description;
     }
@@ -31,6 +33,7 @@ class NoticeDevTab : Tab {
     void PostUserNotice() {
         Json::Value@ postJson = Json::Object();
         postJson["enable"] = noticeEnableEdit;
+        postJson["icon"] = noticeIconEdit;
         postJson["title"] = noticeTitleEdit;
         postJson["description"] = noticeDescriptionEdit;
 
@@ -51,6 +54,7 @@ class NoticeDevTab : Tab {
         }
 
         g_userNotice.isEnabled = noticeEnableEdit;
+        g_userNotice.icon = noticeIconEdit;
         g_userNotice.title = noticeTitleEdit;
         g_userNotice.description = noticeDescriptionEdit;
     }
@@ -66,6 +70,7 @@ class NoticeDevTab : Tab {
 
         noticeEnableEdit = UI::Checkbox("Enable User notice##noticeEnableEdit", noticeEnableEdit);
 
+        noticeIconEdit = UI::InputText("Set icon##noticeTitleEdit", noticeIconEdit);
         noticeTitleEdit = UI::InputText("Set title##noticeTitleEdit", noticeTitleEdit);
         noticeDescriptionEdit = UI::InputTextMultiline("Set description##noticeDescriptionEdit", noticeDescriptionEdit);
 

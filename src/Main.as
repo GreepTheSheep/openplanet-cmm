@@ -13,6 +13,8 @@ int64 stampServerRetry = -1;
 bool g_queueJoin = false;
 bool g_inMatch = false;
 
+UI::Font@ g_headerFont = UI::LoadFont("DroidSans.ttf", 24, -1, -1, true, true, true);
+
 void RenderMenu()
 {
     string serverRefreshSeconds = Time::FormatString(" (next retry in %Ss)", stampServerRetry - Time::Stamp);

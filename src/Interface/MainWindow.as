@@ -107,6 +107,18 @@ class MainWindow : Window {
         UI::Separator();
 
         vec2 posOrig = UI::GetCursorPos();
+        if (g_userNotice.isEnabled) {
+            UI::Text(ColoredString(g_userNotice.icon));
+            if (UI::IsItemHovered()) {
+                UI::BeginTooltip();
+                UI::PushFont(g_headerFont);
+                UI::Text(ColoredString(g_userNotice.icon) + "\\$z " + g_userNotice.title);
+                UI::PopFont();
+                UI::Text(g_userNotice.description);
+                UI::EndTooltip();
+            }
+            UI::SameLine();
+        }
         UI::Text(Icons::Users + " " + g_connectedPlayerCount);
         UI::SetPreviousTooltip("Number of players connected into " + PLUGIN_NAME_SHORT);
 
