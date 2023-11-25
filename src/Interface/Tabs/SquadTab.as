@@ -9,6 +9,7 @@ class SquadTab : Tab {
     string squadJoinCode = "";
     string playerAccountIdActions = "";
 
+    bool IsVisible() override { return false; }
     string GetLabel() override { return Icons::Kenney::Users + " Squad"; }
     vec4 GetColor() override { return vec4(0.05f, 0.47f, 0, 1); }
 
