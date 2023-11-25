@@ -77,11 +77,23 @@ class QueueTab : Tab {
             UI::Separator();
         }
         UI::SetCursorPos(vec2(UI::GetWindowSize().x/2.25 - 25, UI::GetWindowSize().y - 25));
-        if (!g_queueJoin && !g_inMatch) {
-            if (UI::GreenButton(Icons::Play + " Enter queue")) startnew(CoroutineFunc(JoinQueueAsync));
-        }
-        if (g_queueJoin && !g_inMatch) {
-            if (UI::RedButton(Icons::Stop + " Leave queue")) startnew(CoroutineFunc(LeaveQueueAsync));
+        if (g_selectedMatchmakingType is null) {
+            UI::BeginDisabled();
+            UI::GrayButton("Loading");
+            UI::EndDisabled();
+        } else {
+            UI::BeginDisabled(g_selectedMatchmakingType.isDisabled);
+            if (g_selectedMatchmakingType.isDisabled) {
+                UI::GrayButton("Disabled");
+            } else {
+                if (!g_queueJoin && !g_inMatch) {
+                    if (UI::GreenButton(Icons::Play + " Enter queue")) startnew(CoroutineFunc(JoinQueueAsync));
+                }
+                if (g_queueJoin && !g_inMatch) {
+                    if (UI::RedButton(Icons::Stop + " Leave queue")) startnew(CoroutineFunc(LeaveQueueAsync));
+                }
+            }
+            UI::EndDisabled();
         }
     }
 }

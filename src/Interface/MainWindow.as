@@ -1,12 +1,14 @@
 class MainWindow : Window {
     Tab@ m_homePageTab;
     // Tab@ m_YourProfileTab;
-    Net::HttpRequest@ m_request;
+    Net::HttpRequest@ m_getMeRequest;
+    Net::HttpRequest@ m_getMMTypeRequest;
     Player@ m_player;
     string m_totalPlayers;
     bool isError = false;
     string errorMsg = "";
     bool isLoading = false;
+    bool isLoadingMMType = true;
     bool matchmakingTypeSelectChanged = false;
 
     MainWindow(){
@@ -18,15 +20,14 @@ class MainWindow : Window {
     void StartRequest()
     {
         isLoading = true;
-        string url = Setting_BaseURL+"/user/me";
 
-        @m_request = API::Get(url);
+        @m_getMeRequest = API::Get(Setting_BaseURL+"/user/me");
     }
 
     void CheckStartRequest()
     {
         // If there's not already a request and the window is appearing, we start a new request
-        if (m_request is null && UI::IsWindowAppearing()) {
+        if (m_getMeRequest is null && UI::IsWindowAppearing()) {
             StartRequest();
         }
     }
@@ -36,12 +37,12 @@ class MainWindow : Window {
         CheckStartRequest();
 
         // If there's a request, check if it has finished
-        if (m_request !is null && m_request.Finished()) {
+        if (m_getMeRequest !is null && m_getMeRequest.Finished()) {
             isLoading = false;
             // Parse the response
-            string res = m_request.String();
-            if (Meta::IsDeveloperMode()) trace("HomePageTab::CheckRequest: " + res);
-            @m_request = null;
+            string res = m_getMeRequest.String();
+            if (Meta::IsDeveloperMode()) trace("HomePageTab::CheckRequest(User): " + res);
+            @m_getMeRequest = null;
             auto json = Json::Parse(res);
 
             if (json.GetType() == Json::Type::Null) {
@@ -69,6 +70,7 @@ class MainWindow : Window {
 
     void RenderHeader() override {
         CheckRequest();
+        CheckRequestMMType();
 
         if (isLoading) {
             int HourGlassValue = Time::Stamp % 3;
@@ -83,20 +85,26 @@ class MainWindow : Window {
         }
 
         vec2 BasePos = UI::GetCursorPos();
-        UI::Text("Points: " + g_selectedPlayerMatchmakingType.points);
-        UI::Text("Rank: " + g_selectedPlayerMatchmakingType.rank + " / " + m_totalPlayers);
+        if (isLoadingMMType) UI::Text("Points: Loading...");
+        else UI::Text("Points: " + g_selectedPlayerMatchmakingType.points);
+        if (isLoadingMMType) UI::Text("Rank: Loading...");
+        else UI::Text("Rank: " + g_selectedPlayerMatchmakingType.rank + " / " + m_totalPlayers);
         vec2 BottomPos = UI::GetCursorPos();
 
         UI::SetCursorPos(vec2(UI::GetWindowSize().x - 215, BasePos.y + 12));
 
         UI::BeginDisabled(g_queueJoin || g_inMatch);
         UI::SetNextItemWidth(200);
-        if (UI::BeginCombo("##MatchmakingTypeSelect", g_selectedMatchmakingType.name)) {
-            for (uint i = 0; i < g_matchmakingTypes.Length; i++) {
-                matchmakingTypeSelectChanged = UI::Selectable(g_matchmakingTypes[i].name+"##"+g_matchmakingTypes[i].id, matchmakingTypeSelectChanged);
-                if (matchmakingTypeSelectChanged) SelectMatchmakingType(g_matchmakingTypes[i]);
+        if (isLoadingMMType) {
+            if (UI::BeginCombo("##MatchmakingTypeSelect", "Loading...")) UI::EndCombo();
+        } else {
+            if (UI::BeginCombo("##MatchmakingTypeSelect", g_selectedMatchmakingType.name)) {
+                for (uint i = 0; i < g_matchmakingTypes.Length; i++) {
+                    matchmakingTypeSelectChanged = UI::Selectable(g_matchmakingTypes[i].name+"##"+g_matchmakingTypes[i].id, matchmakingTypeSelectChanged);
+                    if (matchmakingTypeSelectChanged) SelectMatchmakingType(g_matchmakingTypes[i]);
+                }
+                UI::EndCombo();
             }
-            UI::EndCombo();
         }
         UI::EndDisabled();
 
@@ -114,7 +122,7 @@ class MainWindow : Window {
                 UI::PushFont(g_headerFont);
                 UI::Text(ColoredString(g_userNotice.icon) + "\\$z " + g_userNotice.title);
                 UI::PopFont();
-                UI::Text(g_userNotice.description);
+                UI::TextWrapped(g_userNotice.description);
                 UI::EndTooltip();
             }
             UI::SameLine();
@@ -132,9 +140,6 @@ class MainWindow : Window {
                 UI::Text(textColor + Icons::Kenney::Users + " " + g_activeSquad.players.Length + " / " + g_selectedMatchmakingType.playersPerTeams);
             } else UI::Text("\\$666" + Icons::Kenney::Users + " " + g_activeSquad.players.Length);
             UI::SetPreviousTooltip(g_activeSquad.name);
-        } else {
-            UI::Text("\\$666" + Icons::Kenney::Users + " N/A");
-            UI::SetPreviousTooltip("No active squad");
         }
 
         string versionString = "\\$666v"+Meta::ExecutingPlugin().Version;
@@ -143,12 +148,43 @@ class MainWindow : Window {
     }
 
     void SelectMatchmakingType(MatchmakingType@ matchmakingType) {
-        @g_selectedMatchmakingType = matchmakingType;
+        isLoadingMMType = true;
 
-        for (uint p = 0; p < m_player.matchmakingTypes.Length; p++) {
-            if (m_player.matchmakingTypes[p].matchmakingTypeId == g_selectedMatchmakingType.id) {
-                @g_selectedPlayerMatchmakingType = m_player.matchmakingTypes[p];
-                break;
+        dictionary params;
+        params.Set("id", tostring(matchmakingType.id));
+
+        string urlParams = "";
+        if (!params.IsEmpty()) {
+            auto keys = params.GetKeys();
+            for (uint i = 0; i < keys.Length; i++) {
+                string key = keys[i];
+                string value;
+                params.Get(key, value);
+
+                urlParams += (i == 0 ? "?" : "&");
+                urlParams += key + "=" + Net::UrlEncode(value);
+            }
+        }
+
+        @m_getMMTypeRequest = API::Get(Setting_BaseURL+"/matchmaking/type/status"+urlParams);
+    }
+
+    void CheckRequestMMType() {
+        if (m_getMMTypeRequest !is null && m_getMMTypeRequest.Finished()) {
+            isLoadingMMType = false;
+            // Parse the response
+            string res = m_getMMTypeRequest.String();
+            if (Meta::IsDeveloperMode()) trace("HomePageTab::CheckRequest(MMType): " + res);
+            @m_getMMTypeRequest = null;
+            auto json = Json::Parse(res);
+            MatchmakingType@ resType = MatchmakingType(json);
+            @g_selectedMatchmakingType = resType;
+
+            for (uint p = 0; p < m_player.matchmakingTypes.Length; p++) {
+                if (m_player.matchmakingTypes[p].matchmakingTypeId == g_selectedMatchmakingType.id) {
+                    @g_selectedPlayerMatchmakingType = m_player.matchmakingTypes[p];
+                    break;
+                }
             }
         }
     }
