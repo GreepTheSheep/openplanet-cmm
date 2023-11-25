@@ -50,7 +50,11 @@ namespace Auth
             }
         }
 
-        bool srvConnected = serverRes["connected"];
+        bool srvConnected = false;
+        if (serverRes.HasKey("connected")) {
+            srvConnected = serverRes["connected"];
+        }
+
         connectionInProgress = false;
 
         if (srvConnected) {

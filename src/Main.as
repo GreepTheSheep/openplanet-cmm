@@ -19,12 +19,12 @@ void RenderMenu()
 {
     string serverRefreshSeconds = Time::FormatString(" (next retry in %Ss)", stampServerRetry - Time::Stamp);
     if (serverRefreshSeconds == "<invalid>") serverRefreshSeconds = "";
-    if (!isServerAlive) {
-        UI::MenuItem("\\$f00" + Icons::TimesCircle + " \\$zYAMM: Server Unavailable"+ serverRefreshSeconds);
-        return;
-    }
     if (Auth::connectionError && !Auth::connectionInProgress) {
         UI::MenuItem("\\$f00" + Icons::TimesCircle + " \\$zYAMM: Connection Error"+ serverRefreshSeconds);
+        return;
+    }
+    if (!isServerAlive) {
+        UI::MenuItem("\\$f00" + Icons::TimesCircle + " \\$zYAMM: Server Unavailable"+ serverRefreshSeconds);
         return;
     }
     if (isCheckingServer || !Auth::connected || Auth::connectionInProgress) return;
@@ -81,10 +81,12 @@ bool CheckServer()
 }
 
 void CheckServerLoop() {
+    if (Auth::connectionError) return;
     while(true) {
         bool alive = CheckServer();
         if (alive && !isServerAlive) {
             Auth::Login();
+            if (Auth::connectionError) return;
             Matchmaking::getMatchmakingTypes();
             @yammMainWindow = MainWindow();
             @yammDevWindow = DevWindow();
