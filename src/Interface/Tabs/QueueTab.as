@@ -57,22 +57,19 @@ class QueueTab : Tab {
 
     void Render() override {
         if (g_userNotice.isEnabled) {
-            float width = UI::GetWindowSize().x*0.07;
+            float width = 40;
             vec2 posTop = UI::GetCursorPos();
-            UI::BeginChild("UserNoticeIcon", vec2(width,0));
             UI::SetCursorPos(posTop + vec2(width / 3, 10));
             UI::PushFont(m_userNoticeExclamationFont);
             UI::Text(ColoredString(g_userNotice.icon));
             UI::PopFont();
-            UI::EndChild();
             UI::SetCursorPos(posTop + vec2(width + 8, 0));
-            UI::BeginChild("UserNoticeText");
             UI::PushFont(g_headerFont);
             UI::TextWrapped(g_userNotice.title);
             UI::PopFont();
+            UI::SetCursorPos(UI::GetCursorPos() + vec2(width + 8, 0));
             UI::TextWrapped(g_userNotice.description);
             vec2 posDesc = UI::GetCursorPos();
-            UI::EndChild();
             UI::SetCursorPos(posDesc);
             UI::Separator();
         }
