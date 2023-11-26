@@ -73,24 +73,40 @@ class QueueTab : Tab {
             UI::SetCursorPos(posDesc);
             UI::Separator();
         }
-        UI::SetCursorPos(vec2(UI::GetWindowSize().x/2.25 - 25, UI::GetWindowSize().y - 25));
-        if (g_selectedMatchmakingType is null) {
-            UI::BeginDisabled();
-            UI::GrayButton("Loading");
-            UI::EndDisabled();
-        } else {
-            UI::BeginDisabled(g_selectedMatchmakingType.isDisabled);
-            if (g_selectedMatchmakingType.isDisabled) {
-                UI::GrayButton("Disabled");
+        if (!g_inMatch) {
+            UI::SetCursorPos(vec2(UI::GetWindowSize().x/2.25 - 25, UI::GetWindowSize().y - 25));
+            if (g_selectedMatchmakingType is null) {
+                UI::BeginDisabled();
+                UI::GrayButton("Loading");
+                UI::EndDisabled();
             } else {
-                if (!g_queueJoin && !g_inMatch) {
-                    if (UI::GreenButton(Icons::Play + " Enter queue")) startnew(CoroutineFunc(JoinQueueAsync));
+                UI::BeginDisabled(g_selectedMatchmakingType.isDisabled);
+                if (g_selectedMatchmakingType.isDisabled) {
+                    UI::GrayButton("Disabled");
+                } else {
+                    if (!g_queueJoin && !g_inMatch) {
+                        if (UI::GreenButton(Icons::Play + " Enter queue")) startnew(CoroutineFunc(JoinQueueAsync));
+                    }
+                    if (g_queueJoin && !g_inMatch) {
+                        if (UI::RedButton(Icons::Stop + " Leave queue")) startnew(CoroutineFunc(LeaveQueueAsync));
+                    }
                 }
-                if (g_queueJoin && !g_inMatch) {
-                    if (UI::RedButton(Icons::Stop + " Leave queue")) startnew(CoroutineFunc(LeaveQueueAsync));
+                UI::EndDisabled();
+            }
+        } else {
+            if (g_matchInfo !is null) {
+                UI::Text(g_matchInfo.status);
+                if (g_matchInfo.tmServer !is null && g_matchInfo.tmServer.joinLink != "") {
+                    UI::Text("Join link: " + g_matchInfo.tmServer.joinLink);
+                    if (UI::Button("Join")) {
+                        CTrackMania@ app = cast<CTrackMania>(GetApp());
+	                    app.ManiaPlanetScriptAPI.OpenLink(g_matchInfo.tmServer.quickJoinLink, CGameManiaPlanetScriptAPI::ELinkType::ManialinkBrowser);
+                    }
+                }
+                if (g_matchInfo.map !is null) {
+                    UI::Text("Map: " + ColoredString(g_matchInfo.map.Name));
                 }
             }
-            UI::EndDisabled();
         }
     }
 }

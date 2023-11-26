@@ -12,6 +12,7 @@ UserNotice@ g_userNotice;
 int64 stampServerRetry = -1;
 bool g_queueJoin = false;
 bool g_inMatch = false;
+Match@ g_matchInfo;
 
 UI::Font@ g_headerFont = UI::LoadFont("DroidSans.ttf", 24, -1, -1, true, true, true);
 
@@ -102,9 +103,9 @@ void CheckServerLoop() {
 }
 
 void PingMatchmakingLoop() {
-    while (g_queueJoin) {
+    while (g_queueJoin || g_inMatch) {
         sleep(5000);
-        if (!g_queueJoin) return;
+        if (!g_queueJoin && !g_inMatch) return;
 
         dictionary params;
         params.Set("matchmakingId", tostring(g_selectedMatchmakingType.id));
@@ -122,7 +123,7 @@ void PingMatchmakingLoop() {
             }
         }
 
-        Json::Value@ res = API::GetAsync(Setting_BaseURL+"/matchmaking/ping" + urlParams);
+        Json::Value@ res = API::GetAsync(Setting_BaseURL+"/matchmaking/ping" + urlParams, false);
 
         if (res.GetType() == Json::Type::Null) {
             Log::Error("Error while loading matchmaking");
@@ -136,5 +137,13 @@ void PingMatchmakingLoop() {
         }
 
         g_queueJoin = res["inQueue"];
+
+        if (res["match"].GetType() == Json::Type::Object) {
+            g_inMatch = true;
+            @g_matchInfo = Match(res["match"]);
+        } else if (res["match"].GetType() == Json::Type::Null) {
+            g_inMatch = false;
+            @g_matchInfo = null;
+        }
     }
 }
