@@ -12,6 +12,7 @@ UserNotice@ g_userNotice;
 int64 stampServerRetry = -1;
 bool g_queueJoin = false;
 bool g_inMatch = false;
+bool g_connectedToMatchGameServer = false;
 Match@ g_matchInfo;
 
 UI::Font@ g_headerFont = UI::LoadFont("DroidSans.ttf", 24, -1, -1, true, true, true);
@@ -40,7 +41,8 @@ void RenderMenu()
 
 void Main()
 {
-    startnew(CheckServerLoop);
+    if (!TM::hasPermissions()) Log::Error("Missing permissions: you need to be able to play on public room to use this plugin.", true);
+    else startnew(CheckServerLoop);
 }
 
 void OnDisabled() {
@@ -104,7 +106,8 @@ void CheckServerLoop() {
 
 void PingMatchmakingLoop() {
     while (g_queueJoin || g_inMatch) {
-        sleep(5000);
+        if (g_queueJoin) sleep(5000);
+        else if (g_inMatch) sleep(20000);
         if (!g_queueJoin && !g_inMatch) return;
 
         dictionary params;
@@ -141,8 +144,14 @@ void PingMatchmakingLoop() {
         if (res["match"].GetType() == Json::Type::Object) {
             g_inMatch = true;
             @g_matchInfo = Match(res["match"]);
+            if (g_matchInfo.tmServer !is null && g_matchInfo.tmServer.quickJoinLink != "") {
+                if (!g_connectedToMatchGameServer && g_matchInfo.status.ToLower().StartsWith("waiting for players")) {
+                    TM::JoinServer(g_matchInfo.tmServer.quickJoinLink);
+                }
+            }
         } else if (res["match"].GetType() == Json::Type::Null) {
             g_inMatch = false;
+            g_connectedToMatchGameServer = false;
             @g_matchInfo = null;
         }
     }

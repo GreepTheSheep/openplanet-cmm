@@ -77,12 +77,12 @@ class QueueTab : Tab {
             UI::SetCursorPos(vec2(UI::GetWindowSize().x/2.25 - 25, UI::GetWindowSize().y - 25));
             if (g_selectedMatchmakingType is null) {
                 UI::BeginDisabled();
-                UI::GrayButton("Loading");
+                UI::GrayButton(Icons::Hourglass + " Loading");
                 UI::EndDisabled();
             } else {
                 UI::BeginDisabled(g_selectedMatchmakingType.isDisabled);
                 if (g_selectedMatchmakingType.isDisabled) {
-                    UI::GrayButton("Disabled");
+                    UI::GrayButton(Icons::Times + " Disabled");
                 } else {
                     if (!g_queueJoin && !g_inMatch) {
                         if (UI::GreenButton(Icons::Play + " Enter queue")) startnew(CoroutineFunc(JoinQueueAsync));
@@ -96,15 +96,42 @@ class QueueTab : Tab {
         } else {
             if (g_matchInfo !is null) {
                 UI::Text(g_matchInfo.status);
-                if (g_matchInfo.tmServer !is null && g_matchInfo.tmServer.joinLink != "") {
-                    UI::Text("Join link: " + g_matchInfo.tmServer.joinLink);
-                    if (UI::Button("Join")) {
-                        CTrackMania@ app = cast<CTrackMania>(GetApp());
-	                    app.ManiaPlanetScriptAPI.OpenLink(g_matchInfo.tmServer.quickJoinLink, CGameManiaPlanetScriptAPI::ELinkType::ManialinkBrowser);
+                if (g_matchInfo.tmServer !is null) {
+                    if (g_matchInfo.map !is null) {
+                        UI::Text("Map: " + ColoredString(g_matchInfo.map.Name));
+                        UI::Separator();
                     }
-                }
-                if (g_matchInfo.map !is null) {
-                    UI::Text("Map: " + ColoredString(g_matchInfo.map.Name));
+                    float width = UI::GetWindowSize().x / g_matchInfo.teams.Length;
+                    float posX = 0;
+                    vec2 posTop = UI::GetCursorPos();
+                    for (uint t = 0; t < g_matchInfo.teams.Length; t++) {
+                        if (t > 0) UI::SetCursorPos(posTop + vec2(posX, 0));
+                        UI::BeginChild("MatchTeam"+t, vec2(width,0));
+                        UI::Text(ColoredString("$" + g_matchInfo.teams[t].colorTM + g_matchInfo.teams[t].name));
+                        UI::Separator();
+                        for (uint p = 0; p < g_matchInfo.teams[t].players.Length; p++) {
+                            UI::Text("- " + g_matchInfo.teams[t].players[p].displayName);
+                            if (g_matchInfo.teams[t].players[p].group.icon.Length > 0) {
+                                UI::SameLine();
+                                UI::Text(g_matchInfo.teams[t].players[p].group.iconWithColor);
+                                UI::SetPreviousTooltip(g_matchInfo.teams[t].players[p].group.name);
+                            }
+                            for (uint mt = 0; mt < g_matchInfo.teams[t].players[p].matchmakingTypes.Length; mt++) {
+                                if (g_matchInfo.teams[t].players[p].matchmakingTypes[mt].matchmakingTypeId == g_selectedMatchmakingType.id) {
+                                    UI::SameLine();
+                                    UI::Text(g_matchInfo.teams[t].players[p].matchmakingTypes[mt].points + " points");
+                                    if (g_matchInfo.teams[t].players[p].matchmakingTypes[mt].rank == -1)
+                                        UI::SetPreviousTooltip("#" + g_matchInfo.teams[t].players[p].matchmakingTypes[mt].rank);
+                                }
+                            }
+                        }
+                        posX = posX + UI::GetWindowSize().x + 8;
+                        UI::EndChild();
+                    }
+                    if (g_matchInfo.tmServer.quickJoinLink != "") {
+                        UI::SetCursorPos(vec2(UI::GetWindowSize().x/2.25 - 25, UI::GetWindowSize().y - 25));
+                        if (UI::Button(Icons::Kenney::Reload + " Force Join")) TM::JoinServer(g_matchInfo.tmServer.quickJoinLink);
+                    }
                 }
             }
         }
