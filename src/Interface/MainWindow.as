@@ -62,7 +62,7 @@ class MainWindow : Window {
             @m_player = Player(json);
             @g_connectedPlayer = m_player;
             m_totalPlayers = json["totalPlayers"];
-            SelectMatchmakingType(g_matchmakingTypes[0]);
+            if (g_selectedMatchmakingType is null) SelectMatchmakingType(g_matchmakingTypes[0]);
         }
     }
 
