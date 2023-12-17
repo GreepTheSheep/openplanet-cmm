@@ -153,6 +153,16 @@ void PingMatchmakingLoop() {
             g_inMatch = false;
             g_connectedToMatchGameServer = false;
             @g_matchInfo = null;
+
+            // Refresh player points after the match
+            @g_connectedPlayer = Player(API::GetAsync(Setting_BaseURL+"/user/me"));
+
+            for (uint p = 0; p < g_connectedPlayer.matchmakingTypes.Length; p++) {
+                if (g_connectedPlayer.matchmakingTypes[p].matchmakingTypeId == g_selectedMatchmakingType.id) {
+                    @g_selectedPlayerMatchmakingType = g_connectedPlayer.matchmakingTypes[p];
+                    break;
+                }
+            }
         }
     }
 }
