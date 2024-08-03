@@ -8,6 +8,7 @@ class Player {
     int64 lastLogonTimestamp;
     string lastPluginVersion;
     string lastIpAddress;
+    bool isTrustedDeveloper;
     Group@ group;
 
     Player(const Json::Value &in json) {
@@ -23,6 +24,7 @@ class Player {
         lastLogonTimestamp = json["lastLogonTimestamp"];
         lastPluginVersion = json["lastPluginVersion"]["fullVersion"];
         lastIpAddress = json["lastIpAddress"];
+        isTrustedDeveloper = json["isTrustedDeveloper"];
         if (json.HasKey("group") && json["group"].GetType() != Json::Type::Null) @group = Group(json["group"]);
     }
 

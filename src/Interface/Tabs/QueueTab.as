@@ -74,24 +74,30 @@ class QueueTab : Tab {
                 UI::SetCursorPos(posDesc);
                 UI::Separator();
             }
-            UI::SetCursorPos(vec2(UI::GetWindowSize().x/2.25 - 25, UI::GetWindowSize().y - 25));
+            UI::SetCursorPos(vec2(UI::GetWindowSize().x/2.25 - 35, UI::GetWindowSize().y - 25));
             if (g_selectedMatchmakingType is null) {
                 UI::BeginDisabled();
                 UI::GrayButton(Icons::Hourglass + " Loading");
                 UI::EndDisabled();
             } else {
-                UI::BeginDisabled(g_selectedMatchmakingType.isDisabled);
-                if (g_selectedMatchmakingType.isDisabled) {
+#if !FORCE_JOIN_MATCHMAKING
+                UI::BeginDisabled(g_selectedMatchmakingType.isDisabled || (Meta::IsDeveloperMode() && !g_connectedPlayer.isTrustedDeveloper));
+                if (Meta::IsDeveloperMode() && !g_connectedPlayer.isTrustedDeveloper) {
+                    UI::RedButton(Icons::Times + " Developer Mode enabled");
+                } else if (g_selectedMatchmakingType.isDisabled) {
                     UI::GrayButton(Icons::Times + " Disabled");
                 } else {
-                    if (!g_queueJoin && !g_inMatch) {
+#endif
+                    if (!g_queueJoin) {
                         if (UI::GreenButton(Icons::Play + " Enter queue")) startnew(CoroutineFunc(JoinQueueAsync));
                     }
-                    if (g_queueJoin && !g_inMatch) {
+                    if (g_queueJoin) {
                         if (UI::RedButton(Icons::Stop + " Leave queue")) startnew(CoroutineFunc(LeaveQueueAsync));
                     }
+#if !FORCE_JOIN_MATCHMAKING
                 }
                 UI::EndDisabled();
+#endif
             }
         } else {
             if (g_matchInfo !is null) {

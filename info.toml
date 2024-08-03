@@ -10,4 +10,6 @@ version = "0.0.1-closedalpha-20231203"
 [script]
 module = "YAMM"
 #defines = [ "FORCE_API_DOWN" ]
+#defines = [ "FORCE_JOIN_MATCHMAKING" ]
 # FORCE_API_DOWN : Forces the API to be "down" after loading for tags and seasons.
+# FORCE_JOIN_MATCHMAKING : Forces the plugin to join any matchmaking despite being disabled.
