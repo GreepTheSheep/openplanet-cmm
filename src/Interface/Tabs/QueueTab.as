@@ -2,6 +2,7 @@ class QueueTab : Tab {
     bool isError = false;
     // UI::Font@ Header = UI::LoadFont("DroidSans.ttf", 20);
     string errorMsg;
+    string queueButtonMsg;
     UI::Font@ m_userNoticeExclamationFont = UI::LoadFont("DroidSans.ttf", 32, -1, -1, true, true, true);
 
     string GetLabel() override { return Icons::Play; }
@@ -74,25 +75,33 @@ class QueueTab : Tab {
                 UI::SetCursorPos(posDesc);
                 UI::Separator();
             }
-            UI::SetCursorPos(vec2(UI::GetWindowSize().x/2.25 - 35, UI::GetWindowSize().y - 25));
+            UI::SetCursorPos(vec2((UI::GetWindowSize().x*.5) - (Draw::MeasureString(queueButtonMsg).x/2), UI::GetWindowSize().y - 25));
             if (g_selectedMatchmakingType is null) {
                 UI::BeginDisabled();
-                UI::GrayButton(Icons::Hourglass + " Loading");
+                queueButtonMsg = Icons::Hourglass + " Loading";
+                UI::GrayButton(queueButtonMsg);
                 UI::EndDisabled();
             } else {
 #if !FORCE_JOIN_MATCHMAKING
                 UI::BeginDisabled(g_selectedMatchmakingType.isDisabled || (Meta::IsDeveloperMode() && !g_connectedPlayer.isTrustedDeveloper));
                 if (Meta::IsDeveloperMode() && !g_connectedPlayer.isTrustedDeveloper) {
-                    UI::RedButton(Icons::Times + " Developer Mode enabled");
+                    queueButtonMsg = Icons::Times + " Developer Mode enabled";
+                    UI::RedButton(queueButtonMsg);
                 } else if (g_selectedMatchmakingType.isDisabled) {
-                    UI::GrayButton(Icons::Times + " Disabled");
+                    queueButtonMsg = Icons::Times + " Disabled";
+                    UI::GrayButton(queueButtonMsg);
+                } else if (g_activeSquad !is null && g_activeSquad.players.Length > g_selectedMatchmakingType.playersPerTeams) {
+                    queueButtonMsg = Icons::Times + " Too many players in squad";
+                    UI::GrayButton(queueButtonMsg);
                 } else {
 #endif
                     if (!g_queueJoin) {
-                        if (UI::GreenButton(Icons::Play + " Enter queue")) startnew(CoroutineFunc(JoinQueueAsync));
+                        queueButtonMsg = Icons::Play + " Enter queue";
+                        if (UI::GreenButton(queueButtonMsg)) startnew(CoroutineFunc(JoinQueueAsync));
                     }
                     if (g_queueJoin) {
-                        if (UI::RedButton(Icons::Stop + " Leave queue")) startnew(CoroutineFunc(LeaveQueueAsync));
+                        queueButtonMsg = Icons::Stop + " Leave queue";
+                        if (UI::RedButton(queueButtonMsg)) startnew(CoroutineFunc(LeaveQueueAsync));
                     }
 #if !FORCE_JOIN_MATCHMAKING
                 }
