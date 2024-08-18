@@ -18,7 +18,7 @@ namespace Auth
 
         if (Meta::IsDeveloperMode()) Log::Trace("Token: " + AccountToken);
 
-        if (AccountToken.Length == 0 || AccountToken is null) {
+        if (AccountToken.Length == 0) {
             Log::Trace("Token is empty, retrying auth...");
             sleep(2000);
             Login();
