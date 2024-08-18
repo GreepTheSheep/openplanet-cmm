@@ -7,7 +7,6 @@ namespace Auth
     string AccountToken = "";
 
     void Login() {
-        retriesNumber++;
         connectionInProgress = true;
         Log::Log("Starting Auth...");
 
@@ -18,6 +17,14 @@ namespace Auth
         AccountToken = tokenTask.Token();
 
         if (Meta::IsDeveloperMode()) Log::Trace("Token: " + AccountToken);
+
+        if (AccountToken.Length == 0 || AccountToken is null) {
+            Log::Trace("Token is empty, retrying auth...");
+            sleep(2000);
+            Login();
+            return;
+        }
+
         if (Meta::IsDeveloperMode()) Log::Log("Sending Token...");
 
         CTrackManiaNetwork@ Network = cast<CTrackManiaNetwork>(GetApp().Network);
@@ -31,6 +38,7 @@ namespace Auth
         serverJson["pluginVersion"] = Meta::ExecutingPlugin().Version;
 
         Json::Value@ serverRes = API::PostAsync(Setting_BaseURL + "/auth/login", Json::Write(serverJson));
+        retriesNumber++;
 
         if (serverRes.HasKey("error")) {
             string errMsg = serverRes["error"]["message"];
@@ -40,6 +48,7 @@ namespace Auth
                     Log::Warn(errMsg + "\nRetrying... ("+retriesNumber+"/3 attempts)");
                     sleep(2000);
                     Auth::Login();
+                    return;
                 } else {
                     Log::Error(errMsg + "\nThe plugin will not load.");
                     connectionError = true;
