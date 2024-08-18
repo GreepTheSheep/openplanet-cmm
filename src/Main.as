@@ -16,7 +16,7 @@ bool g_inMatch = false;
 bool g_connectedToMatchGameServer = false;
 Match@ g_matchInfo;
 
-UI::Font@ g_headerFont = UI::LoadFont("DroidSans.ttf", 24, -1, -1, true, true, true);
+UI::Font@ g_headerFont;
 
 void RenderMenu()
 {
@@ -42,6 +42,7 @@ void RenderMenu()
 
 void Main()
 {
+    @g_headerFont = UI::LoadFont("DroidSans.ttf", 24, -1, -1, true, true, true);
     if (!TM::hasPermissions()) Log::Error("Missing permissions: you need to be able to play on public room to use this plugin.", true);
     else startnew(CheckServerLoop);
 }
