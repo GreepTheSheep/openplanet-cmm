@@ -30,6 +30,9 @@ class QueueTab : Tab {
         }
 
         g_queueJoin = res["inQueue"];
+        if (res.HasKey("queueLength")) g_queuePlayersCount = res["queueLength"];
+        else g_queuePlayersCount = 0;
+
         startnew(PingMatchmakingLoop);
     }
 
@@ -54,6 +57,7 @@ class QueueTab : Tab {
         }
 
         g_queueJoin = res["inQueue"];
+        if (g_queueJoin == false) g_queuePlayersCount = 0;
     }
 
     void Render() override {

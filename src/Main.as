@@ -7,7 +7,8 @@ array<MatchmakingType@> g_matchmakingTypes;
 Squad@ g_activeSquad;
 MatchmakingType@ g_selectedMatchmakingType;
 PlayerMatchmakingType@ g_selectedPlayerMatchmakingType;
-uint g_connectedPlayerCount;
+uint g_connectedPlayerCount = 0;
+uint g_queuePlayersCount = 0;
 bool g_squadEnabled = false;
 UserNotice@ g_userNotice;
 int64 stampServerRetry = -1;
@@ -143,6 +144,8 @@ void PingMatchmakingLoop() {
         }
 
         g_queueJoin = res["inQueue"];
+        if (res.HasKey("queueLength")) g_queuePlayersCount = res["queueLength"];
+        else g_queuePlayersCount = 0;
 
         if (res["match"].GetType() == Json::Type::Object) {
             g_inMatch = true;
@@ -153,19 +156,20 @@ void PingMatchmakingLoop() {
                 }
             }
         } else if (res["match"].GetType() == Json::Type::Null) {
+            if (g_inMatch == true) {
+                // Refresh player points after the match
+                @g_connectedPlayer = Player(API::GetAsync(Setting_BaseURL+"/user/me"));
+
+                for (uint p = 0; p < g_connectedPlayer.matchmakingTypes.Length; p++) {
+                    if (g_connectedPlayer.matchmakingTypes[p].matchmakingTypeId == g_selectedMatchmakingType.id) {
+                        @g_selectedPlayerMatchmakingType = g_connectedPlayer.matchmakingTypes[p];
+                        break;
+                    }
+                }
+            }
             g_inMatch = false;
             g_connectedToMatchGameServer = false;
             @g_matchInfo = null;
-
-            // Refresh player points after the match
-            @g_connectedPlayer = Player(API::GetAsync(Setting_BaseURL+"/user/me"));
-
-            for (uint p = 0; p < g_connectedPlayer.matchmakingTypes.Length; p++) {
-                if (g_connectedPlayer.matchmakingTypes[p].matchmakingTypeId == g_selectedMatchmakingType.id) {
-                    @g_selectedPlayerMatchmakingType = g_connectedPlayer.matchmakingTypes[p];
-                    break;
-                }
-            }
         }
     }
 }
