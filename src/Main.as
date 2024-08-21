@@ -10,6 +10,7 @@ PlayerMatchmakingType@ g_selectedPlayerMatchmakingType;
 uint g_connectedPlayerCount = 0;
 uint g_queuePlayersCount = 0;
 bool g_squadEnabled = false;
+string g_serverInstanceId = "";
 UserNotice@ g_userNotice;
 int64 stampServerRetry = -1;
 bool g_queueJoin = false;
@@ -81,6 +82,19 @@ bool CheckServer()
         g_connectedPlayerCount = res["connectedPlayers"];
         if (res.HasKey("squadEnabled")) g_squadEnabled = res["squadEnabled"];
         @g_userNotice = UserNotice(res["notice"]);
+
+        // server instance Id will check if the server has been restarted between last check and this check
+        // If the instance Id is not the same, then the server has been restarted, so the plugin had to redo the auth process
+        // this is to prevent "Connected player not found" errors
+        string instanceId = res["instanceId"];
+        if (Meta::IsDeveloperMode()) Log::Trace("Server instance id: " + instanceId);
+        if (g_serverInstanceId.Length == 0) g_serverInstanceId = instanceId;
+        if (g_serverInstanceId != instanceId) {
+            Log::Warn("Server instance ID is incorrect, this is due to server restarting. Logging out. Logging in will be done in a minute", true);
+            g_serverInstanceId = instanceId;
+            return false;
+        }
+
         return true;
     }
     return false;
