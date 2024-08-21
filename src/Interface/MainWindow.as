@@ -133,7 +133,7 @@ class MainWindow : Window {
         } else {
             string userIcon = Time::Stamp % 2 == 0 ? Icons::User : Icons::UserO;
             UI::Text(userIcon + " " + g_queuePlayersCount);
-            UI::SetPreviousTooltip("Number of players queuing for " + g_selectedPlayerMatchmakingType.name);
+            UI::SetPreviousTooltip("Number of players queuing for " + g_selectedMatchmakingType.name);
         }
 
         UI::SameLine();
