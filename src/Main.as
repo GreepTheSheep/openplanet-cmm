@@ -87,7 +87,7 @@ bool CheckServer()
         // If the instance Id is not the same, then the server has been restarted, so the plugin had to redo the auth process
         // this is to prevent "Connected player not found" errors
         string instanceId = res["instanceId"];
-        if (Meta::IsDeveloperMode()) Log::Trace("Server instance id: " + instanceId);
+        if (Meta::IsDeveloperMode() && g_serverInstanceId != instanceId) Log::Trace("Server instance id: " + instanceId);
         if (g_serverInstanceId.Length == 0) g_serverInstanceId = instanceId;
         if (g_serverInstanceId != instanceId) {
             Log::Warn("Server instance ID is incorrect, this is due to server restarting. Logging out. Logging in will be done in a minute", true);
