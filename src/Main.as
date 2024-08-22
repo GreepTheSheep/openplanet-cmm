@@ -115,6 +115,12 @@ void CheckServerLoop() {
         if (isServerAlive && !alive) {
             @yammMainWindow = null;
             @yammDevWindow = null;
+            g_matchmakingTypes.RemoveRange(0, g_matchmakingTypes.Length);
+            g_queueJoin = false;
+            g_inMatch = false;
+            @g_matchInfo = null;
+            g_connectedToMatchGameServer = false;
+            g_squadEnabled = false;
         }
         isServerAlive = alive;
         stampServerRetry = Time::Stamp + 60;
