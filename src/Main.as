@@ -79,10 +79,6 @@ bool CheckServer()
     if (res.GetType() == Json::Type::Null) {
         if (!isServerAlive) Log::Error("Server is not responding.", false);
     } else if (res.GetType() == Json::Type::Object) {
-        g_connectedPlayerCount = res["connectedPlayers"];
-        if (res.HasKey("squadEnabled")) g_squadEnabled = res["squadEnabled"];
-        @g_userNotice = UserNotice(res["notice"]);
-
         // server instance Id will check if the server has been restarted between last check and this check
         // If the instance Id is not the same, then the server has been restarted, so the plugin had to redo the auth process
         // this is to prevent "Connected player not found" errors
@@ -94,6 +90,10 @@ bool CheckServer()
             g_serverInstanceId = instanceId;
             return false;
         }
+
+        g_connectedPlayerCount = res["connectedPlayers"];
+        if (res.HasKey("squadEnabled")) g_squadEnabled = res["squadEnabled"];
+        @g_userNotice = UserNotice(res["notice"]);
 
         return true;
     }
