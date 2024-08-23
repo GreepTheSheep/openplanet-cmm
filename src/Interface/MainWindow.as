@@ -84,6 +84,10 @@ class MainWindow : Window {
             return;
         }
 
+        if (isLoadingMMType) {
+            if (g_selectedMatchmakingType !is null && g_selectedPlayerMatchmakingType !is null) isLoadingMMType = false;
+        }
+
         vec2 BasePos = UI::GetCursorPos();
         if (isLoadingMMType) UI::Text("Points: Loading...");
         else UI::Text("Points: " + g_selectedPlayerMatchmakingType.points);
