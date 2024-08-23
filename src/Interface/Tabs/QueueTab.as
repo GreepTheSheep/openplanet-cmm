@@ -10,6 +10,8 @@ class QueueTab : Tab {
     vec4 GetColor() override { return vec4(0.05f, 0.47f, 0, 1); }
 
     void JoinQueueAsync() {
+        g_isPingingMatchmakingQueue = true;
+        g_lastPingQueueSent = Time::Now;
         Json::Value@ postJson = Json::Object();
         postJson["matchmakingId"] = g_selectedMatchmakingType.id;
         Json::Value@ res = API::PostAsync(Setting_BaseURL+"/matchmaking/join", Json::Write(postJson));
@@ -32,6 +34,9 @@ class QueueTab : Tab {
         g_queueJoin = res["inQueue"];
         if (res.HasKey("queueLength")) g_queuePlayersCount = res["queueLength"];
         else g_queuePlayersCount = 0;
+
+        g_queueJoinTime = Time::Now;
+        g_isPingingMatchmakingQueue = false;
 
         startnew(PingMatchmakingLoop);
     }

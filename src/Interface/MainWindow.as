@@ -120,13 +120,31 @@ class MainWindow : Window {
             if (UI::IsItemHovered()) {
                 UI::BeginTooltip();
                 UI::PushFont(g_headerFont);
-                UI::Text(ColoredString(g_userNotice.icon) + "\\$z " + g_userNotice.title);
+                UI::Text(ColoredString(g_userNotice.icon) + "\\$z   " + g_userNotice.title);
                 UI::PopFont();
                 UI::TextWrapped(g_userNotice.description);
                 UI::EndTooltip();
             }
             UI::SameLine();
         }
+
+        if (g_queueJoin || g_inMatch) {
+            string queueStatusMsg = "";
+
+            if (Time::Now - Math::Max(g_lastPingQueue,g_lastPingQueueSent) < (g_queueJoin ? 10000 : 30000)) {
+                queueStatusMsg += UI::CreateColorCode(UI::hsv2rgb(vec3(0.33333 - Math::Abs(Time::Now - g_lastPingQueue) / 30000.0, 0.8, 1.0)));
+            } else {
+                queueStatusMsg += "\\$d00";
+            }
+
+            queueStatusMsg += "" + (g_lastPingQueue > g_lastPingQueueSent ? Icons::Download : Icons::Upload);
+            if (g_queueJoin) queueStatusMsg += " \\$z" + Time::Format(Time::Now - g_queueJoinTime, false);
+            else if (g_inMatch) queueStatusMsg += " \\$zIn match";
+
+            UI::Text(queueStatusMsg);
+            UI::SameLine();
+        }
+
         if (!g_queueJoin) {
             UI::Text(Icons::Users + " " + g_connectedPlayerCount);
             UI::SetPreviousTooltip("Number of players connected into " + PLUGIN_NAME_SHORT);
@@ -146,6 +164,7 @@ class MainWindow : Window {
                 UI::Text(textColor + Icons::Kenney::Users + " " + g_activeSquad.players.Length + " / " + g_selectedMatchmakingType.playersPerTeams);
             } else UI::Text("\\$666" + Icons::Kenney::Users + " " + g_activeSquad.players.Length);
             UI::SetPreviousTooltip(g_activeSquad.name);
+            UI::SameLine();
         }
 
         string versionString = "\\$666v"+Meta::ExecutingPlugin().Version;

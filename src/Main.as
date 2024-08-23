@@ -14,7 +14,11 @@ string g_serverInstanceId = "";
 UserNotice@ g_userNotice;
 int64 stampServerRetry = -1;
 bool g_queueJoin = false;
+uint64 g_queueJoinTime;
 bool g_inMatch = false;
+bool g_isPingingMatchmakingQueue = false;
+uint64 g_lastPingQueue;
+uint64 g_lastPingQueueSent;
 bool g_connectedToMatchGameServer = false;
 Match@ g_matchInfo;
 
@@ -130,9 +134,14 @@ void CheckServerLoop() {
 
 void PingMatchmakingLoop() {
     while (g_queueJoin || g_inMatch) {
+        g_isPingingMatchmakingQueue = false;
+        if (!g_queueJoin && !g_inMatch) return;
+
         if (g_queueJoin) sleep(5000);
         else if (g_inMatch) sleep(20000);
-        if (!g_queueJoin && !g_inMatch) return;
+
+        g_isPingingMatchmakingQueue = true;
+        g_lastPingQueueSent = Time::Now;
 
         dictionary params;
         params.Set("matchmakingId", tostring(g_selectedMatchmakingType.id));
@@ -153,7 +162,7 @@ void PingMatchmakingLoop() {
         Json::Value@ res = API::GetAsync(Setting_BaseURL+"/matchmaking/ping" + urlParams, false);
 
         if (res.GetType() == Json::Type::Null) {
-            Log::Error("Error while loading matchmaking");
+            Log::Error("Error while pinging matchmaking");
             return;
         }
 
@@ -166,6 +175,8 @@ void PingMatchmakingLoop() {
         g_queueJoin = res["inQueue"];
         if (res.HasKey("queueLength")) g_queuePlayersCount = res["queueLength"];
         else g_queuePlayersCount = 0;
+
+        g_lastPingQueue = Time::Now;
 
         if (res["match"].GetType() == Json::Type::Object) {
             g_inMatch = true;
@@ -191,5 +202,6 @@ void PingMatchmakingLoop() {
             g_connectedToMatchGameServer = false;
             @g_matchInfo = null;
         }
+        g_isPingingMatchmakingQueue = false;
     }
 }
