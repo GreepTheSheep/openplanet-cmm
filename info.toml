@@ -5,7 +5,7 @@ category = "Matchmaking"
 perms = "paid"
 siteid = 424
 
-version = "0.0.3-alpha-20240822"
+version = "0.0.3-alpha-20240823"
 
 [script]
 module = "YAMM"
