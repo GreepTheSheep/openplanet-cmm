@@ -87,16 +87,24 @@ class QueueTab : Tab {
                 UI::EndDisabled();
             } else {
 #if !FORCE_JOIN_MATCHMAKING
-                UI::BeginDisabled(g_selectedMatchmakingType.isDisabled || (Meta::IsDeveloperMode() && !g_connectedPlayer.isTrustedDeveloper));
-                if (Meta::IsDeveloperMode() && !g_connectedPlayer.isTrustedDeveloper) {
-                    queueButtonMsg = Icons::Times + " Developer Mode enabled";
+#if SIG_SCHOOL
+                if (!Meta::IsSchoolModeWhitelisted()) {
+                    UI::BeginDisabled();
+                    queueButtonMsg = Icons::Times + " School Mode enabled";
                     UI::RedButton(queueButtonMsg);
-                } else if (g_selectedMatchmakingType.isDisabled) {
+                    UI::EndDisabled();
+                } else
+#endif
+                if (g_selectedMatchmakingType.isDisabled) {
+                    UI::BeginDisabled();
                     queueButtonMsg = Icons::Times + " Disabled";
                     UI::GrayButton(queueButtonMsg);
+                    UI::EndDisabled();
                 } else if (g_activeSquad !is null && g_activeSquad.players.Length > g_selectedMatchmakingType.playersPerTeams) {
+                    UI::BeginDisabled();
                     queueButtonMsg = Icons::Times + " Too many players in squad";
                     UI::GrayButton(queueButtonMsg);
+                    UI::EndDisabled();
                 } else {
 #endif
                     if (!g_queueJoin) {
@@ -109,7 +117,6 @@ class QueueTab : Tab {
                     }
 #if !FORCE_JOIN_MATCHMAKING
                 }
-                UI::EndDisabled();
 #endif
             }
         } else {
