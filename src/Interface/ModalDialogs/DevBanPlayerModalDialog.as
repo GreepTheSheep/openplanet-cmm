@@ -21,7 +21,7 @@ class DevBanPlayerModalDialog : ModalDialog
         float scale = UI::GetScale();
         UI::BeginChild("Content", vec2(0, -32) * scale);
         UI::Text("Enter temporary ban time in minutes (0 = permanent ban).");
-        banTimeMin = UI::InputText("##banTimeMin", banTimeMin, false, UI::InputTextFlags::CharsDecimal);
+        banTimeMin = UI::InputText("##banTimeMin", banTimeMin, UI::InputTextFlags::CharsDecimal);
         if (m_requestError) {
             UI::Text("\\$f00" + Icons::ExclamationTriangle +  " \\$zError:");
             UI::SameLine();

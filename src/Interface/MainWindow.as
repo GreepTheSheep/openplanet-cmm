@@ -120,11 +120,11 @@ class MainWindow : Window {
 
         vec2 posOrig = UI::GetCursorPos();
         if (g_userNotice.isEnabled) {
-            UI::Text(ColoredString(g_userNotice.icon));
+            UI::Text(Text::OpenplanetFormatCodes(g_userNotice.icon));
             if (UI::IsItemHovered()) {
                 UI::BeginTooltip();
-                UI::PushFont(g_headerFont);
-                UI::Text(ColoredString(g_userNotice.icon) + "\\$z   " + g_userNotice.title);
+                UI::PushFont(Fonts::Header);
+                UI::Text(Text::OpenplanetFormatCodes(g_userNotice.icon) + "\\$z   " + g_userNotice.title);
                 UI::PopFont();
                 UI::TextWrapped(g_userNotice.description);
                 UI::EndTooltip();
@@ -172,7 +172,7 @@ class MainWindow : Window {
         }
 
         string versionString = "\\$666v"+Meta::ExecutingPlugin().Version;
-        UI::SetCursorPos(vec2(UI::GetWindowSize().x-Draw::MeasureString(versionString).x-10, posOrig.y));
+        UI::SetCursorPos(vec2(UI::GetWindowSize().x-UI::MeasureString(versionString).x-10, posOrig.y));
         UI::Text(versionString);
     }
 

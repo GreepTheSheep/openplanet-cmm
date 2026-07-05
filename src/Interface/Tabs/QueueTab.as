@@ -1,9 +1,7 @@
 class QueueTab : Tab {
     bool isError = false;
-    // UI::Font@ Header = UI::LoadFont("DroidSans.ttf", 20);
     string errorMsg;
     string queueButtonMsg;
-    UI::Font@ m_userNoticeExclamationFont = UI::LoadFont("DroidSans.ttf", 32, -1, -1, true, true, true);
 
     string GetLabel() override { return Icons::Play; }
     string GetTooltip() override { return "Queue"; }
@@ -71,11 +69,11 @@ class QueueTab : Tab {
                 float width = 40;
                 vec2 posTop = UI::GetCursorPos();
                 UI::SetCursorPos(posTop + vec2(width / 3, 10));
-                UI::PushFont(m_userNoticeExclamationFont);
-                UI::Text(ColoredString(g_userNotice.icon));
+                UI::PushFont(Fonts::UserNoticeIcon);
+                UI::Text(Text::OpenplanetFormatCodes(g_userNotice.icon));
                 UI::PopFont();
                 UI::SetCursorPos(posTop + vec2(width + 8, 0));
-                UI::PushFont(g_headerFont);
+                UI::PushFont(Fonts::Header);
                 UI::TextWrapped(g_userNotice.title);
                 UI::PopFont();
                 UI::SetCursorPos(UI::GetCursorPos() + vec2(width + 8, 0));
@@ -84,7 +82,7 @@ class QueueTab : Tab {
                 UI::SetCursorPos(posDesc);
                 UI::Separator();
             }
-            UI::SetCursorPos(vec2((UI::GetWindowSize().x*.5) - (Draw::MeasureString(queueButtonMsg).x/2), UI::GetWindowSize().y - 25));
+            UI::SetCursorPos(vec2((UI::GetWindowSize().x*.5) - (UI::MeasureString(queueButtonMsg).x/2), UI::GetWindowSize().y - 25));
             if (g_selectedMatchmakingType is null) {
                 UI::BeginDisabled();
                 queueButtonMsg = Icons::Hourglass + " Loading";
@@ -129,7 +127,7 @@ class QueueTab : Tab {
                 UI::Text(g_matchInfo.status);
                 if (g_matchInfo.tmServer !is null) {
                     if (g_matchInfo.map !is null) {
-                        UI::Text("Map: " + ColoredString(g_matchInfo.map.Name));
+                        UI::Text("Map: " + Text::OpenplanetFormatCodes(g_matchInfo.map.Name));
                         UI::Separator();
                     }
                     float width = UI::GetWindowSize().x / g_matchInfo.teams.Length;
@@ -138,7 +136,7 @@ class QueueTab : Tab {
                     for (uint t = 0; t < g_matchInfo.teams.Length; t++) {
                         if (t > 0) UI::SetCursorPos(posTop + vec2(posX, 0));
                         UI::BeginChild("MatchTeam"+t, vec2(width,0));
-                        UI::Text(ColoredString("$" + g_matchInfo.teams[t].colorTM + g_matchInfo.teams[t].name));
+                        UI::Text(Text::OpenplanetFormatCodes("$" + g_matchInfo.teams[t].colorTM + g_matchInfo.teams[t].name));
                         UI::Separator();
                         for (uint p = 0; p < g_matchInfo.teams[t].players.Length; p++) {
                             UI::Text("- " + g_matchInfo.teams[t].players[p].displayName);
