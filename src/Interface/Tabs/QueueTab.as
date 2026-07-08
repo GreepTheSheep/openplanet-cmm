@@ -148,9 +148,9 @@ class QueueTab : Tab {
                             for (uint mt = 0; mt < g_matchInfo.teams[t].players[p].matchmakingTypes.Length; mt++) {
                                 if (g_matchInfo.teams[t].players[p].matchmakingTypes[mt].matchmakingTypeId == g_selectedMatchmakingType.id) {
                                     UI::SameLine();
-                                    UI::Text(g_matchInfo.teams[t].players[p].matchmakingTypes[mt].points + " points");
-                                    if (g_matchInfo.teams[t].players[p].matchmakingTypes[mt].rank == -1)
-                                        UI::SetPreviousTooltip("#" + g_matchInfo.teams[t].players[p].matchmakingTypes[mt].rank);
+                                    UI::Text(g_matchInfo.teams[t].players[p].matchmakingTypes[mt].points);
+                                    if (g_matchInfo.teams[t].players[p].matchmakingTypes[mt].rank >= 1)
+                                        UI::SetPreviousTooltip("Rank #" + g_matchInfo.teams[t].players[p].matchmakingTypes[mt].rank);
                                 }
                             }
                         }
