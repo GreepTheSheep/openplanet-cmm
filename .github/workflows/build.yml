@@ -22,7 +22,8 @@ jobs:
           & $zip a -mx1 -tzip "$name.op" info.toml src
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: ${{ env.OP_NAME }}.op
+          name: ${{ env.OP_NAME }}
           path: ${{ env.OP_NAME }}.op
+          archive: false
