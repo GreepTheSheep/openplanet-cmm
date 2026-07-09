@@ -8,7 +8,7 @@ class DevWindow : Window {
         AddTab(MMTypeDevTab());
     }
 
-    string GetWindowId() override { return "YAMMDevWindow"; }
+    string GetWindowId() override { return PLUGIN_NAME_SHORT+"DevWindow"; }
     string GetWindowName() override { return COLOR_STR + Icons::Code + "\\$z " + PLUGIN_NAME + " (Superadmin interface)"; }
 
 }

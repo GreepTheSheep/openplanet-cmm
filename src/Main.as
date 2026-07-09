@@ -1,7 +1,7 @@
 bool isServerAlive = false;
 bool isCheckingServer = true;
-MainWindow@ yammMainWindow;
-DevWindow@ yammDevWindow;
+MainWindow@ cmmMainWindow;
+DevWindow@ cmmDevWindow;
 Player@ g_connectedPlayer;
 array<MatchmakingType@> g_matchmakingTypes;
 Squad@ g_activeSquad;
@@ -27,19 +27,19 @@ void RenderMenu()
     string serverRefreshSeconds = Time::FormatString(" (next retry in %Ss)", stampServerRetry - Time::Stamp);
     if (serverRefreshSeconds == "<invalid>") serverRefreshSeconds = "";
     if (Auth::connectionError && !Auth::connectionInProgress) {
-        UI::MenuItem("\\$f00" + Icons::TimesCircle + " \\$zYAMM: Connection Error"+ serverRefreshSeconds);
+        UI::MenuItem("\\$f00" + Icons::TimesCircle + "\\$z "+PLUGIN_NAME_SHORT+": Connection Error"+ serverRefreshSeconds);
         return;
     }
     if (!isServerAlive) {
-        UI::MenuItem("\\$f00" + Icons::TimesCircle + " \\$zYAMM: Server Unavailable"+ serverRefreshSeconds);
+        UI::MenuItem("\\$f00" + Icons::TimesCircle + "\\$z "+PLUGIN_NAME_SHORT+": Server Unavailable"+ serverRefreshSeconds);
         return;
     }
     if (isCheckingServer || !Auth::connected || Auth::connectionInProgress) return;
-    if (Meta::IsDeveloperMode() && yammDevWindow !is null && UI::MenuItem("YAMM Superadmin Interface", "", yammDevWindow.isOpened)) {
-        yammDevWindow.isOpened = !yammDevWindow.isOpened;
+    if (Meta::IsDeveloperMode() && cmmDevWindow !is null && UI::MenuItem(PLUGIN_NAME_SHORT+" Superadmin Interface", "", cmmDevWindow.isOpened)) {
+        cmmDevWindow.isOpened = !cmmDevWindow.isOpened;
     }
-    if (yammMainWindow !is null && UI::MenuItem(ICON_COL + PLUGIN_NAME, "", yammMainWindow.isOpened)) {
-        yammMainWindow.isOpened = !yammMainWindow.isOpened;
+    if (cmmMainWindow !is null && UI::MenuItem(ICON_COL + PLUGIN_NAME, "", cmmMainWindow.isOpened)) {
+        cmmMainWindow.isOpened = !cmmMainWindow.isOpened;
     }
 }
 
@@ -62,8 +62,8 @@ void OnDestroyed() {
 }
 
 void RenderInterface(){
-    if (yammMainWindow !is null) yammMainWindow.Render();
-    if (yammDevWindow !is null) yammDevWindow.Render();
+    if (cmmMainWindow !is null) cmmMainWindow.Render();
+    if (cmmDevWindow !is null) cmmDevWindow.Render();
 }
 
 void Render()
@@ -114,12 +114,12 @@ void CheckServerLoop() {
             Auth::Login();
             if (Auth::connectionError) return;
             Matchmaking::getMatchmakingTypes();
-            @yammMainWindow = MainWindow();
-            @yammDevWindow = DevWindow();
+            @cmmMainWindow = MainWindow();
+            @cmmDevWindow = DevWindow();
         }
         if (isServerAlive && !alive) {
-            @yammMainWindow = null;
-            @yammDevWindow = null;
+            @cmmMainWindow = null;
+            @cmmDevWindow = null;
             g_matchmakingTypes.RemoveRange(0, g_matchmakingTypes.Length);
             g_queueJoin = false;
             g_inMatch = false;

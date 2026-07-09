@@ -66,7 +66,7 @@ class MainWindow : Window {
         }
     }
 
-    string GetWindowId() override { return "YAMMMainWindow"; }
+    string GetWindowId() override { return PLUGIN_NAME_SHORT+"MainWindow"; }
 
     void RenderHeader() override {
         CheckRequest();
