@@ -8,18 +8,16 @@ env:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build .op with 7-Zip
-        shell: pwsh
+      - name: Build .op
         run: |
-          $zip = "C:\Program Files\7-Zip\7z.exe"
-          $name = "${{ env.OP_NAME }}"
-          if (Test-Path "$name.op") { Remove-Item "$name.op" }
-          & $zip a -mx1 -tzip "$name.op" info.toml src
+          name="${{ env.OP_NAME }}"
+          [ -f "$name.op" ] && rm -f "$name.op"
+          zip -r "$name.op" info.toml src
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
