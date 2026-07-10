@@ -1,15 +1,21 @@
 class PlayerMatchmakingType {
     int matchmakingTypeId;
     int points;
-    int64 rank;
+    int placementMatchesDone;
+    int64 matchesPlayed;
+    int64 matchesWin;
+    int64 matchesDraw;
+    int64 matchesLoss;
     int seasonId;
-    string seasonName;
 
     PlayerMatchmakingType(const Json::Value &in json) {
         matchmakingTypeId = json["matchmakingTypeId"];
         points = json["points"];
-        if (json.HasKey("rank") && json["rank"].GetType() != Json::Type::Null) rank = json["rank"];
+        placementMatchesDone = json["placementMatchesDone"];
+        matchesPlayed = json["matchesPlayed"];
+        matchesWin = json["matchesWin"];
+        matchesDraw = json["matchesDraw"];
+        matchesLoss = json["matchesLoss"];
         seasonId = json["seasonId"];
-        seasonName = json["seasonName"];
     }
 }

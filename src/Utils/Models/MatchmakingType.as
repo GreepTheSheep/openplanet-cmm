@@ -4,12 +4,9 @@ class MatchmakingType {
     uint teams;
     uint playersPerTeams;
     bool isDisabled;
-    int baseKFactor;
-    int placementKFactor;
     int placementMatches;
-    int initialRating;
-    int maxSquadSize;
     bool allowSquad;
+    MatchmakingTypeSeason@ season;
 
     MatchmakingType(const Json::Value &in json) {
         id = json["id"];
@@ -17,11 +14,8 @@ class MatchmakingType {
         teams = json["teams"];
         playersPerTeams = json["playersPerTeams"];
         isDisabled = json["isDisabled"];
-        baseKFactor = json["baseKFactor"];
-        placementKFactor = json["placementKFactor"];
         placementMatches = json["placementMatches"];
-        initialRating = json["initialRating"];
-        maxSquadSize = json["maxSquadSize"];
         allowSquad = json["allowSquad"];
+        if (json.HasKey("season") && json["season"].GetType() != Json::Type::Null) @season = MatchmakingTypeSeason(json["season"]);
     }
 }

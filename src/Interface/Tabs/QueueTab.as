@@ -149,8 +149,6 @@ class QueueTab : Tab {
                                 if (g_matchInfo.teams[t].players[p].matchmakingTypes[mt].matchmakingTypeId == g_selectedMatchmakingType.id) {
                                     UI::SameLine();
                                     UI::Text(tostring(g_matchInfo.teams[t].players[p].matchmakingTypes[mt].points));
-                                    if (g_matchInfo.teams[t].players[p].matchmakingTypes[mt].rank >= 1)
-                                        UI::SetPreviousTooltip("Rank #" + g_matchInfo.teams[t].players[p].matchmakingTypes[mt].rank);
                                 }
                             }
                         }

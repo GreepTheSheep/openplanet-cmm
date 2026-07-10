@@ -4,7 +4,6 @@ class MainWindow : Window {
     Net::HttpRequest@ m_getMeRequest;
     Net::HttpRequest@ m_getMMTypeRequest;
     Player@ m_player;
-    string m_totalPlayers;
     bool isError = false;
     string errorMsg = "";
     bool isLoading = false;
@@ -61,7 +60,6 @@ class MainWindow : Window {
 
             @m_player = Player(json);
             @g_connectedPlayer = m_player;
-            m_totalPlayers = json["totalPlayers"];
             if (g_selectedMatchmakingType is null) SelectMatchmakingType(g_matchmakingTypes[0]);
         }
     }
@@ -72,9 +70,10 @@ class MainWindow : Window {
         CheckRequest();
         CheckRequestMMType();
 
+        int HourGlassValue = Time::Stamp % 3;
+        string Hourglass = (HourGlassValue == 0 ? Icons::HourglassStart : (HourGlassValue == 1 ? Icons::HourglassHalf : Icons::HourglassEnd));
+
         if (isLoading) {
-            int HourGlassValue = Time::Stamp % 3;
-            string Hourglass = (HourGlassValue == 0 ? Icons::HourglassStart : (HourGlassValue == 1 ? Icons::HourglassHalf : Icons::HourglassEnd));
             UI::Text(Hourglass + " Loading...");
             return;
         }
@@ -89,10 +88,24 @@ class MainWindow : Window {
         }
 
         vec2 BasePos = UI::GetCursorPos();
-        if (isLoadingMMType) UI::Text("Points: Loading...");
-        else UI::Text("Points: " + g_selectedPlayerMatchmakingType.points);
-        if (isLoadingMMType) UI::Text("Rank: Loading...");
-        else UI::Text("Rank: " + g_selectedPlayerMatchmakingType.rank + " / " + m_totalPlayers);
+        if (isLoadingMMType) UI::Text(Hourglass);
+        else {
+            UI::Text(g_selectedMatchmakingType.season.name);
+            // Add tooltip if the season will have a end date
+            string seasonTooltipText = "";
+            if (g_selectedMatchmakingType.season.endDateTimestamp == -1) seasonTooltipText += "This season will end this " + Time::FormatString("%c", g_selectedMatchmakingType.season.endDateTimestamp);
+            if (seasonTooltipText.Length > 0) UI::SetPreviousTooltip(seasonTooltipText);
+        }
+        if (isLoadingMMType) UI::Text(Hourglass);
+        else {
+            // Don't show points until player has done placement matches
+            if (g_selectedPlayerMatchmakingType.placementMatchesDone < g_selectedMatchmakingType.placementMatches) {
+                int remaining = g_selectedMatchmakingType.placementMatches - g_selectedPlayerMatchmakingType.placementMatchesDone;
+                UI::Text(tostring(remaining) + " matches left to get your Skill Level");
+            } else {
+                UI::Text("\\$900" + g_selectedPlayerMatchmakingType.points);
+            }
+        }
         vec2 BottomPos = UI::GetCursorPos();
 
         UI::SetCursorPos(vec2(UI::GetWindowSize().x - 215, BasePos.y + 12));
