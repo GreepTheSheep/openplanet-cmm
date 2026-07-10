@@ -221,6 +221,7 @@ class MainWindow : Window {
             auto json = Json::Parse(res);
             MatchmakingType@ resType = MatchmakingType(json);
             @g_selectedMatchmakingType = resType;
+            if (json.HasKey("allowSquad")) g_squadEnabled = json["allowSquad"];
 
             for (uint p = 0; p < m_player.matchmakingTypes.Length; p++) {
                 if (m_player.matchmakingTypes[p].matchmakingTypeId == g_selectedMatchmakingType.id) {
