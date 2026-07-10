@@ -24,14 +24,14 @@ Match@ g_matchInfo;
 
 void RenderMenu()
 {
-    string serverRefreshSeconds = Time::FormatString(" (next retry in %Ss)", stampServerRetry - Time::Stamp);
+    string serverRefreshSeconds = Time::FormatString("%Ss", stampServerRetry - Time::Stamp);
     if (serverRefreshSeconds == "<invalid>") serverRefreshSeconds = "";
     if (Auth::connectionError && !Auth::connectionInProgress) {
-        UI::MenuItem("\\$f00" + Icons::TimesCircle + "\\$z "+PLUGIN_NAME_SHORT+": Connection Error"+ serverRefreshSeconds);
+        UI::MenuItem("\\$f00" + Icons::TimesCircle + "\\$z "+PLUGIN_NAME_SHORT+": Connection Error", serverRefreshSeconds);
         return;
     }
     if (!isServerAlive) {
-        UI::MenuItem("\\$f00" + Icons::TimesCircle + "\\$z "+PLUGIN_NAME_SHORT+": Server Unavailable"+ serverRefreshSeconds);
+        UI::MenuItem("\\$f00" + Icons::TimesCircle + "\\$z "+PLUGIN_NAME_SHORT+": Server Unavailable", serverRefreshSeconds);
         return;
     }
     if (isCheckingServer || !Auth::connected || Auth::connectionInProgress) return;
