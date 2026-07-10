@@ -99,8 +99,8 @@ class MainWindow : Window {
         if (isLoadingMMType) UI::Text(Hourglass);
         else {
             // Don't show points until player has done placement matches
-            if (g_selectedPlayerMatchmakingType.placementMatchesDone < g_selectedMatchmakingType.placementMatches) {
-                int remaining = g_selectedMatchmakingType.placementMatches - g_selectedPlayerMatchmakingType.placementMatchesDone;
+            if (g_selectedPlayerMatchmakingType.matchesPlayed < g_selectedMatchmakingType.placementMatches) {
+                int remaining = g_selectedMatchmakingType.placementMatches - g_selectedPlayerMatchmakingType.matchesPlayed;
                 UI::Text(tostring(remaining) + " matches left to get your Skill Level");
             } else {
                 UI::Text("\\$900" + g_selectedPlayerMatchmakingType.points);

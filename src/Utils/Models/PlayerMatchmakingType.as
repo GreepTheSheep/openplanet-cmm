@@ -1,7 +1,6 @@
 class PlayerMatchmakingType {
     int matchmakingTypeId;
     int points;
-    int placementMatchesDone;
     int64 matchesPlayed;
     int64 matchesWin;
     int64 matchesDraw;
@@ -11,7 +10,6 @@ class PlayerMatchmakingType {
     PlayerMatchmakingType(const Json::Value &in json) {
         matchmakingTypeId = json["matchmakingTypeId"];
         points = json["points"];
-        placementMatchesDone = json["placementMatchesDone"];
         matchesPlayed = json["matchesPlayed"];
         matchesWin = json["matchesWin"];
         matchesDraw = json["matchesDraw"];
