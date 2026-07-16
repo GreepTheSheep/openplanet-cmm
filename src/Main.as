@@ -34,7 +34,15 @@ void RenderMenu()
         UI::MenuItem("\\$f00" + Icons::TimesCircle + "\\$z "+PLUGIN_NAME_SHORT+": Server Unavailable", serverRefreshSeconds);
         return;
     }
-    if (isCheckingServer || !Auth::connected || Auth::connectionInProgress) return;
+    if (isCheckingServer) {
+        UI::MenuItem(PLUGIN_ICON + " " + PLUGIN_NAME_SHORT+": Checking services...");
+        return;
+    }
+    if (Auth::connectionInProgress) {
+        UI::MenuItem(Icons::Server + " " + PLUGIN_NAME_SHORT+": Authenticating...");
+        return;
+    }
+    if (!Auth::connected) return;
     if (Meta::IsDeveloperMode() && cmmDevWindow !is null && UI::MenuItem(PLUGIN_NAME_SHORT+" Admin Interface", "", cmmDevWindow.isOpened)) {
         cmmDevWindow.isOpened = !cmmDevWindow.isOpened;
     }
