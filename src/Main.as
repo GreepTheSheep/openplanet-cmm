@@ -35,7 +35,7 @@ void RenderMenu()
         return;
     }
     if (isCheckingServer || !Auth::connected || Auth::connectionInProgress) return;
-    if (Meta::IsDeveloperMode() && cmmDevWindow !is null && UI::MenuItem(PLUGIN_NAME_SHORT+" Superadmin Interface", "", cmmDevWindow.isOpened)) {
+    if (Meta::IsDeveloperMode() && cmmDevWindow !is null && UI::MenuItem(PLUGIN_NAME_SHORT+" Admin Interface", "", cmmDevWindow.isOpened)) {
         cmmDevWindow.isOpened = !cmmDevWindow.isOpened;
     }
     if (cmmMainWindow !is null && UI::MenuItem(ICON_COL + PLUGIN_NAME, "", cmmMainWindow.isOpened)) {
