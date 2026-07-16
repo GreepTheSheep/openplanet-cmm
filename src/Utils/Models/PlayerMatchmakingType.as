@@ -1,10 +1,10 @@
 class PlayerMatchmakingType {
     int matchmakingTypeId;
     int points;
-    int64 matchesPlayed;
-    int64 matchesWin;
-    int64 matchesDraw;
-    int64 matchesLoss;
+    int matchesPlayed;
+    int matchesWin;
+    int matchesDraw;
+    int matchesLoss;
     int seasonId;
 
     PlayerMatchmakingType(const Json::Value &in json) {
