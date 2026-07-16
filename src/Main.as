@@ -24,7 +24,7 @@ Match@ g_matchInfo;
 
 void RenderMenu()
 {
-    string serverRefreshSeconds = Time::FormatString("%Ss", stampServerRetry - Time::Stamp);
+    string serverRefreshSeconds = Time::FormatString(Icons::Refresh + " %Ss", stampServerRetry - Time::Stamp);
     if (serverRefreshSeconds == "<invalid>") serverRefreshSeconds = "";
     if (Auth::connectionError && !Auth::connectionInProgress) {
         UI::MenuItem("\\$f00" + Icons::TimesCircle + "\\$z "+PLUGIN_NAME_SHORT+": Connection Error", serverRefreshSeconds);
