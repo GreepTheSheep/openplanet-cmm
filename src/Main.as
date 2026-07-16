@@ -105,7 +105,6 @@ bool CheckServer()
         }
 
         g_connectedPlayerCount = res["connectedPlayers"];
-        if (res.HasKey("squadEnabled")) g_squadEnabled = res["squadEnabled"];
         @g_userNotice = UserNotice(res["notice"]);
 
         return true;
