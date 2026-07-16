@@ -165,7 +165,7 @@ class QueueTab : Tab {
                         g_matchInfo.tmServer.quickJoinLink != "")
                     {
                         UI::SetCursorPos(vec2(UI::GetWindowSize().x/2.25 - 25, UI::GetWindowSize().y - 25));
-                        if (UI::Button(Icons::Kenney::Reload + " Force Join")) TM::JoinServer(g_matchInfo.tmServer.quickJoinLink);
+                        if (UI::Button(Icons::Kenney::Reload + " Join Server")) TM::JoinServer(g_matchInfo.tmServer.quickJoinLink);
                     }
                 }
             }
