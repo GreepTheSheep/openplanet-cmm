@@ -146,7 +146,10 @@ class QueueTab : Tab {
                                 UI::SetPreviousTooltip(g_matchInfo.teams[t].players[p].group.name);
                             }
                             for (uint mt = 0; mt < g_matchInfo.teams[t].players[p].matchmakingTypes.Length; mt++) {
-                                if (g_matchInfo.teams[t].players[p].matchmakingTypes[mt].matchmakingTypeId == g_selectedMatchmakingType.id) {
+                                if (
+                                    g_matchInfo.teams[t].players[p].matchmakingTypes[mt].matchmakingTypeId == g_selectedMatchmakingType.id &&
+                                    g_matchInfo.teams[t].players[p].matchmakingTypes[mt].matchesPlayed >= g_selectedMatchmakingType.placementMatches
+                                ) {
                                     UI::SameLine();
                                     UI::Text(tostring(g_matchInfo.teams[t].players[p].matchmakingTypes[mt].points));
                                 }
