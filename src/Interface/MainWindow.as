@@ -93,7 +93,7 @@ class MainWindow : Window {
             UI::Text(g_selectedMatchmakingType.season.name);
             // Add tooltip if the season will have a end date
             string seasonTooltipText = "";
-            if (g_selectedMatchmakingType.season.endDateTimestamp == -1) seasonTooltipText += "This season will end this " + Time::FormatString("%c", g_selectedMatchmakingType.season.endDateTimestamp);
+            if (g_selectedMatchmakingType.season.endDateTimestamp != 0) seasonTooltipText += "This season will end this " + Time::FormatString("%c", g_selectedMatchmakingType.season.endDateTimestamp);
             if (seasonTooltipText.Length > 0) UI::SetPreviousTooltip(seasonTooltipText);
         }
         if (isLoadingMMType) UI::Text(Hourglass);
