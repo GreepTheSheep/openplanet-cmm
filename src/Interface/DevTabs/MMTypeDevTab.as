@@ -1,9 +1,11 @@
 class MMTypeDevTab : Tab {
     Net::HttpRequest@ m_getRequest;
+    Net::HttpRequest@ m_getSettingsRequest;
     bool isError = false;
     string errorMsg = "";
     bool isLoading = false;
     MatchmakingType@ selectedType;
+    array<MatchmakingTypeModeSetting@> selectedTypeModeSettings;
     bool typeDisableEdit;
     string typeNameEdit;
     string seasonNameEdit;
@@ -17,6 +19,7 @@ class MMTypeDevTab : Tab {
 
         dictionary params;
         params.Set("id", tostring(selectedType.id));
+        params.Set("matchmakingTypeId", tostring(selectedType.id));
 
         string urlParams = "";
         if (!params.IsEmpty()) {
@@ -32,6 +35,7 @@ class MMTypeDevTab : Tab {
         }
 
         @m_getRequest = API::Get(Setting_BaseURL+"/matchmaking/type/status"+urlParams);
+        @m_getSettingsRequest = API::Get(Setting_BaseURL+"/admin/mmtype/modesettings"+urlParams);
     }
 
     void CheckStartRequest()
@@ -50,13 +54,23 @@ class MMTypeDevTab : Tab {
             isLoading = false;
             // Parse the response
             string res = m_getRequest.String();
-            if (Meta::IsDeveloperMode()) trace("MMTypeDevTab::CheckRequest: " + res);
+            if (Meta::IsDeveloperMode()) trace("MMTypeDevTab::m_getRequest::CheckRequest: " + res);
             @m_getRequest = null;
             auto json = Json::Parse(res);
             @selectedType = MatchmakingType(json);
             typeDisableEdit = selectedType.isDisabled;
             typeNameEdit = selectedType.name;
             if (selectedType.season !is null) seasonNameEdit = selectedType.season.name;
+        }
+        if (m_getSettingsRequest !is null && m_getSettingsRequest.Finished()) {
+            string resSettings = m_getSettingsRequest.String();
+            if (Meta::IsDeveloperMode()) trace("MMTypeDevTab::m_getSettingsRequest::CheckRequest: " + resSettings);
+            @m_getSettingsRequest = null;
+            auto jsonSettings = Json::Parse(resSettings);
+            for (uint i = 0; i < jsonSettings["modeSettings"].Length; i++) {
+                MatchmakingTypeModeSetting@ modeSetting = MatchmakingTypeModeSetting(jsonSettings["modeSettings"][i]);
+                selectedTypeModeSettings.InsertLast(modeSetting);
+            }
         }
     }
 
@@ -138,6 +152,11 @@ class MMTypeDevTab : Tab {
 
         UI::Separator();
 
+        float width = UI::GetWindowSize().x*0.5;
+        vec2 posTop = UI::GetCursorPos();
+
+        UI::BeginChild("Season", vec2(width,0));
+
         if (selectedType.season !is null) {
             UI::Text((selectedType.season.isActive ? "\\$0f0Active\\$z " : "\\$949Last\\$z ") + "Season info:");
             UI::Text("Season #" + selectedType.season.number);
@@ -157,6 +176,13 @@ class MMTypeDevTab : Tab {
                 if (UI::GreenButton("New season")) startnew(CoroutineFunc(PostNewSeason));
             }
         } else UI::Text("\\$f00Active season is null, check server");
+
+        UI::EndChild();
+
+        UI::SetCursorPos(posTop + vec2(width + 8, 0));
+        UI::BeginChild("ModeSettings");
+        UI::Text("ModeSettings TODO");
+        UI::EndChild();
 
     }
 }
