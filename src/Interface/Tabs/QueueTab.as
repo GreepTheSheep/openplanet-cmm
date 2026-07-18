@@ -103,6 +103,11 @@ class QueueTab : Tab {
                     queueButtonMsg = Icons::Times + " Disabled";
                     UI::GrayButton(queueButtonMsg);
                     UI::EndDisabled();
+                } else if (!g_selectedMatchmakingType.season.isActive) {
+                    UI::BeginDisabled();
+                    queueButtonMsg = Icons::Stop + " Season ended";
+                    UI::GrayButton(queueButtonMsg);
+                    UI::EndDisabled();
                 } else if (g_activeSquad !is null && g_activeSquad.players.Length > g_selectedMatchmakingType.playersPerTeams) {
                     UI::BeginDisabled();
                     queueButtonMsg = Icons::Times + " Too many players in squad";
