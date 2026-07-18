@@ -53,11 +53,10 @@ class MMTypeDevTab : Tab {
             if (Meta::IsDeveloperMode()) trace("MMTypeDevTab::CheckRequest: " + res);
             @m_getRequest = null;
             auto json = Json::Parse(res);
-            MatchmakingType@ resType = MatchmakingType(json);
-            typeDisableEdit = resType.isDisabled;
-            typeNameEdit = resType.name;
-            seasonNameEdit = resType.season.name;
-            @selectedType = resType;
+            @selectedType = MatchmakingType(json);
+            typeDisableEdit = selectedType.isDisabled;
+            typeNameEdit = selectedType.name;
+            if (selectedType.season !is null) seasonNameEdit = selectedType.season.name;
         }
     }
 
@@ -157,7 +156,7 @@ class MMTypeDevTab : Tab {
                 seasonNameEdit = UI::InputText("Set name##seasonNameEdit", seasonNameEdit);
                 if (UI::GreenButton("New season")) startnew(CoroutineFunc(PostNewSeason));
             }
-        } else UI::Text("\\$f00Can't get season info, check server");
+        } else UI::Text("\\$f00Active season is null, check server");
 
     }
 }
