@@ -5,10 +5,12 @@ class MMTypeDevTab : Tab {
     string errorMsg = "";
     bool isLoading = false;
     MatchmakingType@ selectedType;
+    int selectedTypeIndex;
     array<MatchmakingTypeModeSetting@> selectedTypeModeSettings;
     MatchmakingTypeModeSetting@ settingToRemove;
     bool typeDisableEdit;
     string typeNameEdit;
+    bool typeAllowSquadEdit;
     string seasonNameEdit;
     bool matchmakingTypeSelectChanged = false;
 
@@ -62,6 +64,7 @@ class MMTypeDevTab : Tab {
             @selectedType = MatchmakingType(json);
             typeDisableEdit = selectedType.isDisabled;
             typeNameEdit = selectedType.name;
+            typeAllowSquadEdit = selectedType.allowSquad;
             if (selectedType.season !is null) seasonNameEdit = selectedType.season.name;
         }
         if (m_getSettingsRequest !is null && m_getSettingsRequest.Finished()) {
@@ -77,47 +80,41 @@ class MMTypeDevTab : Tab {
 
     void SelectMatchmakingType(MatchmakingType@ matchmakingType) {
         @selectedType = matchmakingType;
+        selectedTypeIndex = g_matchmakingTypes.FindByRef(matchmakingType);
         Reload();
     }
 
     void PostMMType() {
-        int index = g_matchmakingTypes.FindByRef(selectedType);
-
         Json::Value@ postJson = Json::Object();
         postJson["id"] = selectedType.id;
         postJson["disabled"] = typeDisableEdit;
         postJson["name"] = typeNameEdit;
+        postJson["allowSquad"] = typeAllowSquadEdit;
 
         Json::Value@ resPost = API::PostAsync(Setting_BaseURL+"/admin/mmtype", Json::Write(postJson));
-        MatchmakingType@ resType = MatchmakingType(resPost);
-        g_matchmakingTypes.RemoveAt(index);
-        g_matchmakingTypes.InsertAt(index, resType);
-        @selectedType = resType;
+        g_matchmakingTypes.RemoveAt(selectedTypeIndex);
+        g_matchmakingTypes.InsertAt(selectedTypeIndex, MatchmakingType(resPost));
     }
 
     void PostEndSeason() {
-        int index = g_matchmakingTypes.FindByRef(selectedType);
-
         Json::Value@ postJson = Json::Object();
         postJson["seasonId"] = selectedType.season.id;
 
         Json::Value@ resPost = API::PostAsync(Setting_BaseURL+"/admin/season/end", Json::Write(postJson));
         @selectedType.season = MatchmakingTypeSeason(resPost["season"]);
-        g_matchmakingTypes.RemoveAt(index);
-        g_matchmakingTypes.InsertAt(index, selectedType);
+        g_matchmakingTypes.RemoveAt(selectedTypeIndex);
+        g_matchmakingTypes.InsertAt(selectedTypeIndex, selectedType);
     }
 
     void PostNewSeason() {
-        int index = g_matchmakingTypes.FindByRef(selectedType);
-
         Json::Value@ postJson = Json::Object();
         postJson["matchmakingTypeId"] = selectedType.id;
         postJson["name"] = seasonNameEdit;
 
         Json::Value@ resPost = API::PostAsync(Setting_BaseURL+"/admin/season", Json::Write(postJson));
         @selectedType.season = MatchmakingTypeSeason(resPost["season"]);
-        g_matchmakingTypes.RemoveAt(index);
-        g_matchmakingTypes.InsertAt(index, selectedType);
+        g_matchmakingTypes.RemoveAt(selectedTypeIndex);
+        g_matchmakingTypes.InsertAt(selectedTypeIndex, selectedType);
     }
 
     void PostMMTypeModeSettings() {
@@ -165,7 +162,7 @@ class MMTypeDevTab : Tab {
         UI::Text("Select Type to view / edit");
         UI::SameLine();
         UI::Text(Icons::Refresh);
-        UI::SetPreviousTooltip("Reload types");
+        UI::SetPreviousTooltip("Reload this type");
         if (UI::IsItemClicked()) Reload();
         UI::SetNextItemWidth(200);
         if (UI::BeginCombo("##MatchmakingTypeSelect", selectedType.name)) {
@@ -175,14 +172,16 @@ class MMTypeDevTab : Tab {
             }
             UI::EndCombo();
         }
+        UI::SameLine();
         UI::TextDisabled("Identifier: " + selectedType.id);
 
-        UI::Separator();
-
+        UI::NewLine();
         typeDisableEdit = UI::Checkbox("Disable##typeDisableEdit", typeDisableEdit);
+        typeAllowSquadEdit = UI::Checkbox("Allow Squads##typeAllowSquadEdit", typeAllowSquadEdit);
+        UI::SetNextItemWidth(250);
         typeNameEdit = UI::InputText("Set name##typeNameEdit", typeNameEdit);
 
-        if (UI::GreenButton("Save")) startnew(CoroutineFunc(PostMMType));
+        if (UI::GreenButton(Icons::FloppyO + " Save")) startnew(CoroutineFunc(PostMMType));
 
         UI::Separator();
 
