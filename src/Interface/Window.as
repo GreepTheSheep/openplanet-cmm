@@ -28,7 +28,6 @@ class Window {
     void Render(){
         if(!isOpened) return;
 
-        UI::PushStyleColor(UI::Col::WindowBg,vec4(.1,.1,.1,1));
         UI::SetNextWindowSize(520,360, UI::Cond::Once);
         if(UI::Begin(GetWindowName()+"###"+GetWindowId(), isOpened)){
             RenderHeader();
@@ -101,7 +100,6 @@ class Window {
             }
         }
         UI::End();
-        UI::PopStyleColor(1);
     }
 
 }
