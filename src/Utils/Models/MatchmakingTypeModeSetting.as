@@ -12,4 +12,20 @@ class MatchmakingTypeModeSetting {
         settingType = json["settingType"];
         settingValue = json["settingValue"];
     }
+
+    Json::Value ToJson() {
+        Json::Value json = Json::Object();
+
+        try {
+            json["id"] = id;
+            json["matchmakingTypeId"] = matchmakingTypeId;
+            json["settingName"] = settingName;
+            json["settingType"] = settingType;
+            json["settingValue"] = settingValue;
+        } catch {
+            Log::Warn("Error converting MatchmakingTypeModeSetting to json : " + getExceptionInfo());
+        }
+
+        return json;
+    }
 }

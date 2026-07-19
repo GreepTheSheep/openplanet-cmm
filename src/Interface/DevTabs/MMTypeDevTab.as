@@ -6,6 +6,7 @@ class MMTypeDevTab : Tab {
     bool isLoading = false;
     MatchmakingType@ selectedType;
     array<MatchmakingTypeModeSetting@> selectedTypeModeSettings;
+    MatchmakingTypeModeSetting@ settingToRemove;
     bool typeDisableEdit;
     string typeNameEdit;
     string seasonNameEdit;
@@ -15,6 +16,7 @@ class MMTypeDevTab : Tab {
     bool IsVisible() override { return g_connectedPlayer.hasPermission("edit_mmtype"); }
 
     void Reload() override {
+        selectedTypeModeSettings.RemoveRange(0, selectedTypeModeSettings.Length);
         isLoading = true;
 
         dictionary params;
@@ -68,8 +70,7 @@ class MMTypeDevTab : Tab {
             @m_getSettingsRequest = null;
             auto jsonSettings = Json::Parse(resSettings);
             for (uint i = 0; i < jsonSettings["modeSettings"].Length; i++) {
-                MatchmakingTypeModeSetting@ modeSetting = MatchmakingTypeModeSetting(jsonSettings["modeSettings"][i]);
-                selectedTypeModeSettings.InsertLast(modeSetting);
+                selectedTypeModeSettings.InsertLast(MatchmakingTypeModeSetting(jsonSettings["modeSettings"][i]));
             }
         }
     }
@@ -119,6 +120,39 @@ class MMTypeDevTab : Tab {
         g_matchmakingTypes.InsertAt(index, selectedType);
     }
 
+    void PostMMTypeModeSettings() {
+        Json::Value@ postJson = Json::Object();
+        postJson["matchmakingTypeId"] = selectedType.id;
+        postJson["modeSettings"] = Json::Array();
+
+        for (uint i = 0; i < selectedTypeModeSettings.Length; i++) {
+            postJson["modeSettings"].Add(selectedTypeModeSettings[i].ToJson());
+        }
+
+        Json::Value@ resPost = API::PostAsync(Setting_BaseURL+"/admin/mmtype/modesettings", Json::Write(postJson));
+
+        selectedTypeModeSettings.RemoveRange(0, selectedTypeModeSettings.Length);
+        for (uint i = 0; i < resPost["modeSettings"].Length; i++) {
+            selectedTypeModeSettings.InsertLast(MatchmakingTypeModeSetting(resPost["modeSettings"][i]));
+        }
+    }
+
+    void RemoveSetting() {
+        selectedTypeModeSettings.RemoveAt(selectedTypeModeSettings.FindByRef(settingToRemove));
+        @settingToRemove = null;
+    }
+
+    void AddNewSetting() {
+        // Create new JSON object then transform to class
+        Json::Value@ setting = Json::Object();
+        setting["id"] = 0;
+        setting["matchmakingTypeId"] = selectedType.id;
+        setting["settingName"] = "";
+        setting["settingType"] = "";
+        setting["settingValue"] = "";
+        selectedTypeModeSettings.InsertLast(MatchmakingTypeModeSetting(setting));
+    }
+
     void Render() override
     {
         CheckRequest();
@@ -152,7 +186,7 @@ class MMTypeDevTab : Tab {
 
         UI::Separator();
 
-        float width = UI::GetWindowSize().x*0.5;
+        float width = UI::GetWindowSize().x*0.35;
         vec2 posTop = UI::GetCursorPos();
 
         UI::BeginChild("Season", vec2(width,0));
@@ -181,8 +215,60 @@ class MMTypeDevTab : Tab {
 
         UI::SetCursorPos(posTop + vec2(width + 8, 0));
         UI::BeginChild("ModeSettings");
-        UI::Text("ModeSettings TODO");
-        UI::EndChild();
+        UI::AlignTextToFramePadding();
+        UI::Text("ModeSettings");
+        UI::SameLine();
+        if (UI::Button(Icons::Plus)) startnew(CoroutineFunc(AddNewSetting));
+        UI::SameLine();
+        if (UI::GreenButton(Icons::FloppyO + " Update settings")) startnew(CoroutineFunc(PostMMTypeModeSettings));
 
+        if (UI::BeginTable("mmTypeModeSettings", 5, UI::TableFlags(UI::TableFlags::Resizable | UI::TableFlags::NoSavedSettings | UI::TableFlags::SizingStretchProp | UI::TableFlags::ScrollY))) {
+            UI::TableSetupScrollFreeze(0, 1);
+            PushTabStyle();
+            UI::TableSetupColumn("ID", UI::TableColumnFlags::WidthFixed, 20);
+            UI::TableSetupColumn("Setting Name", UI::TableColumnFlags::WidthFixed, 260);
+            UI::TableSetupColumn("Setting Type", UI::TableColumnFlags::WidthFixed, 110);
+            UI::TableSetupColumn("Setting Value", UI::TableColumnFlags::WidthFixed, 260);
+            UI::TableSetupColumn("Actions", UI::TableColumnFlags::WidthStretch);
+            UI::TableHeadersRow();
+            PopTabStyle();
+
+            UI::ListClipper clipper(selectedTypeModeSettings.Length);
+            while(clipper.Step()) {
+                for(int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
+                {
+                    UI::PushID("mmTypeModeSettings"+i);
+                    UI::TableNextRow();
+
+                    UI::TableSetColumnIndex(0);
+                    UI::Text(selectedTypeModeSettings[i].id == 0 ? Icons::PlusCircle : tostring(selectedTypeModeSettings[i].id));
+
+                    UI::TableSetColumnIndex(1);
+                    UI::SetNextItemWidth(260 - 8);
+                    selectedTypeModeSettings[i].settingName = UI::InputText("##settingNameEdit"+i, selectedTypeModeSettings[i].settingName);
+
+                    UI::TableSetColumnIndex(2);
+                    UI::SetNextItemWidth(110 - 8);
+                    selectedTypeModeSettings[i].settingType = UI::InputText("##settingTypeEdit"+i, selectedTypeModeSettings[i].settingType);
+
+                    UI::TableSetColumnIndex(3);
+                    UI::SetNextItemWidth(260 - 8);
+                    selectedTypeModeSettings[i].settingValue = UI::InputText("##settingValueEdit"+i, selectedTypeModeSettings[i].settingValue);
+
+                    UI::TableSetColumnIndex(4);
+                    if (UI::RedButton(Icons::TrashO)) {
+                        @settingToRemove = selectedTypeModeSettings[i];
+                        startnew(CoroutineFunc(RemoveSetting));
+                    }
+                    UI::SetPreviousTooltip("Remove this setting");
+
+                    UI::PopID();
+                }
+            }
+
+            UI::EndTable();
+        }
+
+        UI::EndChild();
     }
 }
