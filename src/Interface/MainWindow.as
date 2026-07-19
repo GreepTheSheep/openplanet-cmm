@@ -1,5 +1,4 @@
 class MainWindow : Window {
-    Tab@ m_homePageTab;
     // Tab@ m_YourProfileTab;
     Net::HttpRequest@ m_getMeRequest;
     Net::HttpRequest@ m_getMMTypeRequest;
@@ -11,9 +10,9 @@ class MainWindow : Window {
     bool matchmakingTypeSelectChanged = false;
 
     MainWindow(){
-        @m_homePageTab = QueueTab();
-        AddTab(m_homePageTab);
+        AddTab(QueueTab());
         AddTab(SquadTab());
+        AddTab(InfoTab());
     }
 
     void StartRequest()

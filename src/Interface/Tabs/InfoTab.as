@@ -1,0 +1,57 @@
+class InfoTab : Tab {
+    string GetLabel() override { return Icons::InfoCircle; }
+    string GetTooltip() override { return "Info"; }
+    vec4 GetColor() override { return vec4(0.9f, 1, 1, 1); }
+
+    void Render() override {
+        UI::PushFont(Fonts::Header);
+        UI::SeparatorText(COLOR_STR + Icons::Plug + " \\$z Plugin");
+        UI::PopFont();
+        UI::Text("Version \\$777" + Meta::ExecutingPlugin().Version);
+        UI::Text("Plugin ID \\$777" + Meta::ExecutingPlugin().ID);
+        UI::Text("Site ID \\$777" + Meta::ExecutingPlugin().SiteID);
+        UI::Text("Type \\$777" + tostring(Meta::ExecutingPlugin().Type));
+#if SIG_DEVELOPER
+        UI::SameLine();
+        UI::Text("\\$777(\\$f39" + Icons::Code + " \\$777Dev mode)");
+#endif
+#if SIG_SCHOOL
+        UI::SameLine();
+        UI::Text("\\$777(\\$0f0" + Icons::CodeFork + " \\$777School mode"+ (Meta::IsSchoolModeWhitelisted() ? (" \\$0f0"+Icons::Check+" \\$777Whitelisted") : "") +")");
+#endif
+#if WINDOWS
+        UI::Text(Icons::Windows + " \\$777Windows");
+#endif
+#if LINUX
+        UI::Text(Icons::Linux + " \\$777Linux");
+#endif
+#if WINDOWS_WINE
+        UI::Text(Icons::Glass + " \\$777Wine compatibility layer detected");
+#endif
+
+        if (UI::Button(Icons::Patreon + " \\$zSupport " + PLUGIN_NAME_SHORT)) OpenBrowserURL("https://patreon.com/Greep");
+        UI::SameLine();
+        if (UI::Button(Icons::DiscordAlt + " Discord")) OpenBrowserURL("https://greep.fr/#/discord");
+        UI::SameLine();
+        if (UI::Button(Icons::Heartbeat + " Plugin Home")) OpenBrowserURL("https://openplanet.dev/plugin/" + Meta::ExecutingPlugin().SiteID);
+
+        UI::PushFont(Fonts::Header);
+        UI::SeparatorText(ICON_COL + " Server");
+        UI::PopFont();
+        UI::Text("Instance ID \\$777" + g_serverInstanceId);
+
+        UI::SeparatorText(Icons::User + " Connected Player");
+        UI::Text(g_connectedPlayer.displayName + " \\$777(" + g_connectedPlayer.accountId + ")");
+        UI::Text("Last logon \\$777" + Time::FormatString("%F %X", g_connectedPlayer.lastLogonTimestamp));
+        UI::Text("Group \\$777" + g_connectedPlayer.group.nameWithIconColor);
+
+        UI::PushFont(Fonts::Header);
+        UI::SeparatorText("\\$f39" + Icons::Heartbeat + " \\$z Openplanet");
+        UI::PopFont();
+        UI::Text("Version \\$777" + Meta::OpenplanetBuildInfo());
+#if DEVELOPER
+        UI::SameLine();
+        UI::Text("\\$777(\\$f39" + Icons::CodeFork + " \\$777debug build)");
+#endif
+    }
+}
