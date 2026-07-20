@@ -36,17 +36,23 @@ class InfoTab : Tab {
         if (UI::Button(Icons::Heartbeat + " Plugin Home")) OpenBrowserURL("https://openplanet.dev/plugin/" + Meta::ExecutingPlugin().SiteID);
 
         UI::PushFont(Fonts::Header);
+        UI::PushStyleColor(UI::Col::Separator, COLOR_VEC);
         UI::SeparatorText(ICON_COL + " Server");
+        UI::PopStyleColor();
         UI::PopFont();
         UI::Text("Instance ID \\$777" + g_serverInstanceId);
 
-        UI::SeparatorText(Icons::User + " Connected Player");
+        UI::PushStyleColor(UI::Col::Separator, COLOR_VEC);
+        UI::SeparatorText(Icons::User + " Connected Player:");
+        UI::PopStyleColor();
         UI::Text(g_connectedPlayer.displayName + " \\$777(" + g_connectedPlayer.accountId + ")");
         UI::Text("Last logon \\$777" + Time::FormatString("%F %X", g_connectedPlayer.lastLogonTimestamp));
         UI::Text("Group \\$777" + g_connectedPlayer.group.nameWithIconColor);
 
         UI::PushFont(Fonts::Header);
+        UI::PushStyleColor(UI::Col::Separator, vec4(1, 0.24f, 0.66f, 1));
         UI::SeparatorText("\\$f39" + Icons::Heartbeat + " \\$z Openplanet");
+        UI::PopStyleColor();
         UI::PopFont();
         UI::Text("Version \\$777" + Meta::OpenplanetBuildInfo());
 #if DEVELOPER
