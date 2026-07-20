@@ -159,11 +159,9 @@ class MMTypeDevTab : Tab {
             return;
         }
 
+        UI::AlignTextToFramePadding();
         UI::Text("Select Type to view / edit");
         UI::SameLine();
-        UI::Text(Icons::Refresh);
-        UI::SetPreviousTooltip("Reload this type");
-        if (UI::IsItemClicked()) Reload();
         UI::SetNextItemWidth(200);
         if (UI::BeginCombo("##MatchmakingTypeSelect", selectedType.name)) {
             for (uint i = 0; i < g_matchmakingTypes.Length; i++) {
@@ -174,8 +172,18 @@ class MMTypeDevTab : Tab {
         }
         UI::SameLine();
         UI::TextDisabled("Identifier: " + selectedType.id);
+        UI::SameLine();
+        UI::Text(Icons::Refresh);
+        UI::SetPreviousTooltip("Reload this type");
+        if (UI::IsItemClicked()) Reload();
 
-        UI::NewLine();
+        UI::Separator();
+        float width = UI::GetWindowSize().x*0.35;
+        float widthRight = UI::GetWindowSize().x-width;
+        vec2 posTop = UI::GetCursorPos();
+
+        UI::BeginChild("Edit Type Infos", vec2(width, 185));
+
         typeDisableEdit = UI::Checkbox("Disable##typeDisableEdit", typeDisableEdit);
         typeAllowSquadEdit = UI::Checkbox("Allow Squads##typeAllowSquadEdit", typeAllowSquadEdit);
         UI::SetNextItemWidth(250);
@@ -183,12 +191,12 @@ class MMTypeDevTab : Tab {
 
         if (UI::GreenButton(Icons::FloppyO + " Save")) startnew(CoroutineFunc(PostMMType));
 
-        UI::Separator();
+        UI::EndChild();
 
-        float width = UI::GetWindowSize().x*0.35;
-        vec2 posTop = UI::GetCursorPos();
+        vec2 posBottom = UI::GetCursorPos();
 
-        UI::BeginChild("Season", vec2(width,0));
+        UI::SetCursorPos(posTop + vec2(width + 8, 0));
+        UI::BeginChild("Season", vec2(widthRight - 8, 185));
 
         if (selectedType.season !is null) {
             UI::Text((selectedType.season.isActive ? "\\$0f0Active\\$z " : "\\$949Last\\$z ") + "Season info:");
@@ -212,8 +220,23 @@ class MMTypeDevTab : Tab {
 
         UI::EndChild();
 
+        posTop = posBottom;
+        UI::SetCursorPos(posTop);
+
+        UI::Separator();
+
+        width = UI::GetWindowSize().x*0.4;
+        widthRight = UI::GetWindowSize().x-width;
+        posTop = UI::GetCursorPos();
+
+        UI::BeginChild("Mappack", vec2(width,0));
+
+        UI::Text("Mappack TODO");
+
+        UI::EndChild();
+
         UI::SetCursorPos(posTop + vec2(width + 8, 0));
-        UI::BeginChild("ModeSettings");
+        UI::BeginChild("ModeSettings", vec2(widthRight - 8, 0));
         UI::AlignTextToFramePadding();
         UI::Text("ModeSettings");
         UI::SameLine();
