@@ -5,7 +5,7 @@ class InfoTab : Tab {
 
     void Render() override {
         UI::PushFont(Fonts::Header);
-        UI::SeparatorText(COLOR_STR + Icons::Plug + " \\$z Plugin");
+        UI::SeparatorText(Icons::Plug + " \\$z Plugin");
         UI::PopFont();
         UI::Text("Version \\$777" + Meta::ExecutingPlugin().Version);
         UI::Text("Plugin ID \\$777" + Meta::ExecutingPlugin().ID);
