@@ -1,7 +1,7 @@
 class InfoTab : Tab {
     string GetLabel() override { return Icons::InfoCircle; }
     string GetTooltip() override { return "Info"; }
-    vec4 GetColor() override { return vec4(0.9f, 1, 1, 1); }
+    vec4 GetColor() override { return vec4(0.47f, 0.47f, 0.47f, 1); }
 
     void Render() override {
         UI::PushFont(Fonts::Header);
