@@ -82,6 +82,36 @@ class QueueTab : Tab {
                 UI::SetCursorPos(posDesc);
                 UI::Separator();
             }
+
+            if (g_selectedPlayerMatchmakingType !is null) {
+                if (g_selectedPlayerMatchmakingType.matchesPlayed >= g_selectedMatchmakingType.placementMatches) {
+                    vec2 posTop = UI::GetCursorPos();
+                    array<float> recentMatchesPoints;
+                    for (uint rm = 0; rm < g_selectedPlayerMatchmakingType.recentMatches.Length; rm++) {
+                        recentMatchesPoints.InsertLast(g_selectedPlayerMatchmakingType.recentMatches[rm].ratingAfter);
+                    }
+                    UI::PushStyleColor(UI::Col::FrameBg, vec4(0,0,0,0));
+                    UI::PushStyleColor(UI::Col::PlotLines, vec4(1,1,1,0.2));
+                    UI::PushStyleColor(UI::Col::PlotLinesHovered, vec4(1,1,1,0.4));
+                    UI::PushStyleColor(UI::Col::Text, vec4(0,0,0,0));
+                    UI::PushStyleColor(UI::Col::PopupBg, vec4(0,0,0,0));
+                    UI::SetNextItemWidth(UI::GetWindowSize().x + (4 * UI::GetScale()));
+                    UI::PlotLines("##recentMatchesPointsGraph", recentMatchesPoints, 0, UI::GetWindowSize().y - 100);
+                    UI::PopStyleColor(5);
+                    if (UI::IsItemHovered()) {
+                        vec4 graphRect = UI::GetItemRect();
+                        vec2 mousePos = UI::GetMousePos();
+                        mousePos = vec2(mousePos.x - graphRect.x, mousePos.y - graphRect.y);
+                        mousePos = vec2(mousePos.x / graphRect.z, mousePos.y / graphRect.w);
+                        uint index = uint(mousePos.x * g_selectedPlayerMatchmakingType.recentMatches.Length);
+                        UI::SetCursorPos(posTop);
+                        UI::PushStyleColor(UI::Col::Text, vec4(1,1,1,0.5));
+                        UI::Text(g_selectedPlayerMatchmakingType.recentMatches[index].ratingAfter + "pts");
+                        UI::PopStyleColor(1);
+                    }
+                }
+            }
+
             UI::SetCursorPos(vec2((UI::GetWindowSize().x*.5) - (UI::MeasureString(queueButtonMsg).x/2), UI::GetWindowSize().y - 25));
             if (g_selectedMatchmakingType is null) {
                 UI::BeginDisabled();
