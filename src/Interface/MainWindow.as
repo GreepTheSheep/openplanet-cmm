@@ -2,7 +2,6 @@ class MainWindow : Window {
     // Tab@ m_YourProfileTab;
     Net::HttpRequest@ m_getMeRequest;
     Net::HttpRequest@ m_getMMTypeRequest;
-    Player@ m_player;
     bool isError = false;
     string errorMsg = "";
     bool isLoading = false;
@@ -57,8 +56,7 @@ class MainWindow : Window {
                 return;
             }
 
-            @m_player = Player(json);
-            @g_connectedPlayer = m_player;
+            @g_connectedPlayer = Player(json);
             if (g_selectedMatchmakingType is null) SelectMatchmakingType(g_matchmakingTypes[0]);
         }
     }
@@ -236,9 +234,9 @@ class MainWindow : Window {
             @g_selectedMatchmakingType = resType;
             if (json.HasKey("allowSquad")) g_squadEnabled = json["allowSquad"];
 
-            for (uint p = 0; p < m_player.matchmakingTypes.Length; p++) {
-                if (m_player.matchmakingTypes[p].matchmakingTypeId == g_selectedMatchmakingType.id) {
-                    @g_selectedPlayerMatchmakingType = m_player.matchmakingTypes[p];
+            for (uint p = 0; p < g_connectedPlayer.matchmakingTypes.Length; p++) {
+                if (g_connectedPlayer.matchmakingTypes[p].matchmakingTypeId == g_selectedMatchmakingType.id) {
+                    @g_selectedPlayerMatchmakingType = g_connectedPlayer.matchmakingTypes[p];
                     break;
                 }
             }
