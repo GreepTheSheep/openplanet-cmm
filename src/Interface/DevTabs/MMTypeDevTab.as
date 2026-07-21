@@ -1,10 +1,12 @@
 class MMTypeDevTab : Tab {
     Net::HttpRequest@ m_getRequest;
     Net::HttpRequest@ m_getSettingsRequest;
+    Net::HttpRequest@ m_getMapPackRequest;
     bool isError = false;
     string errorMsg = "";
     bool isLoading = false;
     MatchmakingType@ selectedType;
+    MatchmakingTypeSeasonMapPack@ selectedTypeSeasonMapPack;
     int selectedTypeIndex;
     array<MatchmakingTypeModeSetting@> selectedTypeModeSettings;
     MatchmakingTypeModeSetting@ settingToRemove;
@@ -12,6 +14,8 @@ class MMTypeDevTab : Tab {
     string typeNameEdit;
     bool typeAllowSquadEdit;
     string seasonNameEdit;
+    int seasonMapPackIdEdit;
+    string seasonMapPackSecretEdit;
     bool matchmakingTypeSelectChanged = false;
 
     string GetLabel() override { return "Matchmaking Type"; }
@@ -65,7 +69,10 @@ class MMTypeDevTab : Tab {
             typeDisableEdit = selectedType.isDisabled;
             typeNameEdit = selectedType.name;
             typeAllowSquadEdit = selectedType.allowSquad;
-            if (selectedType.season !is null) seasonNameEdit = selectedType.season.name;
+            if (selectedType.season !is null) {
+                seasonNameEdit = selectedType.season.name;
+                @m_getMapPackRequest = API::Get(Setting_BaseURL+"/admin/season/"+selectedType.season.id+"/mappack");
+            }
         }
         if (m_getSettingsRequest !is null && m_getSettingsRequest.Finished()) {
             string resSettings = m_getSettingsRequest.String();
@@ -75,6 +82,14 @@ class MMTypeDevTab : Tab {
             for (uint i = 0; i < jsonSettings["modeSettings"].Length; i++) {
                 selectedTypeModeSettings.InsertLast(MatchmakingTypeModeSetting(jsonSettings["modeSettings"][i]));
             }
+        }
+        if (m_getMapPackRequest !is null && m_getMapPackRequest.Finished()) {
+            string resMapPack = m_getMapPackRequest.String();
+            if (Meta::IsDeveloperMode()) trace("MMTypeDevTab::m_getMapPackRequest::CheckRequest: " + resMapPack);
+            @m_getMapPackRequest = null;
+            @selectedTypeSeasonMapPack = MatchmakingTypeSeasonMapPack(Json::Parse(resMapPack));
+            seasonMapPackIdEdit = selectedTypeSeasonMapPack.mxMapPackId;
+            seasonMapPackSecretEdit = selectedTypeSeasonMapPack.mxMapPackSecret;
         }
     }
 
@@ -148,6 +163,29 @@ class MMTypeDevTab : Tab {
         setting["settingType"] = "";
         setting["settingValue"] = "";
         selectedTypeModeSettings.InsertLast(MatchmakingTypeModeSetting(setting));
+    }
+
+    void SyncSeasonMapPackInfos() {
+        Json::Value@ postJson = Json::Object();
+        postJson["mxMapPackId"] = selectedTypeSeasonMapPack.mxMapPackId;
+        Json::Value@ resPost = API::PostAsync(Setting_BaseURL+"/admin/mappack/sync", Json::Write(postJson));
+        selectedTypeSeasonMapPack.maps.RemoveRange(0, selectedTypeSeasonMapPack.maps.Length);
+        for (uint i = 0; i < resPost["maps"].Length; i++) {
+            selectedTypeSeasonMapPack.maps.InsertLast(MatchmakingTypeSeasonMap(resPost["maps"][i]));
+        }
+    }
+
+    void PostSeasonMapPackInfos() {
+        if (selectedType.season is null) {
+            Log::Error("Season is null, please check the active season before.");
+            return;
+        }
+        Json::Value@ postJson = Json::Object();
+        postJson["mxMapPackId"] = seasonMapPackIdEdit;
+        postJson["mxMapPackSecret"] = seasonMapPackSecretEdit;
+        Json::Value@ resPost = API::PostAsync(Setting_BaseURL+"/admin/season/"+selectedType.season.id+"/mappack", Json::Write(postJson));
+        selectedTypeSeasonMapPack.mxMapPackId = seasonMapPackIdEdit;
+        selectedTypeSeasonMapPack.mxMapPackSecret = seasonMapPackSecretEdit;
     }
 
     void Render() override
@@ -225,13 +263,67 @@ class MMTypeDevTab : Tab {
 
         UI::Separator();
 
-        width = UI::GetWindowSize().x*0.4;
+        width = UI::GetWindowSize().x*0.45;
         widthRight = UI::GetWindowSize().x-width;
         posTop = UI::GetCursorPos();
 
         UI::BeginChild("Mappack", vec2(width,0));
 
-        UI::Text("Mappack TODO");
+        if (selectedTypeSeasonMapPack !is null) {
+            UI::AlignTextToFramePadding();
+            UI::Text("Map Pack ID: " + selectedTypeSeasonMapPack.mxMapPackId);
+            UI::SameLine();
+            if (UI::Button(Icons::ManiaExchange)) OpenBrowserURL("https://trackmania.exchange/mappackshow/"+selectedTypeSeasonMapPack.mxMapPackId + (selectedTypeSeasonMapPack.mxMapPackSecret.Length > 0 ? "/"+selectedTypeSeasonMapPack.mxMapPackSecret : ""));
+        } else UI::Text("Map Pack is null.");
+
+        UI::SetNextItemWidth(250);
+        seasonMapPackIdEdit = UI::InputInt("Set Map Pack ID##seasonMapPackIdEdit", seasonMapPackIdEdit);
+        UI::SetNextItemWidth(250);
+        seasonMapPackSecretEdit = UI::InputText("Set Map Pack Secret (API key, if any)##seasonMapPackSecretEdit", seasonMapPackSecretEdit, UI::InputTextFlags::CharsNoBlank);
+        if (UI::GreenButton(Icons::FloppyO + " Save")) startnew(CoroutineFunc(PostSeasonMapPackInfos));
+
+        if (selectedTypeSeasonMapPack !is null) {
+            UI::Separator();
+            if (selectedTypeSeasonMapPack.maps.Length == 0) {
+                UI::Text("Cached maps for this season are empty, try to sync maps");
+                if (UI::OrangeButton(Icons::Refresh + " Sync maps to server cache")) startnew(CoroutineFunc(SyncSeasonMapPackInfos));
+            } else {
+                UI::AlignTextToFramePadding();
+                UI::Text("Cached maps for this season:");
+                UI::SameLine();
+                if (UI::OrangeButton(Icons::Refresh + " Sync maps to server cache")) startnew(CoroutineFunc(SyncSeasonMapPackInfos));
+                if (UI::BeginTable("mmSeasonMapPack", 3, UI::TableFlags(UI::TableFlags::Resizable | UI::TableFlags::NoSavedSettings | UI::TableFlags::SizingStretchProp | UI::TableFlags::ScrollY))) {
+                    UI::TableSetupScrollFreeze(0, 1);
+                    PushTabStyle();
+                    UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthStretch);
+                    UI::TableSetupColumn("MX Uploader", UI::TableColumnFlags::WidthFixed, 100);
+                    UI::TableSetupColumn("Downloaded to server date", UI::TableColumnFlags::WidthStretch);
+                    UI::TableHeadersRow();
+                    PopTabStyle();
+
+                    UI::ListClipper clipper(selectedTypeSeasonMapPack.maps.Length);
+                    while(clipper.Step()) {
+                        for(int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
+                            UI::PushID("mmSeasonMapPack"+i);
+                            UI::TableNextRow();
+
+                            UI::TableSetColumnIndex(0);
+                            UI::Text(Text::OpenplanetFormatCodes(selectedTypeSeasonMapPack.maps[i].gbxMapName));
+
+                            UI::TableSetColumnIndex(1);
+                            UI::Text(selectedTypeSeasonMapPack.maps[i].uploaderName);
+
+                            UI::TableSetColumnIndex(2);
+                            UI::Text(selectedTypeSeasonMapPack.maps[i].downloadedAt);
+
+                            UI::PopID();
+                        }
+                    }
+
+                    UI::EndTable();
+                }
+            }
+        }
 
         UI::EndChild();
 
