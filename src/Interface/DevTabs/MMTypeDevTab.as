@@ -125,6 +125,8 @@ class MMTypeDevTab : Tab {
         Json::Value@ postJson = Json::Object();
         postJson["matchmakingTypeId"] = selectedType.id;
         postJson["name"] = seasonNameEdit;
+        postJson["mxMapPackId"] = seasonMapPackIdEdit;
+        postJson["mxMapPackSecret"] = seasonMapPackSecretEdit;
 
         Json::Value@ resPost = API::PostAsync(Setting_BaseURL+"/admin/season", Json::Write(postJson));
         @selectedType.season = MatchmakingTypeSeason(resPost["season"]);
@@ -251,7 +253,12 @@ class MMTypeDevTab : Tab {
             if (!selectedType.season.isActive) {
                 UI::NewLine();
                 UI::Text("Create new season");
+                UI::SetNextItemWidth(250);
                 seasonNameEdit = UI::InputText("Set name##seasonNameEdit", seasonNameEdit);
+                UI::SetNextItemWidth(250);
+                seasonMapPackIdEdit = UI::InputInt("Set Map Pack ID##seasonMapPackIdEdit", seasonMapPackIdEdit);
+                UI::SetNextItemWidth(250);
+                seasonMapPackSecretEdit = UI::InputText("Set Map Pack Secret (API key, if any)##seasonMapPackSecretEdit", seasonMapPackSecretEdit, UI::InputTextFlags::CharsNoBlank);
                 if (UI::GreenButton("New season")) startnew(CoroutineFunc(PostNewSeason));
             }
         } else UI::Text("\\$f00Active season is null, check server");
