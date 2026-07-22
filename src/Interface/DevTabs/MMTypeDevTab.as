@@ -249,19 +249,19 @@ class MMTypeDevTab : Tab {
             UI::Text("End date: " + (selectedType.season.endDateTimestamp != 0 ? Time::FormatString("%c", selectedType.season.endDateTimestamp) : "undefined"));
 
             if (selectedType.season.isActive && UI::RedButton("End this season")) startnew(CoroutineFunc(PostEndSeason));
-
-            if (!selectedType.season.isActive) {
-                UI::NewLine();
-                UI::Text("Create new season");
-                UI::SetNextItemWidth(250);
-                seasonNameEdit = UI::InputText("Set name##seasonNameEdit", seasonNameEdit);
-                UI::SetNextItemWidth(250);
-                seasonMapPackIdEdit = UI::InputInt("Set Map Pack ID##seasonMapPackIdEdit", seasonMapPackIdEdit);
-                UI::SetNextItemWidth(250);
-                seasonMapPackSecretEdit = UI::InputText("Set Map Pack Secret (API key, if any)##seasonMapPackSecretEdit", seasonMapPackSecretEdit, UI::InputTextFlags::CharsNoBlank);
-                if (UI::GreenButton("New season")) startnew(CoroutineFunc(PostNewSeason));
-            }
         } else UI::Text("\\$f00Active season is null, check server");
+
+        if (selectedType.season is null || !selectedType.season.isActive) {
+            UI::NewLine();
+            UI::Text("Create new season");
+            UI::SetNextItemWidth(250);
+            seasonNameEdit = UI::InputText("Set name##seasonNameEdit", seasonNameEdit);
+            UI::SetNextItemWidth(250);
+            seasonMapPackIdEdit = UI::InputInt("Set Map Pack ID##seasonMapPackIdEdit", seasonMapPackIdEdit);
+            UI::SetNextItemWidth(250);
+            seasonMapPackSecretEdit = UI::InputText("Set Map Pack Secret (API key, if any)##seasonMapPackSecretEdit", seasonMapPackSecretEdit, UI::InputTextFlags::CharsNoBlank);
+            if (UI::GreenButton("New season")) startnew(CoroutineFunc(PostNewSeason));
+        }
 
         UI::EndChild();
 
