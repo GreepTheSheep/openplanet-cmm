@@ -10,7 +10,8 @@ class SquadTab : Tab {
     string playerAccountIdActions = "";
 
     bool IsVisible() override { return g_squadEnabled || g_activeSquad !is null; }
-    string GetLabel() override { return Icons::Kenney::Users + " Squad"; }
+    string GetLabel() override { return Icons::Kenney::Users; }
+    string GetTooltip() override { return "Squad"; }
     vec4 GetColor() override { return vec4(0.05f, 0.47f, 0, 1); }
 
     void StartRequest()
