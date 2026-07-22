@@ -109,7 +109,7 @@ class LeaderboardTab : Tab {
             UI::ListClipper clipper(leaderboardEntries.Length);
             while(clipper.Step()) {
                 for(int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
-                    UI::PushID("matchHistory"+i);
+                    UI::PushID("matchmakingLeaderboard"+i);
                     UI::TableNextRow();
 
                     UI::TableSetColumnIndex(0);
