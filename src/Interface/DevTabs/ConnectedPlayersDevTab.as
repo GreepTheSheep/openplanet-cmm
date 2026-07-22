@@ -111,7 +111,6 @@ class ConnectedPlayersDevTab : Tab {
         CheckDisconnectPlayerRequest();
         if (UI::BeginTable("ConnectedPlayersList", 6, UI::TableFlags(UI::TableFlags::Resizable | UI::TableFlags::NoSavedSettings | UI::TableFlags::SizingStretchProp | UI::TableFlags::ScrollY))) {
             UI::TableSetupScrollFreeze(0, 1);
-            PushTabStyle();
             UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthStretch);
             UI::TableSetupColumn("Connexion Date", UI::TableColumnFlags::WidthFixed, 150);
             UI::TableSetupColumn("Plugin Version", UI::TableColumnFlags::WidthFixed, 60);
@@ -119,7 +118,6 @@ class ConnectedPlayersDevTab : Tab {
             UI::TableSetupColumn("Group", UI::TableColumnFlags::WidthStretch);
             UI::TableSetupColumn("Actions", UI::TableColumnFlags::WidthFixed, 80);
             UI::TableHeadersRow();
-            PopTabStyle();
 
             UI::ListClipper clipper(connectedPlayers.Length);
             while(clipper.Step()) {

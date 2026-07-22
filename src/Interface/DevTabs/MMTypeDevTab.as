@@ -301,12 +301,10 @@ class MMTypeDevTab : Tab {
                 if (UI::OrangeButton(Icons::Refresh + " Sync maps to server cache")) startnew(CoroutineFunc(SyncSeasonMapPackInfos));
                 if (UI::BeginTable("mmSeasonMapPack", 3, UI::TableFlags(UI::TableFlags::Resizable | UI::TableFlags::NoSavedSettings | UI::TableFlags::SizingStretchProp | UI::TableFlags::ScrollY))) {
                     UI::TableSetupScrollFreeze(0, 1);
-                    PushTabStyle();
                     UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthStretch);
                     UI::TableSetupColumn("MX Uploader", UI::TableColumnFlags::WidthFixed, 100);
                     UI::TableSetupColumn("Downloaded to server date", UI::TableColumnFlags::WidthStretch);
                     UI::TableHeadersRow();
-                    PopTabStyle();
 
                     UI::ListClipper clipper(selectedTypeSeasonMapPack.maps.Length);
                     while(clipper.Step()) {
@@ -345,14 +343,12 @@ class MMTypeDevTab : Tab {
 
         if (UI::BeginTable("mmTypeModeSettings", 5, UI::TableFlags(UI::TableFlags::Resizable | UI::TableFlags::NoSavedSettings | UI::TableFlags::SizingStretchProp | UI::TableFlags::ScrollY))) {
             UI::TableSetupScrollFreeze(0, 1);
-            PushTabStyle();
             UI::TableSetupColumn("ID", UI::TableColumnFlags::WidthFixed, 20);
             UI::TableSetupColumn("Setting Name", UI::TableColumnFlags::WidthFixed, 260);
             UI::TableSetupColumn("Setting Type", UI::TableColumnFlags::WidthFixed, 110);
             UI::TableSetupColumn("Setting Value", UI::TableColumnFlags::WidthFixed, 260);
             UI::TableSetupColumn("Actions", UI::TableColumnFlags::WidthStretch);
             UI::TableHeadersRow();
-            PopTabStyle();
 
             UI::ListClipper clipper(selectedTypeModeSettings.Length);
             while(clipper.Step()) {

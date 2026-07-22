@@ -185,7 +185,6 @@ class AllPlayersDevTab : Tab {
 
         if (UI::BeginTable("allPlayersList", 6, UI::TableFlags(UI::TableFlags::Resizable | UI::TableFlags::NoSavedSettings | UI::TableFlags::SizingStretchProp | UI::TableFlags::ScrollY))) {
             UI::TableSetupScrollFreeze(0, 1);
-            PushTabStyle();
             UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthStretch);
             UI::TableSetupColumn("Connexion Date", UI::TableColumnFlags::WidthFixed, 150);
             UI::TableSetupColumn("Plugin Version", UI::TableColumnFlags::WidthFixed, 60);
@@ -193,7 +192,6 @@ class AllPlayersDevTab : Tab {
             UI::TableSetupColumn("Group", UI::TableColumnFlags::WidthFixed, 200);
             UI::TableSetupColumn("Actions", UI::TableColumnFlags::WidthFixed, 80);
             UI::TableHeadersRow();
-            PopTabStyle();
 
             UI::ListClipper clipper(allPlayers.Length);
             while(clipper.Step()) {
