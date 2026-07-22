@@ -12,7 +12,7 @@ class SquadTab : Tab {
     bool IsVisible() override { return g_squadEnabled || g_activeSquad !is null; }
     string GetLabel() override { return Icons::Kenney::Users; }
     string GetTooltip() override { return "Squad"; }
-    vec4 GetColor() override { return vec4(0.05f, 0.47f, 0, 1); }
+    vec4 GetColor() override { return vec4(0.48f, 0.66f, 0, 1); }
 
     void StartRequest()
     {
