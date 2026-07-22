@@ -35,4 +35,13 @@ class Player {
         }
         return false;
     }
+
+    bool canHaveAdminWindow() {
+        return
+            hasPermission("list_players") ||
+            hasPermission("list_all_players") ||
+            hasPermission("list_groups") ||
+            hasPermission("edit_mmtype") ||
+            hasPermission("edit_user_notice");
+    }
 }
