@@ -12,6 +12,7 @@ class MatchHistory {
     bool isSquad;
     bool isPlacement;
     string calculatedAt;
+    int64 calculatedAtTimestamp;
 
     MatchHistory(const Json::Value &in json) {
         id = json["id"];
@@ -26,6 +27,7 @@ class MatchHistory {
         matchResult = json["matchResult"];
         isSquad = json["isSquad"];
         isPlacement = json["isPlacement"];
-        calculatedAt = json["calculatedAt"];
+        if (json.HasKey("calculatedAt") && json["calculatedAt"].GetType() != Json::Type::Null) calculatedAt = json["calculatedAt"];
+        if (json.HasKey("calculatedAtTimestamp") && json["calculatedAtTimestamp"].GetType() != Json::Type::Null) calculatedAtTimestamp = json["calculatedAtTimestamp"];
     }
 }
