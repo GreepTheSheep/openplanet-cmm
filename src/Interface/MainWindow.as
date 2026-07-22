@@ -1,5 +1,4 @@
 class MainWindow : Window {
-    // Tab@ m_YourProfileTab;
     Net::HttpRequest@ m_getMeRequest;
     Net::HttpRequest@ m_getMMTypeRequest;
     bool isError = false;
