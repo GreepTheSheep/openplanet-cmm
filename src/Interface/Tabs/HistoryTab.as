@@ -100,6 +100,11 @@ class HistoryTab : Tab {
             return;
         }
 
+        if (historyMatches.Length == 0) {
+            UI::Text("No matches have been recorded for this matchmaking on your account");
+            return;
+        }
+
         if (UI::BeginTable("matchHistory", 3, UI::TableFlags(UI::TableFlags::Resizable | UI::TableFlags::NoSavedSettings | UI::TableFlags::SizingStretchProp | UI::TableFlags::ScrollY))) {
             UI::TableSetupScrollFreeze(0, 1);
             UI::TableSetupColumn("Result", UI::TableColumnFlags::WidthFixed, 50);
