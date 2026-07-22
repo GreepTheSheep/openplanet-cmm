@@ -347,7 +347,7 @@ class MMTypeDevTab : Tab {
             UI::TableSetupColumn("Setting Name", UI::TableColumnFlags::WidthFixed, 260);
             UI::TableSetupColumn("Setting Type", UI::TableColumnFlags::WidthFixed, 110);
             UI::TableSetupColumn("Setting Value", UI::TableColumnFlags::WidthFixed, 260);
-            UI::TableSetupColumn("Actions", UI::TableColumnFlags::WidthStretch);
+            UI::TableSetupColumn("Remove", UI::TableColumnFlags::WidthStretch);
             UI::TableHeadersRow();
 
             UI::ListClipper clipper(selectedTypeModeSettings.Length);
@@ -374,7 +374,6 @@ class MMTypeDevTab : Tab {
                         @settingToRemove = selectedTypeModeSettings[i];
                         startnew(CoroutineFunc(RemoveSetting));
                     }
-                    UI::SetPreviousTooltip("Remove this setting");
 
                     UI::PopID();
                 }
