@@ -6,6 +6,11 @@ class HistoryTab : Tab {
     int lastMatchmakingTypeId;
     array<MatchHistory@> historyMatches;
 
+    bool IsVisible() override {
+        if (g_selectedMatchmakingType is null) return false;
+        if (g_selectedMatchmakingType.season is null) return false;
+        return true;
+    }
     string GetLabel() override { return Icons::History; }
     string GetTooltip() override { return "History"; }
     vec4 GetColor() override { return vec4(0.11f, 0.4f, 0.78f, 1); }

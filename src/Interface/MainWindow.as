@@ -90,33 +90,37 @@ class MainWindow : Window {
         else {
             // Add tooltip if the season will have a end date
             string seasonTooltipText = "";
-            if (g_selectedMatchmakingType.season.endDateTimestamp != 0) {
-                if (g_selectedMatchmakingType.season.isActive) {
-                    int64 timestampLeft = g_selectedMatchmakingType.season.endDateTimestamp - Time::Stamp;
-                    Time::Info timeLeft = Time::Parse(timestampLeft);
-                    string timeLeftString = "";
-                    if (timeLeft.Month > 1) timeLeftString += tostring(timeLeft.Month) + " months, ";
-                    if (timeLeft.Day > 1) timeLeftString += tostring(timeLeft.Day) + " days and ";
-                    timeLeftString += Time::FormatString("%T", timestampLeft);
-                    seasonTooltipText += "This season will end in " + timeLeftString;
-                } else seasonTooltipText += "This season has ended on " + Time::FormatString("%c", g_selectedMatchmakingType.season.endDateTimestamp);
-            }
-            UI::Text((g_selectedMatchmakingType.season.isActive ? "" : "\\$555") + g_selectedMatchmakingType.season.name + (seasonTooltipText.Length > 0 ? " " + Icons::InfoCircle : ""));
-            if (seasonTooltipText.Length > 0) UI::SetPreviousTooltip(seasonTooltipText);
+            if (g_selectedMatchmakingType.season !is null) {
+                if (g_selectedMatchmakingType.season.endDateTimestamp != 0) {
+                    if (g_selectedMatchmakingType.season.isActive) {
+                        int64 timestampLeft = g_selectedMatchmakingType.season.endDateTimestamp - Time::Stamp;
+                        Time::Info timeLeft = Time::Parse(timestampLeft);
+                        string timeLeftString = "";
+                        if (timeLeft.Month > 1) timeLeftString += tostring(timeLeft.Month) + " months, ";
+                        if (timeLeft.Day > 1) timeLeftString += tostring(timeLeft.Day) + " days and ";
+                        timeLeftString += Time::FormatString("%T", timestampLeft);
+                        seasonTooltipText += "This season will end in " + timeLeftString;
+                    } else seasonTooltipText += "This season has ended on " + Time::FormatString("%c", g_selectedMatchmakingType.season.endDateTimestamp);
+                }
+                UI::Text((g_selectedMatchmakingType.season.isActive ? "" : "\\$555") + g_selectedMatchmakingType.season.name + (seasonTooltipText.Length > 0 ? " " + Icons::InfoCircle : ""));
+                if (seasonTooltipText.Length > 0) UI::SetPreviousTooltip(seasonTooltipText);
+            } else UI::Text(g_selectedMatchmakingType.name);
         }
         if (isLoadingMMType) UI::Text(Hourglass);
         else {
-            if (g_selectedMatchmakingType.season.isActive) {
-                // Don't show points until player has done placement matches
-                if (g_selectedPlayerMatchmakingType.matchesPlayed < g_selectedMatchmakingType.placementMatches) {
-                    int remaining = g_selectedMatchmakingType.placementMatches - g_selectedPlayerMatchmakingType.matchesPlayed;
-                    UI::Text(Icons::ArrowCircleORight + " " + tostring(remaining) + " matches left to get your ELO");
+            if (g_selectedMatchmakingType.season !is null) {
+                if (g_selectedMatchmakingType.season.isActive) {
+                    // Don't show points until player has done placement matches
+                    if (g_selectedPlayerMatchmakingType.matchesPlayed < g_selectedMatchmakingType.placementMatches) {
+                        int remaining = g_selectedMatchmakingType.placementMatches - g_selectedPlayerMatchmakingType.matchesPlayed;
+                        UI::Text(Icons::ArrowCircleORight + " " + tostring(remaining) + " matches left to get your ELO");
+                    } else {
+                        UI::Text("\\$900" + Icons::DotCircleO + " " + g_selectedPlayerMatchmakingType.points);
+                    }
                 } else {
-                    UI::Text("\\$900" + Icons::DotCircleO + " " + g_selectedPlayerMatchmakingType.points);
+                    UI::Text("\\$949"+ Icons::Stop +" Season ended");
                 }
-            } else {
-                UI::Text("\\$949"+ Icons::Stop +" Season ended");
-            }
+            } else UI::Text("\\$f00" + Icons::Times + " \\$zNo active or last season.");
         }
         vec2 BottomPos = UI::GetCursorPos();
 

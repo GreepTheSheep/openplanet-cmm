@@ -133,6 +133,11 @@ class QueueTab : Tab {
                     queueButtonMsg = Icons::Times + " Disabled";
                     UI::GrayButton(queueButtonMsg);
                     UI::EndDisabled();
+                } else if (g_selectedMatchmakingType.season is null) {
+                    UI::BeginDisabled();
+                    queueButtonMsg = Icons::Times + " No season";
+                    UI::GrayButton(queueButtonMsg);
+                    UI::EndDisabled();
                 } else if (!g_selectedMatchmakingType.season.isActive) {
                     UI::BeginDisabled();
                     queueButtonMsg = Icons::Stop + " Season ended";
