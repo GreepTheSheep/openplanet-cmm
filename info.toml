@@ -5,11 +5,11 @@ category = "Matchmaking"
 perms = "paid"
 siteid = 424
 
-version = "0.0.3-alpha-20240823"
+version = "0.0.4-alpha-20260722"
 
 [script]
 module = "CMM"
 #defines = [ "FORCE_API_DOWN" ]
-defines = [ "FORCE_JOIN_MATCHMAKING" ]
+#defines = [ "FORCE_JOIN_MATCHMAKING" ]
 # FORCE_API_DOWN : Forces the API to be "down" after loading for tags and seasons.
 # FORCE_JOIN_MATCHMAKING : Forces the plugin to join any matchmaking despite being disabled.
