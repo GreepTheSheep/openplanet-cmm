@@ -314,6 +314,7 @@ class MMTypeDevTab : Tab {
 
                             UI::TableSetColumnIndex(0);
                             UI::Text(Text::OpenplanetFormatCodes(selectedTypeSeasonMapPack.maps[i].gbxMapName));
+                            if (UI::IsItemClicked()) OpenBrowserURL("https://trackmania.exchange/mapshow/"+selectedTypeSeasonMapPack.maps[i].mxMapId + "?mappackid=" + selectedTypeSeasonMapPack.mxMapPackId);
 
                             UI::TableSetColumnIndex(1);
                             UI::Text(selectedTypeSeasonMapPack.maps[i].uploaderName);
