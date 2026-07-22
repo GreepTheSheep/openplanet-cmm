@@ -12,6 +12,7 @@ class MainWindow : Window {
         AddTab(QueueTab());
         AddTab(SquadTab());
         AddTab(HistoryTab());
+        AddTab(LeaderboardTab());
         AddTab(InfoTab());
     }
 
