@@ -107,9 +107,9 @@ class HistoryTab : Tab {
 
                     UI::TableSetColumnIndex(0);
                     if (historyMatches[i].matchResult == "win")
-                        UI::Text("\\$0f0" + Icons::Check);
+                        UI::Text("\\$4a0" + Icons::Trophy);
                     else
-                        UI::Text("\\$f00" + Icons::Times);
+                        UI::Text("\\$a40" + Icons::Times);
 
                     UI::TableSetColumnIndex(1);
                     UI::Text(historyMatches[i].calculatedAt);
