@@ -303,7 +303,7 @@ class MMTypeDevTab : Tab {
                     UI::TableSetupScrollFreeze(0, 1);
                     UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthStretch);
                     UI::TableSetupColumn("MX Uploader", UI::TableColumnFlags::WidthFixed, 100);
-                    UI::TableSetupColumn("Downloaded to server date", UI::TableColumnFlags::WidthStretch);
+                    UI::TableSetupColumn("Downloaded to server", UI::TableColumnFlags::WidthFixed, 100);
                     UI::TableHeadersRow();
 
                     UI::ListClipper clipper(selectedTypeSeasonMapPack.maps.Length);
@@ -319,7 +319,7 @@ class MMTypeDevTab : Tab {
                             UI::Text(selectedTypeSeasonMapPack.maps[i].uploaderName);
 
                             UI::TableSetColumnIndex(2);
-                            UI::Text(selectedTypeSeasonMapPack.maps[i].downloadedAt);
+                            UI::Text(selectedTypeSeasonMapPack.maps[i].downloadedAt.Length > 0 ? Icons::Check : Icons::Times);
 
                             UI::PopID();
                         }
