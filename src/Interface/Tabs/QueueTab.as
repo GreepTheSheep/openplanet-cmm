@@ -77,7 +77,7 @@ class QueueTab : Tab {
                 UI::TextWrapped(g_userNotice.title);
                 UI::PopFont();
                 UI::SetCursorPos(UI::GetCursorPos() + vec2(width + 8, 0));
-                UI::TextWrapped(g_userNotice.description);
+                UI::Markdown(g_userNotice.description);
                 vec2 posDesc = UI::GetCursorPos();
                 UI::SetCursorPos(posDesc);
                 UI::Separator();

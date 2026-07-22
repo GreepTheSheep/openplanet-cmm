@@ -155,7 +155,7 @@ class MainWindow : Window {
                 UI::PushFont(Fonts::Header);
                 UI::Text(Text::OpenplanetFormatCodes(g_userNotice.icon) + "\\$z   " + g_userNotice.title);
                 UI::PopFont();
-                UI::TextWrapped(g_userNotice.description);
+                UI::Markdown(g_userNotice.description);
                 UI::EndTooltip();
             }
             UI::SameLine();
