@@ -112,7 +112,7 @@ class HistoryTab : Tab {
                         UI::Text("\\$a40" + Icons::Times);
 
                     UI::TableSetColumnIndex(1);
-                    UI::Text(historyMatches[i].calculatedAtTimestamp !is null ? Time::FormatString("%c", historyMatches[i].calculatedAtTimestamp) : "");
+                    UI::Text(historyMatches[i].calculatedAtTimestamp != 0 ? Time::FormatString("%c", historyMatches[i].calculatedAtTimestamp) : "");
 
                     UI::TableSetColumnIndex(2);
                     if (historyMatches[i].isPlacement) {
