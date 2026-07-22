@@ -342,9 +342,8 @@ class MMTypeDevTab : Tab {
         UI::SameLine();
         if (UI::GreenButton(Icons::FloppyO + " Update settings")) startnew(CoroutineFunc(PostMMTypeModeSettings));
 
-        if (UI::BeginTable("mmTypeModeSettings", 5, UI::TableFlags(UI::TableFlags::Resizable | UI::TableFlags::NoSavedSettings | UI::TableFlags::SizingStretchProp | UI::TableFlags::ScrollY))) {
+        if (UI::BeginTable("mmTypeModeSettings", 4, UI::TableFlags(UI::TableFlags::Resizable | UI::TableFlags::NoSavedSettings | UI::TableFlags::SizingStretchProp | UI::TableFlags::ScrollY))) {
             UI::TableSetupScrollFreeze(0, 1);
-            UI::TableSetupColumn("ID", UI::TableColumnFlags::WidthFixed, 20);
             UI::TableSetupColumn("Setting Name", UI::TableColumnFlags::WidthFixed, 260);
             UI::TableSetupColumn("Setting Type", UI::TableColumnFlags::WidthFixed, 110);
             UI::TableSetupColumn("Setting Value", UI::TableColumnFlags::WidthFixed, 260);
@@ -359,21 +358,18 @@ class MMTypeDevTab : Tab {
                     UI::TableNextRow();
 
                     UI::TableSetColumnIndex(0);
-                    UI::Text(selectedTypeModeSettings[i].id == 0 ? Icons::PlusCircle : tostring(selectedTypeModeSettings[i].id));
-
-                    UI::TableSetColumnIndex(1);
                     UI::SetNextItemWidth(260 - 8);
                     selectedTypeModeSettings[i].settingName = UI::InputText("##settingNameEdit"+i, selectedTypeModeSettings[i].settingName);
 
-                    UI::TableSetColumnIndex(2);
+                    UI::TableSetColumnIndex(1);
                     UI::SetNextItemWidth(110 - 8);
                     selectedTypeModeSettings[i].settingType = UI::InputText("##settingTypeEdit"+i, selectedTypeModeSettings[i].settingType);
 
-                    UI::TableSetColumnIndex(3);
+                    UI::TableSetColumnIndex(2);
                     UI::SetNextItemWidth(260 - 8);
                     selectedTypeModeSettings[i].settingValue = UI::InputText("##settingValueEdit"+i, selectedTypeModeSettings[i].settingValue);
 
-                    UI::TableSetColumnIndex(4);
+                    UI::TableSetColumnIndex(3);
                     if (UI::RedButton(Icons::TrashO)) {
                         @settingToRemove = selectedTypeModeSettings[i];
                         startnew(CoroutineFunc(RemoveSetting));
