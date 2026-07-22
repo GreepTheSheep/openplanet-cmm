@@ -3,6 +3,7 @@ class HistoryTab : Tab {
     bool isLoading = false;
     bool isError = false;
     string errorMsg;
+    int lastMatchmakingTypeId;
     array<MatchHistory@> historyMatches;
 
     string GetLabel() override { return Icons::History; }
@@ -34,15 +35,17 @@ class HistoryTab : Tab {
 
     void Reload() override {
         historyMatches.RemoveRange(0, historyMatches.Length);
+        lastMatchmakingTypeId = g_selectedMatchmakingType.id;
         StartRequest();
     }
 
     void CheckStartRequest()
     {
         // If there's not already a request and the window is appearing, we start a new request
-        if (m_historyGetRequest is null && UI::IsWindowAppearing()) {
-            Reload();
-        }
+        if (m_historyGetRequest is null && UI::IsWindowAppearing()) Reload();
+
+        // Reload page if the matchmaking type has been changed
+        if (lastMatchmakingTypeId > 0 && lastMatchmakingTypeId != g_selectedMatchmakingType.id) Reload();
     }
 
     void CheckRequest()

@@ -3,6 +3,7 @@ class LeaderboardTab : Tab {
     bool isLoading = false;
     bool isError = false;
     string errorMsg;
+    int lastMatchmakingTypeId;
     array<MatchmakingLeaderboard@> leaderboardEntries;
 
     bool IsVisible() override {
@@ -40,15 +41,17 @@ class LeaderboardTab : Tab {
 
     void Reload() override {
         leaderboardEntries.RemoveRange(0, leaderboardEntries.Length);
+        lastMatchmakingTypeId = g_selectedMatchmakingType.id;
         StartRequest();
     }
 
     void CheckStartRequest()
     {
         // If there's not already a request and the window is appearing, we start a new request
-        if (m_leaderboardGetRequest is null && UI::IsWindowAppearing()) {
-            Reload();
-        }
+        if (m_leaderboardGetRequest is null && UI::IsWindowAppearing()) Reload();
+
+        // Reload page if the matchmaking type has been changed
+        if (lastMatchmakingTypeId > 0 && lastMatchmakingTypeId != g_selectedMatchmakingType.id) Reload();
     }
 
     void CheckRequest()
