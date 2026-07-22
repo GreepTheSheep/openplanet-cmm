@@ -40,7 +40,7 @@ class MainWindow : Window {
             isLoading = false;
             // Parse the response
             string res = m_getMeRequest.String();
-            if (Meta::IsDeveloperMode()) trace("HomePageTab::CheckRequest(User): " + res);
+            if (Meta::IsDeveloperMode()) trace("MainWindow::CheckRequest(User): " + res);
             @m_getMeRequest = null;
             auto json = Json::Parse(res);
 
