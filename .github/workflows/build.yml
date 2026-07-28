@@ -13,19 +13,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Read info.toml
-        id: toml
-        uses: cssnr/toml-action@v1
-        with:
-          file: info.toml
-
-      - name: Clean info.toml
-        uses: cssnr/toml-action@v1
-        with:
-          file: info.toml
-          path: "$"
-          value: ${{ fromJSON(steps.toml.outputs.data) }}
-
       - name: Build .op
         run: |
           name="${{ fromJSON(steps.toml.outputs.data).script.module }}"
