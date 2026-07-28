@@ -41,12 +41,12 @@ jobs:
           path: $.meta.version
           value: ${{ fromJSON(steps.toml.outputs.data).meta.version }}.${{ steps.date.outputs.date }}
 
-      - name: Add CMM_DEV define on info.toml
+      - name: Set defines to only CMM_DEV on info.toml
         uses: cssnr/toml-action@v1.1.0
         with:
           file: info.toml
-          path: $.script.defines[0]
-          value: CMM_DEV
+          path: $.script.defines
+          value: "[ \"CMM_DEV\" ]"
 
       - name: Build .op
         run: |
