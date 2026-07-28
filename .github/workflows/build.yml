@@ -23,7 +23,7 @@ jobs:
         uses: cssnr/toml-action@v1
         with:
           file: info.toml
-          path: $
+          path: "$"
           value: ${{ fromJSON(steps.toml.outputs.data) }}
 
       - name: Build .op
