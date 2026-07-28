@@ -13,22 +13,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Get build date
-        id: date
-        run: echo "date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
-
       - name: Read info.toml
         id: toml
         uses: cssnr/toml-action@v1
         with:
           file: info.toml
 
-      - name: Edit version number on info.toml
+      - name: Clean info.toml
         uses: cssnr/toml-action@v1
         with:
           file: info.toml
-          path: $.meta.version
-          value: ${{ fromJSON(steps.toml.outputs.data).meta.version }}.${{ steps.date.outputs.date }}
+          path: $
+          value: ${{ fromJSON(steps.toml.outputs.data) }}
 
       - name: Build .op
         run: |
