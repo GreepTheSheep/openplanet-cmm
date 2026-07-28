@@ -12,7 +12,7 @@ jobs:
 
       - name: Get build date
         id: date
-        run: echo "::set-output name=date::$(date +'%Y%m%d')"
+        run: echo "date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
 
       - name: Read info.toml
         id: toml
