@@ -316,7 +316,7 @@ class SquadTab : Tab {
 
                     if (g_connectedPlayer.accountId == g_activeSquad.ownerPlayer && player.accountId != g_activeSquad.ownerPlayer) {
                         UI::Separator();
-                        if (UI::MenuItem("\\$ff0" + Icons::IdBadge + " \\$zSet squad Owner")) {
+                        if (UI::MenuItem("\\$ff0" + Icons::IdBadge + " \\$zSet squad host")) {
                             playerAccountIdActions = player.accountId;
                             startnew(CoroutineFunc(SetPlayerSquadOwner));
                         }
@@ -335,7 +335,7 @@ class SquadTab : Tab {
                 if (player.accountId == g_activeSquad.ownerPlayer) {
                     UI::SameLine();
                     UI::Text("\\$ff0" + Icons::IdBadge);
-                    UI::SetPreviousTooltip("Squad Owner");
+                    UI::SetPreviousTooltip("Squad host");
                 }
                 if (g_activeSquad.isPlayerReady(player.accountId)) {
                     UI::SameLine();
