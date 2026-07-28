@@ -6,9 +6,6 @@ on:
       - v*
   workflow_dispatch:
 
-env:
-  OP_NAME: CMM
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,15 +13,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Read info.toml
+        id: toml
+        uses: cssnr/toml-action@v1.1.0
+        with:
+          file: info.toml
+
       - name: Build .op
         run: |
-          name="${{ env.OP_NAME }}"
+          name="${{ fromJSON(steps.toml.outputs.data).script.module }}"
           [ -f "$name.op" ] && rm -f "$name.op"
           zip -r "$name.op" info.toml src
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ env.OP_NAME }}
-          path: ${{ env.OP_NAME }}.op
+          name: ${{ fromJSON(steps.toml.outputs.data).script.module }}
+          path: ${{ fromJSON(steps.toml.outputs.data).script.module }}.op
           archive: false
