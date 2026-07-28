@@ -126,16 +126,19 @@ class MainWindow : Window {
 
         UI::SetCursorPos(vec2(UI::GetWindowSize().x - 215, BasePos.y + 12));
 
-        UI::BeginDisabled(g_queueJoin || g_inMatch);
+        UI::BeginDisabled(g_queueJoin || g_inMatch || (g_activeSquad !is null && g_connectedPlayer !is null && g_connectedPlayer.accountId != g_activeSquad.ownerPlayer));
         UI::SetNextItemWidth(200);
         if (isLoadingMMType) {
             if (UI::BeginCombo("##MatchmakingTypeSelect", "Loading...")) UI::EndCombo();
         } else {
             if (UI::BeginCombo("##MatchmakingTypeSelect", g_selectedMatchmakingType.name)) {
                 for (uint i = 0; i < g_matchmakingTypes.Length; i++) {
+                    if (!g_matchmakingTypes[i].allowSquad && g_activeSquad !is null) continue; // Skips matchmakings that are not squad allowed if we're on a squad
                     matchmakingTypeSelectChanged = UI::Selectable(g_matchmakingTypes[i].name+"##"+g_matchmakingTypes[i].id, matchmakingTypeSelectChanged);
                     if (matchmakingTypeSelectChanged) SelectMatchmakingType(g_matchmakingTypes[i]);
                 }
+                if (g_activeSquad !is null && g_connectedPlayer !is null && g_connectedPlayer.accountId != g_activeSquad.ownerPlayer)
+                    UI::SetPreviousTooltip("Only the squad host can change this");
                 UI::EndCombo();
             }
         }
@@ -244,6 +247,12 @@ class MainWindow : Window {
                     @g_selectedPlayerMatchmakingType = g_connectedPlayer.matchmakingTypes[p];
                     break;
                 }
+            }
+
+            // Auto-set the squad's matchmaking type when the owner changes the selected type
+            if (g_activeSquad !is null && g_connectedPlayer.accountId == g_activeSquad.ownerPlayer && !g_activeSquad.isSearching && !g_selectedMatchmakingType.allowSquad && g_activeSquad.matchmakingTypeId != g_selectedMatchmakingType.id) {
+                g_activeSquad.matchmakingTypeId = g_selectedMatchmakingType.id;
+                startnew(Squad::setMatchmakingType);
             }
         }
     }

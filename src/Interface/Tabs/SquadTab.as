@@ -9,7 +9,6 @@ class SquadTab : Tab {
     string squadJoinCode = "";
     string playerAccountIdActions = "";
 
-    bool IsVisible() override { return g_squadEnabled || g_activeSquad !is null; }
     string GetLabel() override { return Icons::Kenney::Users; }
     string GetTooltip() override { return "Squad"; }
     vec4 GetColor() override { return vec4(0.48f, 0.66f, 0, 1); }
@@ -29,6 +28,26 @@ class SquadTab : Tab {
         // If there's not already a request and the window is appearing, we start a new request
         if (g_activeSquad is null && m_squadGetRequest is null && UI::IsWindowAppearing()) {
             Reload();
+        }
+    }
+
+    void ApplySquadExtrasFromJson(const Json::Value &in json) {
+        if (g_activeSquad is null) return;
+        Squad::applySquadExtras(g_activeSquad, json);
+    }
+
+    void HandleSearchStateChanged() {
+        if (g_activeSquad is null) return;
+        if (g_activeSquad.isSearching) {
+            if (!g_queueJoin && !g_inMatch) {
+                g_queueJoin = true;
+                g_queueJoinTime = Time::Now;
+                startnew(PingMatchmakingLoop);
+            }
+        } else {
+            if (g_queueJoin && !g_inMatch) {
+                g_queueJoin = false;
+            }
         }
     }
 
@@ -63,7 +82,9 @@ class SquadTab : Tab {
 
             isError = false;
             @g_activeSquad = Squad(json["squad"]);
+            ApplySquadExtrasFromJson(json);
             if (Squad::squadFetchLoopCoroutine is null || !Squad::squadFetchLoopCoroutine.IsRunning()) @Squad::squadFetchLoopCoroutine = startnew(Squad::fetchSquadLoop);
+            HandleSearchStateChanged();
         }
     }
 
@@ -92,12 +113,19 @@ class SquadTab : Tab {
         isError = false;
         @g_activeSquad = Squad(newSquad["squad"]);
         if (Squad::squadFetchLoopCoroutine is null || !Squad::squadFetchLoopCoroutine.IsRunning()) @Squad::squadFetchLoopCoroutine = startnew(Squad::fetchSquadLoop);
+
+        // Auto-set the current matchmaking type if it allows squads
+        if (g_selectedMatchmakingType !is null && g_selectedMatchmakingType.allowSquad) {
+            g_activeSquad.matchmakingTypeId = g_selectedMatchmakingType.id;
+            startnew(Squad::setMatchmakingType);
+        }
     }
 
     void LeaveSquad() {
         API::PostAsync(Setting_BaseURL+"/squad/leave");
         @g_activeSquad = null;
         @Squad::squadFetchLoopCoroutine = null;
+        if (g_queueJoin && !g_inMatch) g_queueJoin = false;
     }
 
     void JoinSquad() {
@@ -220,16 +248,18 @@ class SquadTab : Tab {
         }
 
         if (g_activeSquad is null) {
-            UI::Text("Create a Squad and invite players on it to queue together.");
-            UI::SetNextItemWidth(300);
-            bool pressedEnterCreate = false;
-            newSquadName = UI::InputText("Set squad name##squadNameCreate", newSquadName, pressedEnterCreate, UI::InputTextFlags::EnterReturnsTrue);
+            if (g_selectedMatchmakingType !is null && g_selectedMatchmakingType.allowSquad) {
+                UI::Text("Create a Squad and invite players on it to queue together.");
+                UI::SetNextItemWidth(300);
+                bool pressedEnterCreate = false;
+                newSquadName = UI::InputText("Set squad name##squadNameCreate", newSquadName, pressedEnterCreate, UI::InputTextFlags::EnterReturnsTrue);
 
-            UI::BeginDisabled(newSquadName.Length == 0);
-            if (pressedEnterCreate || UI::GreenButton("Create Squad")) startnew(CoroutineFunc(CreateSquad));
-            UI::EndDisabled();
+                UI::BeginDisabled(newSquadName.Length == 0);
+                if (pressedEnterCreate || UI::GreenButton("Create Squad")) startnew(CoroutineFunc(CreateSquad));
+                UI::EndDisabled();
 
-            UI::Separator();
+                UI::Separator();
+            }
 
             UI::Text("Join a Squad:");
             UI::SetNextItemWidth(300);
@@ -280,7 +310,7 @@ class SquadTab : Tab {
                 UI::Text("- " + player.displayName);
                 if (UI::BeginPopupContextItem("SquadPlayer"+player.id)) {
                     if (player.accountId == g_activeSquad.ownerPlayer)
-                        UI::Text("\\$ff0" + Icons::IdBadge + " \\$zSquad Owner");
+                        UI::Text("\\$ff0" + Icons::IdBadge + " \\$zSquad host");
                     if (player.group.icon.Length > 0)
                         UI::Text(player.group.iconWithColor + " " + player.group.nameWithColor);
 
@@ -306,6 +336,11 @@ class SquadTab : Tab {
                     UI::SameLine();
                     UI::Text("\\$ff0" + Icons::IdBadge);
                     UI::SetPreviousTooltip("Squad Owner");
+                }
+                if (g_activeSquad.isPlayerReady(player.accountId)) {
+                    UI::SameLine();
+                    UI::Text("\\$0f0" + Icons::Check);
+                    UI::SetPreviousTooltip("Ready");
                 }
             }
             UI::EndChild(); // SquadPlayers

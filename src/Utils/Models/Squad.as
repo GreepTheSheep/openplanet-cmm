@@ -4,6 +4,9 @@ class Squad {
     array<Player@> players;
     int inviteCode;
     array<SquadMessage@> messages;
+    int matchmakingTypeId = -1;
+    bool isSearching = false;
+    dictionary readyStates;
 
     Squad(const Json::Value &in json) {
         name = json["name"];
@@ -17,5 +20,12 @@ class Squad {
             SquadMessage@ msg = SquadMessage(json["messages"][m]);
             messages.InsertLast(msg);
         }
+        readyStates = dictionary();
+    }
+
+    bool isPlayerReady(const string &in accountId) {
+        bool ready = false;
+        if (readyStates.Get(accountId, ready)) return ready;
+        return false;
     }
 }

@@ -8,6 +8,7 @@ Squad@ g_activeSquad;
 MatchmakingType@ g_selectedMatchmakingType;
 PlayerMatchmakingType@ g_selectedPlayerMatchmakingType;
 uint g_connectedPlayerCount = 0;
+int g_lastSquadMatchmakingTypeId = -1;
 uint g_queuePlayersCount = 0;
 bool g_squadEnabled = false;
 string g_serverInstanceId = "";
@@ -142,6 +143,26 @@ void CheckServerLoop() {
     }
 }
 
+void SyncSquadMatchmakingType(int squadTypeId) {
+    if (squadTypeId <= 0) return;
+    if (g_selectedMatchmakingType !is null && g_selectedMatchmakingType.id == squadTypeId) return;
+    if (g_activeSquad is null) return;
+    if (g_connectedPlayer.accountId == g_activeSquad.ownerPlayer) return; // sync for other players only, the owner (host) manages it
+    for (uint i = 0; i < g_matchmakingTypes.Length; i++) {
+        if (g_matchmakingTypes[i].id == squadTypeId) {
+            @g_selectedMatchmakingType = g_matchmakingTypes[i];
+            g_squadEnabled = g_selectedMatchmakingType.allowSquad;
+            for (uint p = 0; p < g_connectedPlayer.matchmakingTypes.Length; p++) {
+                if (g_connectedPlayer.matchmakingTypes[p].matchmakingTypeId == g_selectedMatchmakingType.id) {
+                    @g_selectedPlayerMatchmakingType = g_connectedPlayer.matchmakingTypes[p];
+                    break;
+                }
+            }
+            return;
+        }
+    }
+}
+
 void PingMatchmakingLoop() {
     while (g_queueJoin || g_inMatch) {
         g_isPingingMatchmakingQueue = false;
@@ -187,6 +208,24 @@ void PingMatchmakingLoop() {
         else g_queuePlayersCount = 0;
 
         g_lastPingQueue = Time::Now;
+
+        // Update squad state from ping response
+        if (res.HasKey("squad") && res["squad"].GetType() == Json::Type::Object) {
+            if (g_activeSquad !is null) {
+                Squad::applySquadExtras(g_activeSquad, res["squad"]);
+                if (!g_queueJoin && !g_inMatch) {
+                    g_activeSquad.isSearching = false;
+                }
+                if (g_activeSquad.matchmakingTypeId != g_lastSquadMatchmakingTypeId) {
+                    g_lastSquadMatchmakingTypeId = g_activeSquad.matchmakingTypeId;
+                    SyncSquadMatchmakingType(g_activeSquad.matchmakingTypeId);
+                }
+            }
+        } else if (res.HasKey("squad") && res["squad"].GetType() == Json::Type::Null) {
+            @g_activeSquad = null;
+            @Squad::squadFetchLoopCoroutine = null;
+            if (!g_inMatch) g_queueJoin = false;
+        }
 
         if (res["match"].GetType() == Json::Type::Object) {
             g_inMatch = true;

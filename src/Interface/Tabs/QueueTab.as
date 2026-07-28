@@ -63,6 +63,44 @@ class QueueTab : Tab {
         if (g_queueJoin == false) g_queuePlayersCount = 0;
     }
 
+    void SquadToggleReady(bool ready) {
+        Json::Value@ postJson = Json::Object();
+        postJson["ready"] = ready;
+        Json::Value@ res = API::PostAsync(Setting_BaseURL+"/squad/ready", Json::Write(postJson));
+
+        if (res.GetType() == Json::Type::Null) {
+            isError = true;
+            errorMsg = "Error while setting ready state";
+            Log::Error(errorMsg);
+            return;
+        }
+        if (res.HasKey("error")) {
+            isError = true;
+            errorMsg = res["error"]["message"];
+            Log::Error(errorMsg);
+            return;
+        }
+        isError = false;
+        @g_activeSquad = Squad(res["squad"]);
+        Squad::applySquadExtras(g_activeSquad, res);
+        HandleSquadSearchStateChanged();
+    }
+
+    void HandleSquadSearchStateChanged() {
+        if (g_activeSquad is null) return;
+        if (g_activeSquad.isSearching) {
+            if (!g_queueJoin && !g_inMatch) {
+                g_queueJoin = true;
+                g_queueJoinTime = Time::Now;
+                startnew(PingMatchmakingLoop);
+            }
+        } else {
+            if (g_queueJoin && !g_inMatch) {
+                g_queueJoin = false;
+            }
+        }
+    }
+
     void Render() override {
         if (!g_inMatch) {
             if (g_userNotice.isEnabled) {
@@ -112,55 +150,11 @@ class QueueTab : Tab {
                 }
             }
 
-            UI::SetCursorPos(vec2((UI::GetWindowSize().x*.5) - (UI::MeasureString(queueButtonMsg).x/2), UI::GetWindowSize().y - 25));
-            if (g_selectedMatchmakingType is null) {
-                UI::BeginDisabled();
-                queueButtonMsg = Icons::Hourglass + " Loading";
-                UI::GrayButton(queueButtonMsg);
-                UI::EndDisabled();
-            } else {
-#if !FORCE_JOIN_MATCHMAKING
-#if SIG_SCHOOL
-                if (!Meta::IsSchoolModeWhitelisted()) {
-                    UI::BeginDisabled();
-                    queueButtonMsg = Icons::Times + " School Mode enabled";
-                    UI::RedButton(queueButtonMsg);
-                    UI::EndDisabled();
-                } else
-#endif
-                if (g_selectedMatchmakingType.isDisabled) {
-                    UI::BeginDisabled();
-                    queueButtonMsg = Icons::Times + " Disabled";
-                    UI::GrayButton(queueButtonMsg);
-                    UI::EndDisabled();
-                } else if (g_selectedMatchmakingType.season is null) {
-                    UI::BeginDisabled();
-                    queueButtonMsg = Icons::Times + " No season";
-                    UI::GrayButton(queueButtonMsg);
-                    UI::EndDisabled();
-                } else if (!g_selectedMatchmakingType.season.isActive) {
-                    UI::BeginDisabled();
-                    queueButtonMsg = Icons::Stop + " Season ended";
-                    UI::GrayButton(queueButtonMsg);
-                    UI::EndDisabled();
-                } else if (g_activeSquad !is null && g_activeSquad.players.Length > g_selectedMatchmakingType.playersPerTeams) {
-                    UI::BeginDisabled();
-                    queueButtonMsg = Icons::Times + " Too many players in squad";
-                    UI::GrayButton(queueButtonMsg);
-                    UI::EndDisabled();
-                } else {
-#endif
-                    if (!g_queueJoin) {
-                        queueButtonMsg = Icons::Play + " Enter queue";
-                        if (UI::GreenButton(queueButtonMsg)) startnew(CoroutineFunc(JoinQueueAsync));
-                    }
-                    if (g_queueJoin) {
-                        queueButtonMsg = Icons::Stop + " Leave queue";
-                        if (UI::RedButton(queueButtonMsg)) startnew(CoroutineFunc(LeaveQueueAsync));
-                    }
-#if !FORCE_JOIN_MATCHMAKING
-                }
-#endif
+            RenderQueueButton();
+
+            if (isError) {
+                UI::Separator();
+                UI::Text("\\$f00" + Icons::ExclamationTriangle + " \\$z" + errorMsg);
             }
         } else {
             if (g_matchInfo !is null) {
@@ -202,8 +196,8 @@ class QueueTab : Tab {
                             g_matchInfo.status.ToLower().StartsWith("waiting for players") ||
                             g_matchInfo.status.ToLower().StartsWith("match in progress")
                         ) &&
-                        g_matchInfo.tmServer.quickJoinLink != "")
-                    {
+                        g_matchInfo.tmServer.quickJoinLink != ""
+                    ){
                         UI::SetCursorPos(vec2(UI::GetWindowSize().x/2.25 - 25, UI::GetWindowSize().y - 25));
                         if (UI::Button(Icons::Kenney::Reload + " Join Server")) TM::JoinServer(g_matchInfo.tmServer.quickJoinLink);
                     }
@@ -211,4 +205,105 @@ class QueueTab : Tab {
             }
         }
     }
+
+    void RenderQueueButton() {
+        UI::SetCursorPos(vec2((UI::GetWindowSize().x*.5) - (UI::MeasureString(queueButtonMsg).x/2), UI::GetWindowSize().y - 25));
+
+        if (g_selectedMatchmakingType is null) {
+            UI::BeginDisabled();
+            queueButtonMsg = Icons::Hourglass + " Loading";
+            UI::GrayButton(queueButtonMsg);
+            UI::EndDisabled();
+            return;
+        }
+
+#if !FORCE_JOIN_MATCHMAKING
+#if SIG_SCHOOL
+        if (!Meta::IsSchoolModeWhitelisted()) {
+            UI::BeginDisabled();
+            queueButtonMsg = Icons::Times + " School Mode enabled";
+            UI::RedButton(queueButtonMsg);
+            UI::EndDisabled();
+            return;
+        }
+#endif
+        if (g_selectedMatchmakingType.isDisabled) {
+            UI::BeginDisabled();
+            queueButtonMsg = Icons::Times + " Disabled";
+            UI::GrayButton(queueButtonMsg);
+            UI::EndDisabled();
+            return;
+        }
+        if (g_selectedMatchmakingType.season is null) {
+            UI::BeginDisabled();
+            queueButtonMsg = Icons::Times + " No season";
+            UI::GrayButton(queueButtonMsg);
+            UI::EndDisabled();
+            return;
+        }
+        if (!g_selectedMatchmakingType.season.isActive) {
+            UI::BeginDisabled();
+            queueButtonMsg = Icons::Stop + " Season ended";
+            UI::GrayButton(queueButtonMsg);
+            UI::EndDisabled();
+            return;
+        }
+#endif
+        if (g_activeSquad !is null) {
+#if !FORCE_JOIN_MATCHMAKING
+            if (!g_selectedMatchmakingType.allowSquad) {
+                UI::BeginDisabled();
+                queueButtonMsg = Icons::Times + " Squads not allowed";
+                UI::GrayButton(queueButtonMsg);
+                UI::EndDisabled();
+                return;
+            }
+            if (g_activeSquad.players.Length > g_selectedMatchmakingType.playersPerTeams) {
+                UI::BeginDisabled();
+                queueButtonMsg = Icons::Times + " Too many players in squad";
+                UI::GrayButton(queueButtonMsg);
+                UI::EndDisabled();
+                return;
+            }
+#endif
+            // Searching state
+            if (g_activeSquad.isSearching) {
+                queueButtonMsg = Icons::Times + " Unready";
+                if (UI::RedButton(queueButtonMsg)) startnew(CoroutineFunc(SquadSetUnready));
+                return;
+            }
+
+            // Type not set yet (auto-set by owner via MainWindow, waiting for propagation)
+            if (g_activeSquad.matchmakingTypeId == -1) {
+                bool isOwner = (g_connectedPlayer !is null && g_connectedPlayer.accountId == g_activeSquad.ownerPlayer);
+                UI::BeginDisabled();
+                queueButtonMsg = isOwner ? (Icons::ArrowUp + " Select a type above") : (Icons::Hourglass + " Waiting for squad host...");
+                UI::GrayButton(queueButtonMsg);
+                UI::EndDisabled();
+                return;
+            }
+
+            // Type set, waiting for ready
+            bool meReady = (g_connectedPlayer !is null && g_activeSquad.isPlayerReady(g_connectedPlayer.accountId));
+            if (!meReady) {
+                queueButtonMsg = Icons::Check + " Ready up";
+                if (UI::GreenButton(queueButtonMsg)) startnew(CoroutineFunc(SquadSetReady));
+            } else {
+                queueButtonMsg = Icons::Times + " Unready";
+                if (UI::RedButton(queueButtonMsg)) startnew(CoroutineFunc(SquadSetUnready));
+            }
+        } else {
+            if (!g_queueJoin) {
+                queueButtonMsg = Icons::Play + " Enter queue";
+                if (UI::GreenButton(queueButtonMsg)) startnew(CoroutineFunc(JoinQueueAsync));
+            }
+            if (g_queueJoin) {
+                queueButtonMsg = Icons::Stop + " Leave queue";
+                if (UI::RedButton(queueButtonMsg)) startnew(CoroutineFunc(LeaveQueueAsync));
+            }
+        }
+    }
+
+    void SquadSetReady() { SquadToggleReady(true); }
+    void SquadSetUnready() { SquadToggleReady(false); }
 }
