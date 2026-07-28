@@ -31,7 +31,7 @@ jobs:
         uses: cssnr/toml-action@v1.1.0
         with:
           file: info.toml
-          path: $.meta.name
+          path: $.script.module
           value: ${{ fromJSON(steps.toml.outputs.data).script.module }}-DEV
 
       - name: Edit version number on info.toml
