@@ -1,0 +1,55 @@
+name: Build DEV plugin
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Get build date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%d')"
+
+      - name: Read info.toml
+        id: toml
+        uses: cssnr/toml-action@v1.1.0
+        with:
+          file: info.toml
+
+      - name: Edit name on info.toml
+        uses: cssnr/toml-action@v1.1.0
+        with:
+          file: info.toml
+          path: $.meta.name
+          value: ${{ fromJSON(steps.toml.outputs.data).meta.name }} [DEV]
+
+      - name: Edit module name on info.toml
+        uses: cssnr/toml-action@v1.1.0
+        with:
+          file: info.toml
+          path: $.meta.name
+          value: ${{ fromJSON(steps.toml.outputs.data).script.module }}-DEV
+
+      - name: Edit version number on info.toml
+        uses: cssnr/toml-action@v1.1.0
+        with:
+          file: info.toml
+          path: $.meta.version
+          value: ${{ fromJSON(steps.toml.outputs.data).meta.version }}.${{ steps.date.outputs.date }}
+
+      - name: Build .op
+        run: |
+          name="${{ fromJSON(steps.toml.outputs.data).script.module }}-DEV"
+          [ -f "$name.op" ] && rm -f "$name.op"
+          zip -r "$name.op" info.toml src
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ fromJSON(steps.toml.outputs.data).script.module }}-DEV
+          path: ${{ fromJSON(steps.toml.outputs.data).script.module }}-DEV.op
+          archive: false
