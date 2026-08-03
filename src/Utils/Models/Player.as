@@ -4,6 +4,8 @@ class Player {
     string displayName;
     array<PlayerMatchmakingType@> matchmakingTypes;
     int groupId;
+    string firstLogon;
+    int64 firstLogonTimestamp;
     string lastLogon;
     int64 lastLogonTimestamp;
     string lastPluginVersion;
@@ -20,6 +22,8 @@ class Player {
             matchmakingTypes.InsertLast(matchmakingType);
         }
         groupId = json["groupId"];
+        firstLogon = json["firstLogon"];
+        firstLogonTimestamp = json["firstLogonTimestamp"];
         lastLogon = json["lastLogon"];
         lastLogonTimestamp = json["lastLogonTimestamp"];
         lastPluginVersion = json["lastPluginVersion"]["fullVersion"];

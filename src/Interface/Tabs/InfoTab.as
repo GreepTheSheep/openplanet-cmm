@@ -96,7 +96,8 @@ class InfoTab : Tab {
         UI::SeparatorText(Icons::User + " Connected Player:");
         UI::PopStyleColor();
         UI::Text(g_connectedPlayer.displayName + " \\$777(" + g_connectedPlayer.accountId + ")");
-        UI::Text("Last logon \\$777" + Time::FormatString("%F %X", g_connectedPlayer.lastLogonTimestamp));
+        UI::Text("First connexion \\$777" + Time::FormatString("%F %X", g_connectedPlayer.firstLogonTimestamp));
+        UI::Text("Connected \\$777" + Time::FormatString("%F %X", g_connectedPlayer.lastLogonTimestamp));
         UI::Text("Group \\$777" + g_connectedPlayer.group.nameWithIconColor);
 
         UI::PushFont(Fonts::Header);
