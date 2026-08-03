@@ -206,6 +206,11 @@ class MainWindow : Window {
         string versionString = "\\$666v"+Meta::ExecutingPlugin().Version;
         UI::SetCursorPos(vec2(UI::GetWindowSize().x-UI::MeasureString(versionString).x-10, posOrig.y));
         UI::Text(versionString);
+        if (UI::IsItemClicked()) {
+            string report = CMMBuildInfo::CreateBuildReportText();
+            Log::Log(report);
+            IO::SetClipboard(report);
+        }
     }
 
     void SelectMatchmakingType(MatchmakingType@ matchmakingType) {

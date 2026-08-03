@@ -3,52 +3,6 @@ class InfoTab : Tab {
     string GetTooltip() override { return "Info"; }
     vec4 GetColor() override { return vec4(0.47f, 0.47f, 0.47f, 1); }
 
-    string CreateBuildReportText() {
-        string buildReportStr = PLUGIN_NAME + " v" + Meta::ExecutingPlugin().Version + "\n";
-        buildReportStr += "Plugin build type: "+tostring(Meta::ExecutingPlugin().Type)+"\n";
-        buildReportStr += "Plugin Dev build: ";
-#if CMM_DEV_BUILD
-        buildReportStr += "True\n";
-#else
-        buildReportStr += "False\n";
-#endif
-        buildReportStr += "OS: ";
-#if WINDOWS
-        buildReportStr += "Windows";
-#elif LINUX
-        buildReportStr += "Linux";
-#endif
-#if WINDOWS_WINE
-        buildReportStr += " (Wine detected)";
-#endif
-        buildReportStr += "\n";
-        buildReportStr += "Openplanet " + Meta::OpenplanetBuildInfo() + "\n";
-#if DEVELOPER
-        buildReportStr += "Openplanet debug build detected\n";
-#endif
-        buildReportStr += "Signature: ";
-#if SIG_SCHOOL
-        buildReportStr += "School" + (Meta::IsSchoolModeWhitelisted() ? " (Whitelisted)" : "");
-#elif SIG_DEVELOPER
-        buildReportStr += "Developer";
-#elif SIG_REGULAR
-        buildReportStr += "Regular";
-#elif SIG_OFFICIAL
-        buildReportStr += "Official";
-#endif
-        buildReportStr += "\n\n";
-        buildReportStr += "Connected player: " + g_connectedPlayer.displayName + " (" + g_connectedPlayer.accountId + ")\n";
-        buildReportStr += "Last logon: " + g_connectedPlayer.lastLogon + "\n";
-        buildReportStr += "Group: " + g_connectedPlayer.group.name;
-        buildReportStr += "\n\n";
-        buildReportStr += "Server: " + Setting_BaseURL + "\n";
-        buildReportStr += "Instance ID: " + g_serverInstanceId;
-        buildReportStr += "\n\n";
-        buildReportStr += "Report generated: " + Time::FormatString("%c", Time::Stamp);
-
-        return buildReportStr;
-    }
-
     void Render() override {
         UI::PushFont(Fonts::Header);
         UI::SeparatorText(Icons::Plug + " \\$z Plugin");
@@ -110,9 +64,5 @@ class InfoTab : Tab {
         UI::SameLine();
         UI::Text("\\$777(\\$f39" + Icons::CodeFork + " \\$777debug build)");
 #endif
-
-        UI::TextDisabled(Icons::Clipboard);
-        UI::SetPreviousTooltip("Copy build info to clipboard for debug purposes.");
-        if (UI::IsItemClicked()) IO::SetClipboard(CreateBuildReportText());
     }
 }
