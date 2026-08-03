@@ -12,6 +12,7 @@ int g_lastSquadMatchmakingTypeId = -1;
 uint g_queuePlayersCount = 0;
 bool g_squadEnabled = false;
 string g_serverInstanceId = "";
+int64 g_serverBootTimestamp;
 UserNotice@ g_userNotice;
 int64 stampServerRetry = -1;
 bool g_queueJoin = false;
@@ -109,6 +110,7 @@ bool CheckServer()
 
         g_connectedPlayerCount = res["connectedPlayers"];
         @g_userNotice = UserNotice(res["notice"]);
+        g_serverBootTimestamp = res["startTimestamp"];
 
         return true;
     }

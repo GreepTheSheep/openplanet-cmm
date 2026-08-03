@@ -45,6 +45,7 @@ class InfoTab : Tab {
         UI::PopStyleColor();
         UI::PopFont();
         UI::Text("Instance ID \\$777" + g_serverInstanceId);
+        UI::Text("Instance started \\$777" + Time::FormatString("%F %X", g_serverBootTimestamp));
 
         UI::PushStyleColor(UI::Col::Separator, COLOR_VEC);
         UI::SeparatorText(Icons::User + " Connected Player:");
