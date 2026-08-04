@@ -5,7 +5,7 @@ category = "Matchmaking"
 perms = "paid"
 siteid = 424
 
-version = "0.0.6.20260804"
+version = "0.0.7.20260805"
 
 [script]
 module = "CMM"
