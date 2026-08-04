@@ -2,6 +2,8 @@ class QueueTab : Tab {
     bool isError = false;
     string errorMsg;
     string queueButtonMsg;
+    bool isSquadToggleReadyClicked = false;
+    bool isLeaveQueueClicked = false;
 
     string GetLabel() override { return Icons::Play; }
     string GetTooltip() override { return "Queue"; }
@@ -40,6 +42,7 @@ class QueueTab : Tab {
     }
 
     void LeaveQueueAsync() {
+        isLeaveQueueClicked = true;
         Json::Value@ postJson = Json::Object();
         postJson["matchmakingId"] = g_selectedMatchmakingType.id;
         Json::Value@ res = API::PostAsync(Setting_BaseURL+"/matchmaking/leave", Json::Write(postJson));
@@ -61,9 +64,11 @@ class QueueTab : Tab {
 
         g_queueJoin = res["inQueue"];
         if (g_queueJoin == false) g_queuePlayersCount = 0;
+        isLeaveQueueClicked = false;
     }
 
     void SquadToggleReady(bool ready) {
+        isSquadToggleReadyClicked = true;
         Json::Value@ postJson = Json::Object();
         postJson["ready"] = ready;
         Json::Value@ res = API::PostAsync(Setting_BaseURL+"/squad/ready", Json::Write(postJson));
@@ -84,6 +89,7 @@ class QueueTab : Tab {
         @g_activeSquad = Squad(res["squad"]);
         Squad::applySquadExtras(g_activeSquad, res);
         HandleSquadSearchStateChanged();
+        isSquadToggleReadyClicked = false;
     }
 
     void HandleSquadSearchStateChanged() {
@@ -285,6 +291,7 @@ class QueueTab : Tab {
 
             // Type set, waiting for ready
             bool meReady = (g_connectedPlayer !is null && g_activeSquad.isPlayerReady(g_connectedPlayer.accountId));
+            UI::BeginDisabled(isSquadToggleReadyClicked);
             if (!meReady) {
                 queueButtonMsg = Icons::Check + " Ready up";
                 if (UI::GreenButton(queueButtonMsg)) startnew(CoroutineFunc(SquadSetReady));
@@ -292,14 +299,19 @@ class QueueTab : Tab {
                 queueButtonMsg = Icons::Times + " Unready";
                 if (UI::RedButton(queueButtonMsg)) startnew(CoroutineFunc(SquadSetUnready));
             }
+            UI::EndDisabled();
         } else {
             if (!g_queueJoin) {
+                UI::BeginDisabled(g_isPingingMatchmakingQueue);
                 queueButtonMsg = Icons::Play + " Enter queue";
                 if (UI::GreenButton(queueButtonMsg)) startnew(CoroutineFunc(JoinQueueAsync));
+                UI::EndDisabled();
             }
             if (g_queueJoin) {
+                UI::BeginDisabled(isLeaveQueueClicked);
                 queueButtonMsg = Icons::Stop + " Leave queue";
                 if (UI::RedButton(queueButtonMsg)) startnew(CoroutineFunc(LeaveQueueAsync));
+                UI::EndDisabled();
             }
         }
     }
