@@ -226,7 +226,6 @@ void PingMatchmakingLoop() {
         } else if (res.HasKey("squad") && res["squad"].GetType() == Json::Type::Null) {
             @g_activeSquad = null;
             @Squad::squadFetchLoopCoroutine = null;
-            if (!g_inMatch) g_queueJoin = false;
         }
 
         if (res["match"].GetType() == Json::Type::Object) {
