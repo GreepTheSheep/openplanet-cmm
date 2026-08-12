@@ -11,7 +11,8 @@ uint g_connectedPlayerCount = 0;
 int g_lastSquadMatchmakingTypeId = -1;
 uint g_queuePlayersCount = 0;
 bool g_squadEnabled = false;
-int64 g_serverBootTimestamp;
+int64 g_clusterBootTimestamp;
+int64 g_podBootTimestamp;
 UserNotice@ g_userNotice;
 int64 stampServerRetry = -1;
 bool g_queueJoin = false;
@@ -97,7 +98,8 @@ bool CheckServer()
     } else if (res.GetType() == Json::Type::Object) {
         g_connectedPlayerCount = res["connectedPlayers"];
         @g_userNotice = UserNotice(res["notice"]);
-        g_serverBootTimestamp = res["startTimestamp"];
+        g_clusterBootTimestamp = res["globalStartTimestamp"];
+        g_podBootTimestamp = res["startTimestamp"];
 
         return true;
     }

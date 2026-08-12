@@ -83,7 +83,8 @@ namespace CMMBuildInfo {
         for (int i = 0; i < serverHeader.Length; i++) serverHeaderDelimiter.InsertLast("-");
         buildReportStr += serverHeader + "\n" + Text::Join(serverHeaderDelimiter,"") + "\n\n";
         buildReportStr += "* URL: " + Setting_BaseURL + "\n";
-        buildReportStr += "* InstanceStart: " + Time::FormatString("%F %X", g_serverBootTimestamp);
+        buildReportStr += "* PodStart: " + Time::FormatString("%F %X", g_podBootTimestamp);
+        buildReportStr += "* ClusterStart: " + Time::FormatString("%F %X", g_clusterBootTimestamp);
 
         return buildReportStr;
     }
