@@ -83,7 +83,6 @@ namespace CMMBuildInfo {
         for (int i = 0; i < serverHeader.Length; i++) serverHeaderDelimiter.InsertLast("-");
         buildReportStr += serverHeader + "\n" + Text::Join(serverHeaderDelimiter,"") + "\n\n";
         buildReportStr += "* URL: " + Setting_BaseURL + "\n";
-        buildReportStr += "* InstanceId: " + g_serverInstanceId + "\n";
         buildReportStr += "* InstanceStart: " + Time::FormatString("%F %X", g_serverBootTimestamp);
 
         return buildReportStr;

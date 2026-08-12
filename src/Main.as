@@ -11,7 +11,6 @@ uint g_connectedPlayerCount = 0;
 int g_lastSquadMatchmakingTypeId = -1;
 uint g_queuePlayersCount = 0;
 bool g_squadEnabled = false;
-string g_serverInstanceId = "";
 int64 g_serverBootTimestamp;
 UserNotice@ g_userNotice;
 int64 stampServerRetry = -1;
@@ -96,18 +95,6 @@ bool CheckServer()
     if (res.GetType() == Json::Type::Null) {
         if (!isServerAlive) Log::Error("Server is not responding.", false);
     } else if (res.GetType() == Json::Type::Object) {
-        // server instance Id will check if the server has been restarted between last check and this check
-        // If the instance Id is not the same, then the server has been restarted, so the plugin had to redo the auth process
-        // this is to prevent "Connected player not found" errors
-        string instanceId = res["instanceId"];
-        if (Meta::IsDeveloperMode() && g_serverInstanceId != instanceId) Log::Trace("Server instance id: " + instanceId);
-        if (g_serverInstanceId.Length == 0) g_serverInstanceId = instanceId;
-        if (g_serverInstanceId != instanceId) {
-            Log::Warn("Server instance ID is incorrect, this is due to server restarting. Logging out. Logging in will be done in a minute", true);
-            g_serverInstanceId = instanceId;
-            return false;
-        }
-
         g_connectedPlayerCount = res["connectedPlayers"];
         @g_userNotice = UserNotice(res["notice"]);
         g_serverBootTimestamp = res["startTimestamp"];
