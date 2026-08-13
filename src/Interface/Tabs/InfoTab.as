@@ -41,15 +41,9 @@ class InfoTab : Tab {
 
         UI::PushFont(Fonts::Header);
         UI::PushStyleColor(UI::Col::Separator, COLOR_VEC);
-        UI::SeparatorText(ICON_COL + " Server");
-        UI::PopStyleColor();
-        UI::PopFont();
-        UI::Text("K8s Pod started \\$777" + Time::FormatString("%F %X", g_podBootTimestamp));
-        UI::Text("Cluster started \\$777" + Time::FormatString("%F %X", g_clusterBootTimestamp));
-
-        UI::PushStyleColor(UI::Col::Separator, COLOR_VEC);
         UI::SeparatorText(Icons::User + " Connected Player:");
         UI::PopStyleColor();
+        UI::PopFont();
         UI::Text(g_connectedPlayer.displayName + " \\$777(" + g_connectedPlayer.accountId + ")");
         UI::Text("First connexion \\$777" + Time::FormatString("%F %X", g_connectedPlayer.firstLogonTimestamp));
         UI::Text("Connected \\$777" + Time::FormatString("%F %X", g_connectedPlayer.lastLogonTimestamp));
