@@ -46,11 +46,11 @@ void RenderMenu()
         return;
     }
     if (!Auth::connected) return;
-    if (cmmDevWindow !is null && g_connectedPlayer !is null && g_connectedPlayer.canHaveAdminWindow() && UI::MenuItem(PLUGIN_NAME_SHORT+" Admin Interface", "", cmmDevWindow.isOpened)) {
-        cmmDevWindow.isOpened = !cmmDevWindow.isOpened;
-    }
     if (cmmMainWindow !is null && UI::MenuItem(ICON_COL + PLUGIN_NAME, "", cmmMainWindow.isOpened)) {
         cmmMainWindow.isOpened = !cmmMainWindow.isOpened;
+    }
+    if (cmmDevWindow !is null && g_connectedPlayer !is null && g_connectedPlayer.canHaveAdminWindow() && UI::MenuItem(PLUGIN_NAME_SHORT+" Admin Interface", "", cmmDevWindow.isOpened)) {
+        cmmDevWindow.isOpened = !cmmDevWindow.isOpened;
     }
 }
 
