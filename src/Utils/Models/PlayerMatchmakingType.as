@@ -16,9 +16,10 @@ class PlayerMatchmakingType {
         matchesDraw = json["matchesDraw"];
         matchesLoss = json["matchesLoss"];
         seasonId = json["seasonId"];
-        for (uint m = 0; m < json["recentMatches"].Length; m++){
-            recentMatches.InsertLast(PlayerMatchmakingTypeRecentMatch(json["recentMatches"][m]));
-        }
+        if (json.HasKey("recentMatches") && json["recentMatches"].GetType() == Json::Type::Array)
+            for (uint m = 0; m < json["recentMatches"].Length; m++){
+                recentMatches.InsertLast(PlayerMatchmakingTypeRecentMatch(json["recentMatches"][m]));
+            }
     }
 }
 
