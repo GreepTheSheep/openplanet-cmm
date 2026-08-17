@@ -10,10 +10,10 @@ version = "0.0.8.20260813"
 [script]
 module = "CMM"
 #defines = [ "FORCE_API_DOWN" ]
-#defines = [ "FORCE_JOIN_MATCHMAKING" ]
+#defines = [ "CMM_FORCE_JOIN_MATCHMAKING" ]
 #defines = [ "CMM_DEV_BUILD" ]
 #defines = [ "CMM_ALLOW_CHANGE_SETTINGS" ]
 # FORCE_API_DOWN : Forces the API to be "down" after loading for tags and seasons.
-# FORCE_JOIN_MATCHMAKING : Forces the plugin to join any matchmaking despite being disabled.
+# CMM_FORCE_JOIN_MATCHMAKING : Forces the plugin to join any matchmaking despite being disabled.
 # CMM_DEV_BUILD : Enables editing the base URL in Plugin Settings, plus changes the plugin name to have a DEV tag
 # CMM_ALLOW_CHANGE_SETTINGS : Enables editing the base URL in Plugin Settings (only for < v1)

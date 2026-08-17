@@ -223,7 +223,7 @@ class QueueTab : Tab {
             return;
         }
 
-#if !FORCE_JOIN_MATCHMAKING
+#if !CMM_FORCE_JOIN_MATCHMAKING
 #if SIG_SCHOOL
         if (!Meta::IsSchoolModeWhitelisted()) {
             UI::BeginDisabled();
@@ -256,7 +256,7 @@ class QueueTab : Tab {
         }
 #endif
         if (g_activeSquad !is null) {
-#if !FORCE_JOIN_MATCHMAKING
+#if !CMM_FORCE_JOIN_MATCHMAKING
             if (!g_selectedMatchmakingType.allowSquad) {
                 UI::BeginDisabled();
                 queueButtonMsg = Icons::Times + " Squads not allowed";
