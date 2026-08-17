@@ -62,6 +62,26 @@ namespace Squad {
         handleSearchStateChanged();
     }
 
+    void SyncSquadMatchmakingType(int squadTypeId) {
+        if (squadTypeId <= 0) return;
+        if (g_selectedMatchmakingType !is null && g_selectedMatchmakingType.id == squadTypeId) return;
+        if (g_activeSquad is null) return;
+        if (g_connectedPlayer.accountId == g_activeSquad.ownerPlayer) return; // sync for other players only, the owner (host) manages it
+        for (uint i = 0; i < g_matchmakingTypes.Length; i++) {
+            if (g_matchmakingTypes[i].id == squadTypeId) {
+                @g_selectedMatchmakingType = g_matchmakingTypes[i];
+                g_squadEnabled = g_selectedMatchmakingType.allowSquad;
+                for (uint p = 0; p < g_connectedPlayer.matchmakingTypes.Length; p++) {
+                    if (g_connectedPlayer.matchmakingTypes[p].matchmakingTypeId == g_selectedMatchmakingType.id) {
+                        @g_selectedPlayerMatchmakingType = g_connectedPlayer.matchmakingTypes[p];
+                        break;
+                    }
+                }
+                return;
+            }
+        }
+    }
+
     void fetchSquadAsync(const bool &in postLog = true) {
         if (g_selectedMatchmakingType !is null && g_selectedMatchmakingType.allowSquad) {
             Json::Value@ res = API::GetAsync(Setting_BaseURL+"/squad", postLog);

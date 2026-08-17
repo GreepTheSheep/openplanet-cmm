@@ -132,26 +132,6 @@ void CheckServerLoop() {
     }
 }
 
-void SyncSquadMatchmakingType(int squadTypeId) {
-    if (squadTypeId <= 0) return;
-    if (g_selectedMatchmakingType !is null && g_selectedMatchmakingType.id == squadTypeId) return;
-    if (g_activeSquad is null) return;
-    if (g_connectedPlayer.accountId == g_activeSquad.ownerPlayer) return; // sync for other players only, the owner (host) manages it
-    for (uint i = 0; i < g_matchmakingTypes.Length; i++) {
-        if (g_matchmakingTypes[i].id == squadTypeId) {
-            @g_selectedMatchmakingType = g_matchmakingTypes[i];
-            g_squadEnabled = g_selectedMatchmakingType.allowSquad;
-            for (uint p = 0; p < g_connectedPlayer.matchmakingTypes.Length; p++) {
-                if (g_connectedPlayer.matchmakingTypes[p].matchmakingTypeId == g_selectedMatchmakingType.id) {
-                    @g_selectedPlayerMatchmakingType = g_connectedPlayer.matchmakingTypes[p];
-                    break;
-                }
-            }
-            return;
-        }
-    }
-}
-
 void PingMatchmakingLoop() {
     while (g_queueJoin || g_inMatch) {
         g_isPingingMatchmakingQueue = false;
@@ -207,7 +187,7 @@ void PingMatchmakingLoop() {
                 }
                 if (g_activeSquad.matchmakingTypeId != g_lastSquadMatchmakingTypeId) {
                     g_lastSquadMatchmakingTypeId = g_activeSquad.matchmakingTypeId;
-                    SyncSquadMatchmakingType(g_activeSquad.matchmakingTypeId);
+                    Squad::SyncSquadMatchmakingType(g_activeSquad.matchmakingTypeId);
                 }
             }
         } else if (res.HasKey("squad") && res["squad"].GetType() == Json::Type::Null) {
