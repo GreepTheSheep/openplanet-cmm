@@ -25,6 +25,7 @@ Match@ g_matchInfo;
 
 void RenderMenu()
 {
+    if (!TM::hasPermissions()) return;
     string serverRefreshSeconds;
     if (stampServerRetry - Time::Stamp >= 0) serverRefreshSeconds = Time::FormatString(Icons::Refresh + " %Ss", stampServerRetry - Time::Stamp);
     if (serverRefreshSeconds == "<invalid>") serverRefreshSeconds = "";
