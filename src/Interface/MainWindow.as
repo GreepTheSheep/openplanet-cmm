@@ -255,7 +255,7 @@ class MainWindow : Window {
             }
 
             // Auto-set the squad's matchmaking type when the owner changes the selected type
-            if (g_activeSquad !is null && g_connectedPlayer.accountId == g_activeSquad.ownerPlayer && !g_activeSquad.isSearching && !g_selectedMatchmakingType.allowSquad && g_activeSquad.matchmakingTypeId != g_selectedMatchmakingType.id) {
+            if (g_activeSquad !is null && g_connectedPlayer.accountId == g_activeSquad.ownerPlayer && !g_activeSquad.isSearching && g_selectedMatchmakingType.allowSquad && g_activeSquad.matchmakingTypeId != g_selectedMatchmakingType.id) {
                 g_activeSquad.matchmakingTypeId = g_selectedMatchmakingType.id;
                 startnew(Squad::setMatchmakingType);
             }
