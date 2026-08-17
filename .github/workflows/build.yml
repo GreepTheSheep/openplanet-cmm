@@ -19,12 +19,12 @@ jobs:
         with:
           file: info.toml
 
-      - name: Add CMM_DEV_BUILD define on info.toml
+      - name: Add CMM_ALLOW_CHANGE_SETTINGS define on info.toml
         uses: cssnr/toml-action@v2
         with:
           file: info.toml
           path: $.script.defines
-          value: "CMM_DEV_BUILD"
+          value: "CMM_ALLOW_CHANGE_SETTINGS"
           append: true
 
       - name: Build .op
