@@ -22,6 +22,7 @@ uint64 g_lastPingQueue;
 uint64 g_lastPingQueueSent;
 bool g_connectedToMatchGameServer = false;
 Match@ g_matchInfo;
+TcpSocketClient@ g_tcpSocket;
 
 void RenderMenu()
 {
@@ -67,10 +68,16 @@ void Main()
 }
 
 void OnDisabled() {
-    if (Auth::connected) Auth::Logoff();
+    if (Auth::connected) {
+        g_tcpSocket.disconnect();
+        Auth::Logoff();
+    }
 }
 void OnDestroyed() {
-    if (Auth::connected) Auth::Logoff();
+    if (Auth::connected) {
+        g_tcpSocket.disconnect();
+        Auth::Logoff();
+    }
 }
 
 void RenderInterface(){
@@ -126,6 +133,10 @@ void CheckServerLoop() {
             @g_matchInfo = null;
             g_connectedToMatchGameServer = false;
             g_squadEnabled = false;
+            if (g_tcpSocket !is null) {
+                g_tcpSocket.disconnect();
+                @g_tcpSocket = null;
+            }
         }
         isServerAlive = alive;
         stampServerRetry = Time::Stamp + 60;

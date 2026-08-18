@@ -74,6 +74,7 @@ namespace Auth
             connected = true;
             checkPlayerAsync();
             checkSquadAsync();
+            @g_tcpSocket = TcpSocketClient();
         }
     }
 
