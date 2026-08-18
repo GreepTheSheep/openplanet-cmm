@@ -58,7 +58,10 @@ class MainWindow : Window {
             }
 
             @g_connectedPlayer = Player(json);
-            if (g_selectedMatchmakingType is null) SelectMatchmakingType(g_matchmakingTypes[0]);
+            if (g_selectedMatchmakingType is null) {
+                if (Setting_LastSelectedMatchmakingIndex > g_matchmakingTypes.Length - 1) Setting_LastSelectedMatchmakingIndex = 0;
+                SelectMatchmakingType(g_matchmakingTypes[Setting_LastSelectedMatchmakingIndex]);
+            }
         }
     }
 
@@ -135,7 +138,10 @@ class MainWindow : Window {
                 for (uint i = 0; i < g_matchmakingTypes.Length; i++) {
                     if (!g_matchmakingTypes[i].allowSquad && g_activeSquad !is null) continue; // Skips matchmakings that are not squad allowed if we're on a squad
                     matchmakingTypeSelectChanged = UI::Selectable(g_matchmakingTypes[i].name+"##"+g_matchmakingTypes[i].id, matchmakingTypeSelectChanged);
-                    if (matchmakingTypeSelectChanged) SelectMatchmakingType(g_matchmakingTypes[i]);
+                    if (matchmakingTypeSelectChanged) {
+                        SelectMatchmakingType(g_matchmakingTypes[i]);
+                        Setting_LastSelectedMatchmakingIndex = i;
+                    }
                 }
                 if (g_activeSquad !is null && g_connectedPlayer !is null && g_connectedPlayer.accountId != g_activeSquad.ownerPlayer)
                     UI::SetPreviousTooltip("Only the squad host can change this");
