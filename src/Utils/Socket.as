@@ -4,6 +4,7 @@ class TcpSocketClient {
     bool connected = false;
     bool connectTimeout = false;
     string lastRead = "";
+    string lastWrite = "";
     int connexionAttemptDelay = 0;
     int connexionAttemptDelayMax = 300;
     string host;
@@ -20,11 +21,8 @@ class TcpSocketClient {
             port = Text::ParseUInt(fullHost.SubStr(fullHost.IndexOf(":")+1));
         } else {
             host = fullHost;
-            if (Setting_BaseURL.StartsWith("http://")) port = 80;
-            else if (Setting_BaseURL.StartsWith("https://")) {
-                port = 443;
-                secure = true;
-            }
+            if (Setting_BaseURL.ToLower().StartsWith("http:")) port = 80;
+            else if (Setting_BaseURL.ToLower().StartsWith("https:")) port = 443;
         }
 
         startnew(CoroutineFunc(connect));
@@ -32,7 +30,7 @@ class TcpSocketClient {
 
     void connect() {
         @socket = Net::Socket();
-        bool connectStatus = socket.Connect(host, port, secure);
+        bool connectStatus = socket.Connect(host, port, port == 443 || secure);
         if (!connectStatus) {
             Log::Error("Failed to connect to Socket server");
             return;
@@ -67,14 +65,15 @@ class TcpSocketClient {
         }
         socket.WriteRaw(headersString);
 
-        connected = true;
-        Log::Trace("Connected to socket server in "+connexionAttemptDelay+" ticks.");
+        if (Meta::IsDeveloperMode()) Log::Trace("Connected to socket server in "+connexionAttemptDelay+" ticks.");
 
         // Get the data from the LiveSplit Server
         while (socket !is null && socket.IsReady()) {
-            if (socket.ReadLine(lastRead)) {
-                lastRead = lastRead.Trim();
+            string rawReceivedData;
+            if (socket.ReadLine(rawReceivedData)) {
+                lastRead = rawReceivedData.Trim();
                 if (Meta::IsDeveloperMode()) Log::Trace("TCP Socket Data: " + lastRead);
+                onDataReceived();
             }
             yield();
         }
@@ -86,9 +85,34 @@ class TcpSocketClient {
         @socket = null;
     }
 
+    void onDataReceived() {
+        try {
+            Json::Value parsedJson = Json::Parse(lastRead);
+            string dataMessage;
+            if (parsedJson.GetType() == Json::Type::Null) return;
+
+            if (parsedJson.HasKey("type") && parsedJson["type"].GetType() == Json::Type::String) {
+                string socketDataType = parsedJson["type"];
+                if (socketDataType == "handshake") {
+                    if (parsedJson.HasKey("message") && parsedJson["message"].GetType() == Json::Type::String) dataMessage = parsedJson["message"];
+                    if (Meta::IsDeveloperMode() && dataMessage.Length > 0) Log::Trace(dataMessage);
+                    if (parsedJson.HasKey("status") && parsedJson["status"].GetType() == Json::Type::Boolean) {
+                        connected = parsedJson["status"];
+                        if (connected) Log::Trace("TCP Handshake OK");
+                    }
+                } else {
+                    Log::Warn("TCP Data received - Unknown type: " + socketDataType);
+                }
+            }
+        } catch {
+            Log::Warn("Error while parsing TLS Socket data: " + getExceptionInfo());
+        }
+    }
+
     void send(const string&in data) {
         if (socket !is null) {
             if (Meta::IsDeveloperMode()) Log::Trace("Sending data to socket server: "+data);
+            lastWrite = data;
             socket.WriteLine(data);
         }
     }
