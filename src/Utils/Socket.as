@@ -104,7 +104,6 @@ class TcpSocketClient {
 
     void send(const string&in data) {
         if (socket !is null) {
-            if (Meta::IsDeveloperMode()) Log::Trace("Sending data to socket server: "+data);
             lastWrite = data;
             socket.WriteLine(data);
         }
