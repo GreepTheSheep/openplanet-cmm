@@ -93,6 +93,20 @@ class TcpSocketClient {
                             startnew(CoroutineFunc(pingSweep));
                         }
                     }
+                } else if (socketDataType == "pong") {
+                    // Received after sending a ping from pingSweep, do nothing.
+                } else if (socketDataType == "userNotification") {
+                    string notificationType = parsedJson["notificationType"];
+                    string message = parsedJson["message"];
+                    if (notificationType == "log") Log::Log("Live Information from admins:\n\n" + message, true);
+                    else if (notificationType == "warn") Log::Warn("Live Warning from admins:\n\n" + message, true);
+                    else Log::Log("Silent message from admins: " + message);
+                } else if (socketDataType == "notice") {
+                    // User notice has been updated for everyone, update it on g_userNotice
+                    g_userNotice.isEnabled = parsedJson["isEnabled"];
+                    g_userNotice.icon = parsedJson["icon"];
+                    g_userNotice.title = parsedJson["title"];
+                    g_userNotice.description = parsedJson["description"];
                 } else {
                     Log::Warn("TCP Data received - Unknown type: " + socketDataType);
                 }
