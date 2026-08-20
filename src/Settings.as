@@ -9,21 +9,6 @@ uint Setting_LastSelectedMatchmakingIndex = 0;
 #if CMM_ALLOW_CHANGE_SETTINGS || CMM_DEV_BUILD || SIG_DEVELOPER
 [SettingsTab name="Advanced" icon="Wrench"]
 void RenderAdvancedSettingsTab() {
-    if (stampServerRetry - Time::Stamp >= 0) UI::TextDisabled(Icons::Refresh + " Next server health check in " + Time::FormatString("%Ss", stampServerRetry - Time::Stamp));
-    else UI::TextDisabled(Icons::Refresh + " A server health check is performed every minute" + (!isServerAlive ? ", but it appears there is a major error in the data being returned" : "") + ".");
-
-    if (g_tcpSocket !is null) {
-        UI::Separator();
-        if (g_tcpSocket.connected) UI::TextWrapped(Icons::ArrowsH + " Connected to Socket. The plugin can receive updates from the server without polling.");
-        else UI::Text(Icons::LongArrowRight  + " Not connected to Socket.");
-        if (Meta::IsDeveloperMode()) {
-            UI::TextDisabled(g_tcpSocket.host+":"+g_tcpSocket.port + " | " + g_tcpSocket.socket.GetRemoteIP());
-            UI::TextWrapped(Icons::Kenney::Upload + " " + g_tcpSocket.lastWrite);
-            UI::TextWrapped(Icons::Kenney::Download + " " + g_tcpSocket.lastRead);
-        }
-        UI::Separator();
-    }
-
     bool changed = false;
     uint64 typingStart;
 
