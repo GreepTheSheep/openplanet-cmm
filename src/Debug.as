@@ -1,5 +1,5 @@
 #if CMM_DEV_BUILD || SIG_DEVELOPER
-string dataToSend;
+string socketDataToSend;
 
 [SettingsTab name="Debug" icon="FileCodeO"]
 void RenderDebugSettingsTab() {
@@ -20,10 +20,10 @@ void RenderDebugSettingsTab() {
             UI::TextWrapped(Icons::Kenney::Download + " " + g_tcpSocket.lastRead);
             if (UI::IsItemClicked()) IO::SetClipboard(g_tcpSocket.lastRead);
 
-            dataToSend = UI::InputText("Data to send", dataToSend);
+            socketDataToSend = UI::InputText("Data to send", socketDataToSend);
             if (UI::Button("Send")) {
-                g_tcpSocket.send(dataToSend);
-                dataToSend = "";
+                g_tcpSocket.send(socketDataToSend);
+                socketDataToSend = "";
             }
         } else UI::Text("Socket class is not initialized at the moment");
         UI::TreePop();
