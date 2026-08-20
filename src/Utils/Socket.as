@@ -66,17 +66,7 @@ class TcpSocketClient {
         socket.WriteRaw(headersString);
 
         if (Meta::IsDeveloperMode()) Log::Trace("Connected to socket server in "+connexionAttemptDelay+" ticks.");
-
-        // Get the data from the LiveSplit Server
-        while (socket !is null && socket.IsReady()) {
-            string rawReceivedData;
-            if (socket.ReadLine(rawReceivedData)) {
-                lastRead = rawReceivedData.Trim();
-                if (Meta::IsDeveloperMode()) Log::Trace("TCP Socket Data: " + lastRead);
-                onDataReceived();
-            }
-            yield();
-        }
+        startnew(CoroutineFunc(dataListener));
     }
 
     void disconnect() {
@@ -98,7 +88,10 @@ class TcpSocketClient {
                     if (Meta::IsDeveloperMode() && dataMessage.Length > 0) Log::Trace(dataMessage);
                     if (parsedJson.HasKey("status") && parsedJson["status"].GetType() == Json::Type::Boolean) {
                         connected = parsedJson["status"];
-                        if (connected) Log::Trace("TCP Handshake OK");
+                        if (connected) {
+                            Log::Trace("TCP Handshake OK");
+                            startnew(CoroutineFunc(pingSweep));
+                        }
                     }
                 } else {
                     Log::Warn("TCP Data received - Unknown type: " + socketDataType);
@@ -114,6 +107,30 @@ class TcpSocketClient {
             if (Meta::IsDeveloperMode()) Log::Trace("Sending data to socket server: "+data);
             lastWrite = data;
             socket.WriteLine(data);
+        }
+    }
+
+    void pingSweep() {
+        while (socket !is null && socket.IsReady()) {
+            sleep(30000);
+            try {
+                Json::Value pingJson = Json::Object();
+                pingJson["type"] = "ping";
+                send(Json::Write(pingJson));
+            } catch {
+                if (Meta::IsDeveloperMode()) Log::Warn("Socket ping - Error while sending : " + getExceptionInfo());
+            }
+        }
+    }
+
+    void dataListener() {
+        while (socket !is null && socket.IsReady()) {
+            string rawReceivedData;
+            if (socket.ReadLine(rawReceivedData)) {
+                lastRead = rawReceivedData.Trim();
+                onDataReceived();
+            }
+            yield();
         }
     }
 }
