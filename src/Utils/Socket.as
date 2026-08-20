@@ -100,6 +100,7 @@ class TcpSocketClient {
                     string message = parsedJson["message"];
                     if (notificationType == "log") Log::Log("Live Information from admins:\n\n" + message, true);
                     else if (notificationType == "warn") Log::Warn("Live Warning from admins:\n\n" + message, true);
+                    else if (notificationType == "alert") Renderables::Add(BroadcastNotificationModalDialog(message));
                     else Log::Log("Silent message from admins: " + message);
                 } else if (socketDataType == "notice") {
                     // User notice has been updated for everyone, update it on g_userNotice
