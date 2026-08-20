@@ -9,9 +9,6 @@ uint Setting_LastSelectedMatchmakingIndex = 0;
 #if CMM_ALLOW_CHANGE_SETTINGS || CMM_DEV_BUILD || SIG_DEVELOPER
 [SettingsTab name="Advanced" icon="Wrench"]
 void RenderAdvancedSettingsTab() {
-    if (stampServerRetry - Time::Stamp >= 0) UI::TextDisabled(Icons::Refresh + " Next server health check in " + Time::FormatString("%Ss", stampServerRetry - Time::Stamp));
-    else UI::TextDisabled(Icons::Refresh + " A server health check is performed every minute" + (!isServerAlive ? ", but it appears there is a major error in the data being returned" : "") + ".");
-
     bool changed = false;
     uint64 typingStart;
 
