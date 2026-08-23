@@ -55,4 +55,5 @@ void onChangeSettingBaseURL() {
     @g_matchInfo = null;
     g_connectedToMatchGameServer = false;
     g_squadEnabled = false;
+    @g_activeSquad = null;
 }

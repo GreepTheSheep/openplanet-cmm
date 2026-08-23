@@ -126,6 +126,7 @@ void CheckServerLoop() {
             @g_matchInfo = null;
             g_connectedToMatchGameServer = false;
             g_squadEnabled = false;
+            @g_activeSquad = null;
         }
         isServerAlive = alive;
         stampServerRetry = Time::Stamp + 60;
