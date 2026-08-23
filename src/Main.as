@@ -8,9 +8,7 @@ Squad@ g_activeSquad;
 MatchmakingType@ g_selectedMatchmakingType;
 PlayerMatchmakingType@ g_selectedPlayerMatchmakingType;
 uint g_connectedPlayerCount = 0;
-int g_lastSquadMatchmakingTypeId = -1;
 uint g_queuePlayersCount = 0;
-bool g_squadEnabled = false;
 int64 g_serverBootTimestamp;
 UserNotice@ g_userNotice;
 int64 stampServerRetry = -1;
@@ -132,7 +130,6 @@ void CheckServerLoop() {
             g_inMatch = false;
             @g_matchInfo = null;
             g_connectedToMatchGameServer = false;
-            g_squadEnabled = false;
             @g_activeSquad = null;
             if (g_tcpSocket !is null) {
                 g_tcpSocket.disconnect();
@@ -198,10 +195,7 @@ void PingMatchmakingLoop() {
                 if (!g_queueJoin && !g_inMatch) {
                     g_activeSquad.isSearching = false;
                 }
-                if (g_activeSquad.matchmakingTypeId != g_lastSquadMatchmakingTypeId) {
-                    g_lastSquadMatchmakingTypeId = g_activeSquad.matchmakingTypeId;
-                    Squad::SyncSquadMatchmakingType(g_activeSquad.matchmakingTypeId);
-                }
+                Squad::SyncSquadMatchmakingType(g_activeSquad.matchmakingTypeId);
             }
         } else if (res.HasKey("squad") && res["squad"].GetType() == Json::Type::Null) {
             @g_activeSquad = null;
