@@ -137,6 +137,7 @@ void CheckServerLoop() {
                 g_tcpSocket.disconnect();
                 @g_tcpSocket = null;
             }
+            @g_activeSquad = null;
         }
         isServerAlive = alive;
         stampServerRetry = Time::Stamp + 60;

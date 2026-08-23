@@ -59,4 +59,5 @@ void onChangeSettingBaseURL() {
         g_tcpSocket.disconnect();
         @g_tcpSocket = null;
     }
+    @g_activeSquad = null;
 }
