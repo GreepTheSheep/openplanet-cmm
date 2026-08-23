@@ -18,7 +18,7 @@ class Group {
         iconWithColor = (color.Length > 0 ? ("\\$" + color) : "") + (icon.Length > 0 ? icon : "");
         nameWithIconColor = (iconWithColor.Length > 0 ? (iconWithColor + " ") : "") + nameWithColor;
 
-        if (json["permissions"].GetType() == Json::Type::Array) {
+        if (json.HasKey("permissions") && json["permissions"].GetType() == Json::Type::Array) {
             for (uint i = 0; i < json["permissions"].Length; i++) {
                 Permission@ perm = Permission(json["permissions"][i]);
                 permissions.InsertLast(perm);
