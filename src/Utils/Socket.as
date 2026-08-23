@@ -90,6 +90,7 @@ class TcpSocketClient {
                         connected = parsedJson["status"];
                         if (connected) {
                             Log::Trace("TCP Handshake OK");
+                            Squad::isUsingSockets = true;
                             startnew(CoroutineFunc(pingSweep));
                         }
                     }
@@ -108,8 +109,11 @@ class TcpSocketClient {
                     g_userNotice.icon = parsedJson["icon"];
                     g_userNotice.title = parsedJson["title"];
                     g_userNotice.description = parsedJson["description"];
+                } else if (socketDataType.StartsWith("squad")) {
+                    Squad::handleSocketData(socketDataType, parsedJson);
                 } else {
                     Log::Warn("TCP Data received - Unknown type: " + socketDataType);
+                    if (Meta::IsDeveloperMode()) Log::Log(lastRead);
                 }
             }
         } catch {

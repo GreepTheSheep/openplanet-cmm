@@ -1,15 +1,36 @@
 namespace Squad {
     awaitable@ squadFetchLoopCoroutine;
+    bool isUsingSockets = false;
 
     void fetchSquadLoop() {
-        while(g_activeSquad !is null) {
-            sleep(1000);
-            fetchSquadAsync(false);
+        if (!isUsingSockets)
+            while(!isUsingSockets && g_activeSquad !is null) {
+                sleep(1500);
+                fetchSquadAsync(false);
+            }
+    }
+
+    void handleSocketData(const string &in dataType, const Json::Value &in data) {
+        if (isUsingSockets && g_activeSquad !is null) {
+            if (dataType == "squadMatchmakingType") {
+                int dataMmTypeId = data["matchmakingTypeId"];
+                SyncSquadMatchmakingType(dataMmTypeId);
+            } else if (dataType == "squadMessage") {
+                g_activeSquad.messages.InsertAt(0, SquadMessage(data));
+            } else if (dataType == "squadPlayerReady") {
+                string accountId = data["accountId"];
+                bool ready = data["ready"];
+                g_activeSquad.readyStates.Set(accountId, ready);
+            } else if (dataType == "squadSearching") {
+                g_activeSquad.isSearching = data["isSearching"];
+            } else {
+                if (Meta::IsDeveloperMode()) Log::Trace("Unknown squad socket '"+dataType+"': " + Json::Write(data));
+            }
         }
     }
 
     void applySquadExtras(Squad@ squad, const Json::Value &in res) {
-        if (squad is null) return;
+        if (squad is null || isUsingSockets) return;
         if (res.HasKey("readyStates")) {
             squad.readyStates = dictionary();
             auto keys = res["readyStates"].GetKeys();
@@ -57,7 +78,7 @@ namespace Squad {
             if (g_activeSquad !is null) g_activeSquad.matchmakingTypeId = -1;
             return;
         }
-        @g_activeSquad = Squad(res["squad"]);
+        if (!Squad::isUsingSockets) @g_activeSquad = Squad(res["squad"]);
         applySquadExtras(g_activeSquad, res);
         handleSearchStateChanged();
     }
@@ -70,14 +91,13 @@ namespace Squad {
         for (uint i = 0; i < g_matchmakingTypes.Length; i++) {
             if (g_matchmakingTypes[i].id == squadTypeId) {
                 @g_selectedMatchmakingType = g_matchmakingTypes[i];
-                g_squadEnabled = g_selectedMatchmakingType.allowSquad;
-                for (uint p = 0; p < g_connectedPlayer.matchmakingTypes.Length; p++) {
-                    if (g_connectedPlayer.matchmakingTypes[p].matchmakingTypeId == g_selectedMatchmakingType.id) {
-                        @g_selectedPlayerMatchmakingType = g_connectedPlayer.matchmakingTypes[p];
-                        break;
-                    }
-                }
-                return;
+                break;
+            }
+        }
+        for (uint p = 0; p < g_connectedPlayer.matchmakingTypes.Length; p++) {
+            if (g_connectedPlayer.matchmakingTypes[p].matchmakingTypeId == g_selectedMatchmakingType.id) {
+                @g_selectedPlayerMatchmakingType = g_connectedPlayer.matchmakingTypes[p];
+                break;
             }
         }
     }
@@ -105,10 +125,7 @@ namespace Squad {
             @g_activeSquad = Squad(res["squad"]);
             applySquadExtras(g_activeSquad, res);
             // Sync the matchmaking type for non-owners when the owner changes it
-            if (g_activeSquad !is null && g_activeSquad.matchmakingTypeId != g_lastSquadMatchmakingTypeId) {
-                g_lastSquadMatchmakingTypeId = g_activeSquad.matchmakingTypeId;
-                SyncSquadMatchmakingType(g_activeSquad.matchmakingTypeId);
-            }
+            SyncSquadMatchmakingType(g_activeSquad.matchmakingTypeId);
             handleSearchStateChanged();
         }
     }

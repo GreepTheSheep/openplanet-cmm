@@ -28,5 +28,11 @@ void RenderDebugSettingsTab() {
         } else UI::Text("Socket class is not initialized at the moment");
         UI::TreePop();
     }
+
+    if (UI::TreeNode("Squad", UI::TreeNodeFlags::Framed)) {
+        UI::Text("Is the squad use sockets: " + (Squad::isUsingSockets ? Icons::Check : Icons::Times));
+
+        UI::TreePop();
+    }
 }
 #endif
