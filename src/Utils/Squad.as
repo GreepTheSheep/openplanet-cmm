@@ -15,6 +15,12 @@ namespace Squad {
                 int dataMmTypeId = data["matchmakingTypeId"];
                 SyncSquadMatchmakingType(dataMmTypeId);
             } else if (dataType == "squadMessage") {
+                // Double message prevention by checking its timestamp, accountId and content
+                int64 messageTimestamp = data["timestamp"];
+                string messageAccountId = data["accountId"];
+                string messageContent = data["message"];
+                if (g_activeSquad.messages[0].timestamp == messageTimestamp && g_activeSquad.messages[0].accountId == messageAccountId && g_activeSquad.messages[0].message == messageContent) return;
+
                 g_activeSquad.messages.InsertAt(0, SquadMessage(data));
             } else if (dataType == "squadPlayerReady") {
                 string accountId = data["accountId"];
@@ -25,6 +31,12 @@ namespace Squad {
             } else if (dataType == "squadSearching") {
                 g_activeSquad.isSearching = data["isSearching"];
             } else if (dataType == "squadPlayerJoined") {
+                // Double same player prevention by checking its accountId
+                string playerJoinedAccountId = data["player"]["accountId"];
+                for (uint p = 0; p < g_activeSquad.players.Length; p++) {
+                    if (g_activeSquad.players[p].accountId == playerJoinedAccountId) return;
+                }
+
                 g_activeSquad.players.InsertLast(Player(data["player"]));
             } else if (dataType == "squadPlayerLeft" || dataType == "squadPlayerKicked") {
                 string accountId = data["accountId"];
