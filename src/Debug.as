@@ -33,5 +33,15 @@ void RenderDebugSettingsTab() {
 #endif
         UI::TreePop();
     }
+
+    if (UI::TreeNode("Main Window", UI::TreeNodeFlags::Framed)) {
+        if (cmmMainWindow !is null) {
+            UI::Text("Window Opened: " + (cmmMainWindow.isOpened ? Icons::Check : Icons::Times));
+            UI::Text("Is Loading: " + (cmmMainWindow.isLoading ? Icons::Refresh : ""));
+            if (cmmMainWindow.c_lastActiveTab !is null) UI::Text("Active tab: " + cmmMainWindow.c_lastActiveTab.GetID());
+            else UI::Text("No active tab");
+        } else UI::Text("Main Window is not initialized");
+        UI::TreePop();
+    }
 }
 #endif
