@@ -107,7 +107,7 @@ namespace Squad {
 
             if (res.GetType() == Json::Type::Null) {
                 Log::Error("Error while loading squad");
-                g_activeSquad = null;
+                @g_activeSquad = null;
                 return;
             }
 
