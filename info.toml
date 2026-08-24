@@ -14,7 +14,7 @@ defines = [
     #"CMM_FORCE_JOIN_MATCHMAKING",
     #"CMM_DEV_BUILD",
     #"CMM_ALLOW_CHANGE_SETTINGS",
-    #CMM_DISALLOW_SOCKETS
+    #"CMM_DISALLOW_SOCKETS"
 ]
 # FORCE_API_DOWN : Forces the API to be "down" after loading for tags and seasons.
 # CMM_FORCE_JOIN_MATCHMAKING : Forces the plugin to join any matchmaking despite being disabled.
