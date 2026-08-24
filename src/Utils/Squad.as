@@ -56,6 +56,11 @@ namespace Squad {
                 string accountId = data["accountId"];
                 for (uint p = 0; p < g_activeSquad.players.Length; p++) {
                     if (g_activeSquad.players[p].accountId == accountId) {
+                        Player@ leftPlayer = g_activeSquad.players[p];
+                        if (!UI::IsOverlayShown() || (cmmMainWindow.c_lastActiveTab !is null && cmmMainWindow.c_lastActiveTab.GetID() != "squad")) {
+                            Audio::PlaySound(Audio::Sounds::SquadPlayerLeft);
+                            UI::ShowNotification(ICON_COL + PLUGIN_NAME, leftPlayer.displayName + " left the squad");
+                        }
                         g_activeSquad.players.RemoveAt(p);
                         break;
                     }
@@ -63,7 +68,7 @@ namespace Squad {
             } else if (dataType == "squadRemoved") {
                 string reason = data["reason"];
                 if (reason == "kicked") Log::Warn("You have been kicked from the squad", true);
-                else if (reason == "left" && Meta::IsDeveloperMode()) Log::Log("A player left the squad");
+                else if (reason == "left" && Meta::IsDeveloperMode()) Log::Trace("left the squad");
                 else if (reason == "deleted" && Meta::IsDeveloperMode()) Log::Trace("The squad has been deleted");
                 else if (Meta::IsDeveloperMode()) Log::Trace("Unbound squadRemoved data: " + Json::Write(data));
                 @g_activeSquad = null;
