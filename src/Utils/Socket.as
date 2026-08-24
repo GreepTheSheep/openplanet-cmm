@@ -3,6 +3,7 @@ class TcpSocketClient {
     bool secure = false;
     bool connected = false;
     bool connectTimeout = false;
+    bool hangUp = false;
     string lastRead = "";
     string lastWrite = "";
     int connexionAttemptDelay = 0;
@@ -67,6 +68,7 @@ class TcpSocketClient {
         socket.WriteRaw(headersString);
 
         if (Meta::IsDeveloperMode()) Log::Trace("Connected to socket server in "+connexionAttemptDelay+" ticks.");
+        hangUp = false;
         startnew(CoroutineFunc(dataListener));
     }
 
@@ -147,6 +149,12 @@ class TcpSocketClient {
     void dataListener() {
         while (socket !is null && socket.IsReady()) {
             string rawReceivedData;
+            if (socket.IsHungUp()) {
+                hangUp = true;
+                Log::Error("Socket hang up. Waiting for next health check to reconnect.");
+                disconnect();
+                return;
+            }
             if (socket.ReadLine(rawReceivedData)) {
                 lastRead = rawReceivedData.Trim();
                 onDataReceived();
