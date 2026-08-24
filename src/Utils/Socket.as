@@ -112,6 +112,8 @@ class TcpSocketClient {
                     g_userNotice.description = parsedJson["description"];
                 } else if (socketDataType.StartsWith("squad")) {
                     Squad::handleSocketData(socketDataType, parsedJson);
+                } else if (socketDataType.StartsWith("matchmaking")) {
+                    Matchmaking::handleSocketData(socketDataType, parsedJson);
                 } else {
                     Log::Warn("TCP Data received - Unknown type: " + socketDataType);
                     if (Meta::IsDeveloperMode()) Log::Log(lastRead);

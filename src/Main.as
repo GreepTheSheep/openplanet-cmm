@@ -197,29 +197,31 @@ void PingMatchmakingLoop() {
             @Squad::squadFetchLoopCoroutine = null;
         }
 
-        if (res["match"].GetType() == Json::Type::Object) {
-            g_inMatch = true;
-            @g_matchInfo = Match(res["match"]);
-            if (g_matchInfo.tmServer !is null && g_matchInfo.tmServer.quickJoinLink != "") {
-                if (!g_connectedToMatchGameServer && g_matchInfo.status.ToLower().StartsWith("waiting for players")) {
-                    TM::JoinServer(g_matchInfo.tmServer.quickJoinLink);
-                }
-            }
-        } else if (res["match"].GetType() == Json::Type::Null) {
-            if (g_inMatch == true) {
-                // Refresh player points after the match
-                @g_connectedPlayer = Player(API::GetAsync(Setting_BaseURL+"/user/me"));
-
-                for (uint p = 0; p < g_connectedPlayer.matchmakingTypes.Length; p++) {
-                    if (g_connectedPlayer.matchmakingTypes[p].matchmakingTypeId == g_selectedMatchmakingType.id) {
-                        @g_selectedPlayerMatchmakingType = g_connectedPlayer.matchmakingTypes[p];
-                        break;
+        if (!g_tcpSocket.connected) { // All data will be handled by the TCP socket at this point, only if the socket is connected
+            if (res["match"].GetType() == Json::Type::Object) {
+                g_inMatch = true;
+                @g_matchInfo = Match(res["match"]);
+                if (g_matchInfo.tmServer !is null && g_matchInfo.tmServer.quickJoinLink != "") {
+                    if (!g_connectedToMatchGameServer && g_matchInfo.status.ToLower().StartsWith("waiting for players")) {
+                        TM::JoinServer(g_matchInfo.tmServer.quickJoinLink);
                     }
                 }
+            } else if (res["match"].GetType() == Json::Type::Null) {
+                if (g_inMatch == true) {
+                    // Refresh player points after the match
+                    @g_connectedPlayer = Player(API::GetAsync(Setting_BaseURL+"/user/me"));
+
+                    for (uint p = 0; p < g_connectedPlayer.matchmakingTypes.Length; p++) {
+                        if (g_connectedPlayer.matchmakingTypes[p].matchmakingTypeId == g_selectedMatchmakingType.id) {
+                            @g_selectedPlayerMatchmakingType = g_connectedPlayer.matchmakingTypes[p];
+                            break;
+                        }
+                    }
+                }
+                g_inMatch = false;
+                g_connectedToMatchGameServer = false;
+                @g_matchInfo = null;
             }
-            g_inMatch = false;
-            g_connectedToMatchGameServer = false;
-            @g_matchInfo = null;
         }
         g_isPingingMatchmakingQueue = false;
     }
