@@ -20,8 +20,22 @@ namespace Squad {
                 string accountId = data["accountId"];
                 bool ready = data["ready"];
                 g_activeSquad.readyStates.Set(accountId, ready);
+            } else if (dataType == "squadResetReady") {
+                g_activeSquad.readyStates.DeleteAll();
             } else if (dataType == "squadSearching") {
                 g_activeSquad.isSearching = data["isSearching"];
+            } else if (dataType == "squadPlayerJoined") {
+                g_activeSquad.players.InsertLast(Player(data["player"]));
+            } else if (dataType == "squadPlayerLeft" || dataType == "squadPlayerKicked") {
+                string accountId = data["accountId"];
+                for (uint p = 0; p < g_activeSquad.players.Length; p++) {
+                    if (g_activeSquad.players[p].accountId == accountId) {
+                        g_activeSquad.players.RemoveAt(p);
+                        break;
+                    }
+                }
+            } else if (dataType == "squadNewOwner") {
+                g_activeSquad.ownerPlayer = data["ownerAccountId"];
             } else {
                 if (Meta::IsDeveloperMode()) Log::Trace("Unknown squad socket '"+dataType+"': " + Json::Write(data));
             }
