@@ -24,8 +24,9 @@ class TcpSocketClient {
             if (Setting_BaseURL.ToLower().StartsWith("http:")) port = 80;
             else if (Setting_BaseURL.ToLower().StartsWith("https:")) port = 443;
         }
-
+#if !CMM_DISALLOW_SOCKETS
         startnew(CoroutineFunc(connect));
+#endif
     }
 
     void connect() {

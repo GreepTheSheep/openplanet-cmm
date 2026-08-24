@@ -28,6 +28,9 @@ void RenderDebugSettingsTab() {
                 }
             }
         } else UI::Text("Socket class is not initialized at the moment");
+#if CMM_DISALLOW_SOCKETS
+        UI::Text(Icons::TimesCircleO + " Sockets are disabled by the CMM_DISALLOW_SOCKETS define.");
+#endif
         UI::TreePop();
     }
 }
