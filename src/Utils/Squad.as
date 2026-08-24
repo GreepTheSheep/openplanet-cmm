@@ -46,6 +46,13 @@ namespace Squad {
                         break;
                     }
                 }
+            } else if (dataType == "squadRemoved") {
+                string reason = data["reason"];
+                if (reason == "kicked") Log::Warn("You have been kicked from the squad", true);
+                else if (reason == "left" && Meta::IsDeveloperMode()) Log::Log("A player left the squad");
+                else if (reason == "deleted" && Meta::IsDeveloperMode()) Log::Trace("The squad has been deleted");
+                else if (Meta::IsDeveloperMode()) Log::Trace("Unbound squadRemoved data: " + Json::Write(data));
+                @g_activeSquad = null;
             } else if (dataType == "squadNewOwner") {
                 g_activeSquad.ownerPlayer = data["ownerAccountId"];
             } else {
