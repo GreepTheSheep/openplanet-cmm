@@ -12,18 +12,20 @@ void RenderDebugSettingsTab() {
             else UI::Text(Icons::LongArrowRight  + " Not connected to Socket.");
             UI::NewLine();
 
-            if (g_tcpSocket.socket !is null && g_tcpSocket.socket.IsReady()) UI::TextDisabled(g_tcpSocket.host+":"+g_tcpSocket.port + " | " + g_tcpSocket.socket.GetRemoteIP());
+            if (g_tcpSocket.socket !is null && g_tcpSocket.socket.IsReady()) {
+                UI::TextDisabled(g_tcpSocket.host+":"+g_tcpSocket.port + " | " + g_tcpSocket.socket.GetRemoteIP());
 
-            UI::TextWrapped(Icons::Kenney::Upload + " " + g_tcpSocket.lastWrite);
-            if (UI::IsItemClicked()) IO::SetClipboard(g_tcpSocket.lastWrite);
+                UI::TextWrapped(Icons::Kenney::Upload + " " + g_tcpSocket.lastWrite);
+                if (UI::IsItemClicked()) IO::SetClipboard(g_tcpSocket.lastWrite);
 
-            UI::TextWrapped(Icons::Kenney::Download + " " + g_tcpSocket.lastRead);
-            if (UI::IsItemClicked()) IO::SetClipboard(g_tcpSocket.lastRead);
+                UI::TextWrapped(Icons::Kenney::Download + " " + g_tcpSocket.lastRead);
+                if (UI::IsItemClicked()) IO::SetClipboard(g_tcpSocket.lastRead);
 
-            socketDataToSend = UI::InputText("Data to send", socketDataToSend);
-            if (UI::Button("Send")) {
-                g_tcpSocket.send(socketDataToSend);
-                socketDataToSend = "";
+                socketDataToSend = UI::InputText("Data to send", socketDataToSend);
+                if (UI::Button("Send")) {
+                    g_tcpSocket.send(socketDataToSend);
+                    socketDataToSend = "";
+                }
             }
         } else UI::Text("Socket class is not initialized at the moment");
         UI::TreePop();
