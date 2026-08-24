@@ -85,10 +85,6 @@ void Render()
 
 bool CheckServer()
 {
-#if FORCE_API_DOWN
-    Log::Error("Force API Down Enabled.");
-    return !isServerAlive;
-#else
     isCheckingServer = true;
     Json::Value@ res = API::GetAsync(Setting_BaseURL, false);
     isCheckingServer = false;
@@ -103,7 +99,6 @@ bool CheckServer()
         return true;
     }
     return false;
-#endif
 }
 
 void CheckServerLoop() {
