@@ -6,6 +6,7 @@ class HistoryTab : Tab {
     int lastMatchmakingTypeId;
     array<MatchHistory@> historyMatches;
 
+    string GetID() override { return "history"; }
     bool IsVisible() override {
         if (g_selectedMatchmakingType is null) return false;
         if (g_selectedMatchmakingType.season is null) return false;

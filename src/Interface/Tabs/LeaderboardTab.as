@@ -6,6 +6,7 @@ class LeaderboardTab : Tab {
     int lastMatchmakingTypeId;
     array<MatchmakingLeaderboard@> leaderboardEntries;
 
+    string GetID() override { return "leaderboard"; }
     bool IsVisible() override {
         if (g_selectedPlayerMatchmakingType is null) return false;
         if (g_selectedMatchmakingType is null) return false;

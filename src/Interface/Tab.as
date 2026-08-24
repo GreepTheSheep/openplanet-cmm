@@ -3,6 +3,7 @@ class Tab
     bool IsVisible() { return true; }
     bool CanClose() { return false; }
 
+    string GetID() { return ""; }
     string GetLabel() { return ""; }
 
     string GetTooltip() { return ""; }

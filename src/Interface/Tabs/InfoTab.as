@@ -1,4 +1,5 @@
 class InfoTab : Tab {
+    string GetID() override { return "info"; }
     string GetLabel() override { return Icons::InfoCircle; }
     string GetTooltip() override { return "Info"; }
     vec4 GetColor() override { return vec4(0.47f, 0.47f, 0.47f, 1); }
