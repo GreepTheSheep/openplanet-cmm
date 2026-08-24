@@ -22,6 +22,15 @@ namespace Squad {
                 if (g_activeSquad.messages[0].timestamp == messageTimestamp && g_activeSquad.messages[0].accountId == messageAccountId && g_activeSquad.messages[0].message == messageContent) return;
 
                 g_activeSquad.messages.InsertAt(0, SquadMessage(data));
+                if (
+                    messageAccountId != "system" &&
+                    messageAccountId != g_connectedPlayer.accountId &&
+                    (!UI::IsOverlayShown() || cmmMainWindow.activeTab.GetID() != "squad")
+                ) {
+                    string messagePlayerName = data["playerName"];
+                    Audio::PlaySound(Audio::Sounds::SquadPlayerMessage);
+                    UI::ShowNotification(PLUGIN_NAME + " - new squad message from " + messagePlayerName, messageContent);
+                }
             } else if (dataType == "squadPlayerReady") {
                 string accountId = data["accountId"];
                 bool ready = data["ready"];
@@ -37,11 +46,19 @@ namespace Squad {
                     if (g_activeSquad.players[p].accountId == playerJoinedAccountId) return;
                 }
 
-                g_activeSquad.players.InsertLast(Player(data["player"]));
+                Player@ joinedPlayer = Player(data["player"]);
+                g_activeSquad.players.InsertLast(joinedPlayer);
+                if (!UI::IsOverlayShown() || cmmMainWindow.activeTab.GetID() != "squad") {
+                    Audio::PlaySound(Audio::Sounds::SquadPlayerJoined);
+                    UI::ShowNotification(PLUGIN_NAME, joinedPlayer.displayName + " joined the squad");
+                }
             } else if (dataType == "squadPlayerLeft" || dataType == "squadPlayerKicked") {
                 string accountId = data["accountId"];
                 for (uint p = 0; p < g_activeSquad.players.Length; p++) {
                     if (g_activeSquad.players[p].accountId == accountId) {
+                        if (!UI::IsOverlayShown() || cmmMainWindow.activeTab.GetID() != "squad") {
+                            UI::ShowNotification(PLUGIN_NAME, g_activeSquad.players[p].displayName + " left the squad");
+                        }
                         g_activeSquad.players.RemoveAt(p);
                         break;
                     }

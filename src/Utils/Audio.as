@@ -2,16 +2,24 @@ namespace Audio {
 
     enum Sounds {
         Default,
-        MatchFound
+        MatchFound,
+        SquadPlayerJoined,
+        SquadPlayerMessage
     }
 
-    void PlaySound(const Sounds &in sound, int volumePercent = 50) {
+    void PlaySound(const Sounds &in sound, int volumePercent = 25) {
 
         string fileName = "src/Sounds/UIConnect_AllPlayers.wav";
 
         switch (sound) {
             case Sounds::MatchFound :
                 fileName = "src/Sounds/UIEvent_ScoreProgress1.wav";
+                break;
+            case Sounds::SquadPlayerJoined :
+                fileName = "src/Sounds/UIConnect_NewPlayer.wav";
+                break;
+            case Sounds::SquadPlayerMessage :
+                fileName = "src/Sounds/UIConnect_AllPlayers.wav";
                 break;
             default:
                 fileName = "src/Sounds/UIConnect_AllPlayers.wav";
