@@ -7,7 +7,7 @@ string Setting_BaseURL = "https://tm-communitymatchmaking-api.greep.fr";
 uint Setting_LastSelectedMatchmakingIndex = 0;
 
 #if CMM_ALLOW_CHANGE_SETTINGS || CMM_DEV_BUILD || SIG_DEVELOPER
-[SettingsTab name="Advanced" icon="Wrench"]
+[SettingsTab name="Advanced" icon="Wrench" order="2"]
 void RenderAdvancedSettingsTab() {
     bool changed = false;
     uint64 typingStart;

@@ -13,6 +13,7 @@ class MainWindow : Window {
         AddTab(HistoryTab());
         AddTab(LeaderboardTab());
         AddTab(InfoTab());
+        AddTab(SettingTab());
     }
 
     void StartRequest()
