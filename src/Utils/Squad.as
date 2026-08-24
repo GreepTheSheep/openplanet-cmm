@@ -37,7 +37,7 @@ namespace Squad {
             } else if (dataType == "squadNewOwner") {
                 g_activeSquad.ownerPlayer = data["ownerAccountId"];
             } else {
-                if (Meta::IsDeveloperMode()) Log::Trace("Unknown squad socket '"+dataType+"': " + Json::Write(data));
+                if (Meta::IsDeveloperMode()) Log::Warn("Unknown squad socket '"+dataType+"': " + Json::Write(data));
             }
         }
     }
