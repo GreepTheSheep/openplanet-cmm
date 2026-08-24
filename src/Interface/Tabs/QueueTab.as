@@ -86,7 +86,7 @@ class QueueTab : Tab {
             return;
         }
         isError = false;
-        if (!Squad::isUsingSockets) @g_activeSquad = Squad(res["squad"]);
+        if (!g_tcpSocket.connected) @g_activeSquad = Squad(res["squad"]);
         Squad::applySquadExtras(g_activeSquad, res);
         HandleSquadSearchStateChanged();
         isSquadToggleReadyClicked = false;

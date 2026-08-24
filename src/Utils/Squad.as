@@ -1,17 +1,16 @@
 namespace Squad {
     awaitable@ squadFetchLoopCoroutine;
-    bool isUsingSockets = false;
 
     void fetchSquadLoop() {
-        if (!isUsingSockets)
-            while(!isUsingSockets && g_activeSquad !is null) {
+        if (!g_tcpSocket.connected)
+            while(!g_tcpSocket.connected && g_activeSquad !is null) {
                 sleep(1500);
                 fetchSquadAsync(false);
             }
     }
 
     void handleSocketData(const string &in dataType, const Json::Value &in data) {
-        if (isUsingSockets && g_activeSquad !is null) {
+        if (g_tcpSocket.connected && g_activeSquad !is null) {
             if (dataType == "squadMatchmakingType") {
                 int dataMmTypeId = data["matchmakingTypeId"];
                 SyncSquadMatchmakingType(dataMmTypeId);
@@ -30,7 +29,7 @@ namespace Squad {
     }
 
     void applySquadExtras(Squad@ squad, const Json::Value &in res) {
-        if (squad is null || isUsingSockets) return;
+        if (squad is null || g_tcpSocket.connected) return;
         if (res.HasKey("readyStates")) {
             squad.readyStates = dictionary();
             auto keys = res["readyStates"].GetKeys();
@@ -78,7 +77,7 @@ namespace Squad {
             if (g_activeSquad !is null) g_activeSquad.matchmakingTypeId = -1;
             return;
         }
-        if (!Squad::isUsingSockets) @g_activeSquad = Squad(res["squad"]);
+        if (!g_tcpSocket.connected) @g_activeSquad = Squad(res["squad"]);
         applySquadExtras(g_activeSquad, res);
         handleSearchStateChanged();
     }

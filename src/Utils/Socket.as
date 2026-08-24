@@ -90,7 +90,6 @@ class TcpSocketClient {
                         connected = parsedJson["status"];
                         if (connected) {
                             Log::Trace("TCP Handshake OK");
-                            Squad::isUsingSockets = true;
                             startnew(CoroutineFunc(pingSweep));
                         }
                     }
