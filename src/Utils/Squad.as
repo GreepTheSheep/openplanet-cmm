@@ -25,7 +25,7 @@ namespace Squad {
                 if (
                     messageAccountId != "system" &&
                     messageAccountId != g_connectedPlayer.accountId &&
-                    (!UI::IsOverlayShown() || cmmMainWindow.activeTab.GetID() != "squad")
+                    (!UI::IsOverlayShown() || cmmMainWindow.c_lastActiveTab.GetID() != "squad")
                 ) {
                     string messagePlayerName = data["playerName"];
                     Audio::PlaySound(Audio::Sounds::SquadPlayerMessage);
@@ -48,7 +48,7 @@ namespace Squad {
 
                 Player@ joinedPlayer = Player(data["player"]);
                 g_activeSquad.players.InsertLast(joinedPlayer);
-                if (!UI::IsOverlayShown() || cmmMainWindow.activeTab.GetID() != "squad") {
+                if (!UI::IsOverlayShown() || cmmMainWindow.c_lastActiveTab.GetID() != "squad") {
                     Audio::PlaySound(Audio::Sounds::SquadPlayerJoined);
                     UI::ShowNotification(PLUGIN_NAME, joinedPlayer.displayName + " joined the squad");
                 }
@@ -56,7 +56,7 @@ namespace Squad {
                 string accountId = data["accountId"];
                 for (uint p = 0; p < g_activeSquad.players.Length; p++) {
                     if (g_activeSquad.players[p].accountId == accountId) {
-                        if (!UI::IsOverlayShown() || cmmMainWindow.activeTab.GetID() != "squad") {
+                        if (!UI::IsOverlayShown() || cmmMainWindow.c_lastActiveTab.GetID() != "squad") {
                             UI::ShowNotification(PLUGIN_NAME, g_activeSquad.players[p].displayName + " left the squad");
                         }
                         g_activeSquad.players.RemoveAt(p);
