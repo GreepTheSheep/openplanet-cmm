@@ -110,6 +110,15 @@ class QueueTab : Tab {
 
     void Render() override {
         if (!g_inMatch) {
+            if (g_tcpSocket is null || (g_tcpSocket !is null && !g_tcpSocket.connected)) {
+                UI::PushFont(Fonts::Bold);
+                Controls::BeginFrameWarning(Icons::Exclamation + " Cannot connect to the socket");
+                UI::PushFont(Fonts::Regular);
+                UI::TextWrapped("Real-time updates and notifications cannot be possible");
+                UI::PopFont();
+                Controls::EndFrame();
+                UI::PopFont();
+            }
             if (g_userNotice.isEnabled) {
                 float width = 40;
                 vec2 posTop = UI::GetCursorPos();

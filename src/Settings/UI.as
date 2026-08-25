@@ -6,12 +6,6 @@ string Setting_MatchFoundAudio = Audio::MatchFoundSounds.GetKeys()[0];
 
 [SettingsTab name="UI" icon="Cog" order="1"]
 void RenderUISettingsTab() {
-    if (g_tcpSocket !is null && !g_tcpSocket.connected) {
-        Controls::BeginFrameWarning(Icons::Exclamation + " Cannot connect to the socket");
-        UI::TextWrapped("Real-time updates and notifications cannot be possible");
-        Controls::EndFrame();
-    }
-
     if (UI::TreeNode(Icons::Kenney::SoundOn + " Audio", UI::TreeNodeFlags::Framed | UI::TreeNodeFlags::DefaultOpen)) {
         UI::SetNextItemWidth(300);
         Setting_NotificationsVolume = UI::SliderInt("##Setting_NotificationsVolume", Setting_NotificationsVolume, 0, 100, "%d %%", UI::SliderFlags::NoRoundToFormat);
