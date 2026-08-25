@@ -48,6 +48,8 @@ class TcpSocketClient {
             connexionAttemptDelay++;
         }
 
+        startnew(CoroutineFunc(dataListener));
+
         // Send the player token to initalize the socket to the player.
         // Server will handle this token and will assign to the player.
         dictionary headers;
@@ -69,7 +71,6 @@ class TcpSocketClient {
 
         if (Meta::IsDeveloperMode()) Log::Trace("Connected to socket server in "+connexionAttemptDelay+" ticks.");
         hangUp = false;
-        startnew(CoroutineFunc(dataListener));
     }
 
     void disconnect() {
