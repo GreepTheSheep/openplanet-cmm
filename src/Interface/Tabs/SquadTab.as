@@ -180,7 +180,7 @@ class SquadTab : Tab {
         }
 
         isError = false;
-        @g_activeSquad = Squad(newSquad["squad"]);
+        if (!g_tcpSocket.connected) @g_activeSquad = Squad(newSquad["squad"]);
         if (Squad::squadFetchLoopCoroutine is null || !Squad::squadFetchLoopCoroutine.IsRunning()) @Squad::squadFetchLoopCoroutine = startnew(Squad::fetchSquadLoop);
     }
 
@@ -207,7 +207,7 @@ class SquadTab : Tab {
         }
 
         isError = false;
-        @g_activeSquad = Squad(newSquad["squad"]);
+        if (!g_tcpSocket.connected) @g_activeSquad = Squad(newSquad["squad"]);
         if (Squad::squadFetchLoopCoroutine is null || !Squad::squadFetchLoopCoroutine.IsRunning()) @Squad::squadFetchLoopCoroutine = startnew(Squad::fetchSquadLoop);
     }
 
@@ -234,7 +234,7 @@ class SquadTab : Tab {
         }
 
         isError = false;
-        @g_activeSquad = Squad(newSquad["squad"]);
+        if (!g_tcpSocket.connected) @g_activeSquad = Squad(newSquad["squad"]);
         if (Squad::squadFetchLoopCoroutine is null || !Squad::squadFetchLoopCoroutine.IsRunning()) @Squad::squadFetchLoopCoroutine = startnew(Squad::fetchSquadLoop);
     }
 

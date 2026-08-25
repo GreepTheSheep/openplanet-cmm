@@ -2,7 +2,10 @@ namespace Audio {
 
     enum Sounds {
         Default,
-        MatchFound
+        MatchFound,
+        SquadPlayerJoined,
+        SquadPlayerLeft,
+        SquadPlayerMessage
     }
 
     dictionary MatchFoundSounds = {
@@ -17,6 +20,15 @@ namespace Audio {
         switch (sound) {
             case Sounds::MatchFound :
                 MatchFoundSounds.Get(Setting_MatchFoundAudio, fileName);
+                break;
+            case Sounds::SquadPlayerJoined :
+                fileName = "src/Sounds/UIConnect_NewPlayer.wav";
+                break;
+            case Sounds::SquadPlayerLeft :
+                fileName = "src/Sounds/UIPopUp_Left.wav";
+                break;
+            case Sounds::SquadPlayerMessage :
+                fileName = "src/Sounds/UIConnect_AllPlayers.wav";
                 break;
             default:
                 fileName = "src/Sounds/UIConnect_AllPlayers.wav";

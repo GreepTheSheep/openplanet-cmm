@@ -54,6 +54,9 @@ void onChangeSettingBaseURL() {
     g_inMatch = false;
     @g_matchInfo = null;
     g_connectedToMatchGameServer = false;
-    g_squadEnabled = false;
     @g_activeSquad = null;
+    if (g_tcpSocket !is null) {
+        g_tcpSocket.disconnect();
+        @g_tcpSocket = null;
+    }
 }

@@ -8,9 +8,7 @@ Squad@ g_activeSquad;
 MatchmakingType@ g_selectedMatchmakingType;
 PlayerMatchmakingType@ g_selectedPlayerMatchmakingType;
 uint g_connectedPlayerCount = 0;
-int g_lastSquadMatchmakingTypeId = -1;
 uint g_queuePlayersCount = 0;
-bool g_squadEnabled = false;
 int64 g_serverBootTimestamp;
 UserNotice@ g_userNotice;
 int64 stampServerRetry = -1;
@@ -22,6 +20,7 @@ uint64 g_lastPingQueue;
 uint64 g_lastPingQueueSent;
 bool g_connectedToMatchGameServer = false;
 Match@ g_matchInfo;
+TcpSocketClient@ g_tcpSocket;
 
 void RenderMenu()
 {
@@ -67,10 +66,16 @@ void Main()
 }
 
 void OnDisabled() {
-    if (Auth::connected) Auth::Logoff();
+    if (Auth::connected) {
+        g_tcpSocket.disconnect();
+        Auth::Logoff();
+    }
 }
 void OnDestroyed() {
-    if (Auth::connected) Auth::Logoff();
+    if (Auth::connected) {
+        g_tcpSocket.disconnect();
+        Auth::Logoff();
+    }
 }
 
 void RenderInterface(){
@@ -120,8 +125,11 @@ void CheckServerLoop() {
             g_inMatch = false;
             @g_matchInfo = null;
             g_connectedToMatchGameServer = false;
-            g_squadEnabled = false;
             @g_activeSquad = null;
+            if (g_tcpSocket !is null) {
+                g_tcpSocket.disconnect();
+                @g_tcpSocket = null;
+            }
         }
         isServerAlive = alive;
         stampServerRetry = Time::Stamp + 60;
@@ -182,10 +190,7 @@ void PingMatchmakingLoop() {
                 if (!g_queueJoin && !g_inMatch) {
                     g_activeSquad.isSearching = false;
                 }
-                if (g_activeSquad.matchmakingTypeId != g_lastSquadMatchmakingTypeId) {
-                    g_lastSquadMatchmakingTypeId = g_activeSquad.matchmakingTypeId;
-                    Squad::SyncSquadMatchmakingType(g_activeSquad.matchmakingTypeId);
-                }
+                Squad::SyncSquadMatchmakingType(g_activeSquad.matchmakingTypeId);
             }
         } else if (res.HasKey("squad") && res["squad"].GetType() == Json::Type::Null) {
             @g_activeSquad = null;
@@ -193,11 +198,13 @@ void PingMatchmakingLoop() {
         }
 
         if (res["match"].GetType() == Json::Type::Object) {
-            g_inMatch = true;
-            @g_matchInfo = Match(res["match"]);
-            if (g_matchInfo.tmServer !is null && g_matchInfo.tmServer.quickJoinLink != "") {
-                if (!g_connectedToMatchGameServer && g_matchInfo.status.ToLower().StartsWith("waiting for players")) {
-                    TM::JoinServer(g_matchInfo.tmServer.quickJoinLink);
+            if (!g_tcpSocket.connected) { // All data will be handled by the TCP socket at this point, only if the socket is connected
+                g_inMatch = true;
+                @g_matchInfo = Match(res["match"]);
+                if (g_matchInfo.tmServer !is null && g_matchInfo.tmServer.quickJoinLink != "") {
+                    if (!g_connectedToMatchGameServer && g_matchInfo.status.ToLower().StartsWith("waiting for players")) {
+                        TM::JoinServer(g_matchInfo.tmServer.quickJoinLink);
+                    }
                 }
             }
         } else if (res["match"].GetType() == Json::Type::Null) {

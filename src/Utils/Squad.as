@@ -2,14 +2,86 @@ namespace Squad {
     awaitable@ squadFetchLoopCoroutine;
 
     void fetchSquadLoop() {
-        while(g_activeSquad !is null) {
-            sleep(1000);
-            fetchSquadAsync(false);
+        if (!g_tcpSocket.connected)
+            while(!g_tcpSocket.connected && g_activeSquad !is null) {
+                sleep(1500);
+                fetchSquadAsync(false);
+            }
+    }
+
+    void handleSocketData(const string &in dataType, const Json::Value &in data) {
+        if (g_tcpSocket.connected && g_activeSquad !is null) {
+            if (dataType == "squadMatchmakingType") {
+                int dataMmTypeId = data["matchmakingTypeId"];
+                SyncSquadMatchmakingType(dataMmTypeId);
+            } else if (dataType == "squadMessage") {
+                // Double message prevention by checking its timestamp, accountId and content
+                int64 messageTimestamp = data["timestamp"];
+                string messageAccountId = data["accountId"];
+                string messageContent = data["message"];
+                if (g_activeSquad.messages[0].timestamp == messageTimestamp && g_activeSquad.messages[0].accountId == messageAccountId && g_activeSquad.messages[0].message == messageContent) return;
+
+                g_activeSquad.messages.InsertAt(0, SquadMessage(data));
+                if (
+                    messageAccountId != "system" &&
+                    messageAccountId != g_connectedPlayer.accountId &&
+                    (!UI::IsOverlayShown() || (cmmMainWindow.c_lastActiveTab !is null && cmmMainWindow.c_lastActiveTab.GetID() != "squad"))
+                ) {
+                    string messagePlayerName = data["playerName"];
+                    Audio::PlaySound(Audio::Sounds::SquadPlayerMessage);
+                    UI::ShowNotification(ICON_COL + PLUGIN_NAME + " - new squad message from " + messagePlayerName, messageContent);
+                }
+            } else if (dataType == "squadPlayerReady") {
+                string accountId = data["accountId"];
+                bool ready = data["ready"];
+                g_activeSquad.readyStates.Set(accountId, ready);
+            } else if (dataType == "squadResetReady") {
+                g_activeSquad.readyStates.DeleteAll();
+            } else if (dataType == "squadSearching") {
+                g_activeSquad.isSearching = data["isSearching"];
+            } else if (dataType == "squadPlayerJoined") {
+                // Double same player prevention by checking its accountId
+                string playerJoinedAccountId = data["player"]["accountId"];
+                for (uint p = 0; p < g_activeSquad.players.Length; p++) {
+                    if (g_activeSquad.players[p].accountId == playerJoinedAccountId) return;
+                }
+
+                Player@ joinedPlayer = Player(data["player"]);
+                g_activeSquad.players.InsertLast(joinedPlayer);
+                if (!UI::IsOverlayShown() || (cmmMainWindow.c_lastActiveTab !is null && cmmMainWindow.c_lastActiveTab.GetID() != "squad")) {
+                    Audio::PlaySound(Audio::Sounds::SquadPlayerJoined);
+                    UI::ShowNotification(ICON_COL + PLUGIN_NAME, joinedPlayer.displayName + " joined the squad");
+                }
+            } else if (dataType == "squadPlayerLeft" || dataType == "squadPlayerKicked") {
+                string accountId = data["accountId"];
+                for (uint p = 0; p < g_activeSquad.players.Length; p++) {
+                    if (g_activeSquad.players[p].accountId == accountId) {
+                        Player@ leftPlayer = g_activeSquad.players[p];
+                        if (!UI::IsOverlayShown() || (cmmMainWindow.c_lastActiveTab !is null && cmmMainWindow.c_lastActiveTab.GetID() != "squad")) {
+                            Audio::PlaySound(Audio::Sounds::SquadPlayerLeft);
+                            UI::ShowNotification(ICON_COL + PLUGIN_NAME, leftPlayer.displayName + " left the squad");
+                        }
+                        g_activeSquad.players.RemoveAt(p);
+                        break;
+                    }
+                }
+            } else if (dataType == "squadRemoved") {
+                string reason = data["reason"];
+                if (reason == "kicked") Log::Warn("You have been kicked from the squad", true);
+                else if (reason == "left" && Meta::IsDeveloperMode()) Log::Trace("left the squad");
+                else if (reason == "deleted" && Meta::IsDeveloperMode()) Log::Trace("The squad has been deleted");
+                else if (Meta::IsDeveloperMode()) Log::Trace("Unbound squadRemoved data: " + Json::Write(data));
+                @g_activeSquad = null;
+            } else if (dataType == "squadNewOwner") {
+                g_activeSquad.ownerPlayer = data["ownerAccountId"];
+            } else {
+                if (Meta::IsDeveloperMode()) Log::Warn("Unknown squad socket '"+dataType+"': " + Json::Write(data));
+            }
         }
     }
 
     void applySquadExtras(Squad@ squad, const Json::Value &in res) {
-        if (squad is null) return;
+        if (squad is null || g_tcpSocket.connected) return;
         if (res.HasKey("readyStates")) {
             squad.readyStates = dictionary();
             auto keys = res["readyStates"].GetKeys();
@@ -57,7 +129,7 @@ namespace Squad {
             if (g_activeSquad !is null) g_activeSquad.matchmakingTypeId = -1;
             return;
         }
-        @g_activeSquad = Squad(res["squad"]);
+        if (!g_tcpSocket.connected) @g_activeSquad = Squad(res["squad"]);
         applySquadExtras(g_activeSquad, res);
         handleSearchStateChanged();
     }
@@ -70,14 +142,13 @@ namespace Squad {
         for (uint i = 0; i < g_matchmakingTypes.Length; i++) {
             if (g_matchmakingTypes[i].id == squadTypeId) {
                 @g_selectedMatchmakingType = g_matchmakingTypes[i];
-                g_squadEnabled = g_selectedMatchmakingType.allowSquad;
-                for (uint p = 0; p < g_connectedPlayer.matchmakingTypes.Length; p++) {
-                    if (g_connectedPlayer.matchmakingTypes[p].matchmakingTypeId == g_selectedMatchmakingType.id) {
-                        @g_selectedPlayerMatchmakingType = g_connectedPlayer.matchmakingTypes[p];
-                        break;
-                    }
-                }
-                return;
+                break;
+            }
+        }
+        for (uint p = 0; p < g_connectedPlayer.matchmakingTypes.Length; p++) {
+            if (g_connectedPlayer.matchmakingTypes[p].matchmakingTypeId == g_selectedMatchmakingType.id) {
+                @g_selectedPlayerMatchmakingType = g_connectedPlayer.matchmakingTypes[p];
+                break;
             }
         }
     }
@@ -106,10 +177,7 @@ namespace Squad {
             @g_activeSquad = Squad(res["squad"]);
             applySquadExtras(g_activeSquad, res);
             // Sync the matchmaking type for non-owners when the owner changes it
-            if (g_activeSquad !is null && g_activeSquad.matchmakingTypeId != g_lastSquadMatchmakingTypeId) {
-                g_lastSquadMatchmakingTypeId = g_activeSquad.matchmakingTypeId;
-                SyncSquadMatchmakingType(g_activeSquad.matchmakingTypeId);
-            }
+            SyncSquadMatchmakingType(g_activeSquad.matchmakingTypeId);
             handleSearchStateChanged();
         }
     }
