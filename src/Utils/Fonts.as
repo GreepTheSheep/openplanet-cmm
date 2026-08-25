@@ -7,7 +7,7 @@ namespace Fonts {
     void Load() {
         @Regular = UI::LoadFont("DroidSans.ttf");
         @Bold = UI::LoadFont("DroidSans-Bold.ttf");
-        @Header = UI::LoadFont("DroidSans.ttf", 24);
+        @Header = UI::LoadFont("DroidSans-Bold.ttf", 24);
         @UserNoticeIcon = UI::LoadFont("DroidSans.ttf", 32);
     }
 }
