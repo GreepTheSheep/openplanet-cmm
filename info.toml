@@ -9,6 +9,7 @@ version = "0.0.10.20260823"
 
 [script]
 module = "CMM"
+dependencies = [ "Controls" ]
 defines = [
     #"CMM_FORCE_JOIN_MATCHMAKING",
     #"CMM_DEV_BUILD",
