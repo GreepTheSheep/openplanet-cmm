@@ -70,6 +70,8 @@ class GroupsDevTab : Tab {
             }
 
             SelectGroup(allGroups[0]);
+            isError = false;
+            errorMsg = "";
         }
 
         if (m_permissionsRequest !is null && m_permissionsRequest.Finished()) {

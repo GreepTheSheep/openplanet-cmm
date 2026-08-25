@@ -59,6 +59,8 @@ class MainWindow : Window {
             }
 
             @g_connectedPlayer = Player(json);
+            isError = false;
+            errorMsg = "";
             if (g_selectedMatchmakingType is null) {
                 if (Setting_LastSelectedMatchmakingIndex > g_matchmakingTypes.Length - 1) Setting_LastSelectedMatchmakingIndex = 0;
                 SelectMatchmakingType(g_matchmakingTypes[Setting_LastSelectedMatchmakingIndex]);

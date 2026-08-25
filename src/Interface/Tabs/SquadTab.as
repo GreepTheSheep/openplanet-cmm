@@ -82,6 +82,7 @@ class SquadTab : Tab {
             }
 
             isError = false;
+            errorMsg = "";
             @g_activeSquad = Squad(json["squad"]);
             ApplySquadExtrasFromJson(json);
             if (Squad::squadFetchLoopCoroutine is null || !Squad::squadFetchLoopCoroutine.IsRunning()) @Squad::squadFetchLoopCoroutine = startnew(Squad::fetchSquadLoop);

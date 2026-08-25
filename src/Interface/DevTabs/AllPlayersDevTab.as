@@ -102,6 +102,8 @@ class AllPlayersDevTab : Tab {
             }
 
             resLength = json["length"];
+            isError = false;
+            errorMsg = "";
         }
 
         if (m_groupRequest !is null && m_groupRequest.Finished()) {

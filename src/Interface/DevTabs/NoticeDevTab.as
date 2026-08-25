@@ -41,7 +41,7 @@ class NoticeDevTab : Tab {
 
         if (resPost.GetType() == Json::Type::Null) {
             isError = true;
-            errorMsg = "Error while loading groups list";
+            errorMsg = "Error while posting user notice";
             Log::Error(errorMsg);
             return;
         }
@@ -57,6 +57,8 @@ class NoticeDevTab : Tab {
         g_userNotice.icon = noticeIconEdit;
         g_userNotice.title = noticeTitleEdit;
         g_userNotice.description = noticeDescriptionEdit;
+        isError = false;
+        errorMsg = "";
     }
 
     void Render() override

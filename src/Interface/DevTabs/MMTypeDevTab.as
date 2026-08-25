@@ -65,10 +65,27 @@ class MMTypeDevTab : Tab {
             if (Meta::IsDeveloperMode()) trace("MMTypeDevTab::m_getRequest::CheckRequest: " + res);
             @m_getRequest = null;
             auto json = Json::Parse(res);
+
+            if (json.GetType() == Json::Type::Null) {
+                isError = true;
+                errorMsg = "Error while loading matchmaking type";
+                Log::Error(errorMsg);
+                return;
+            }
+
+            if (json.HasKey("error")) {
+                isError = true;
+                errorMsg = json["error"]["message"];
+                Log::Error(errorMsg);
+                return;
+            }
+
             @selectedType = MatchmakingType(json);
             typeDisableEdit = selectedType.isDisabled;
             typeNameEdit = selectedType.name;
             typeAllowSquadEdit = selectedType.allowSquad;
+            isError = false;
+            errorMsg = "";
             if (selectedType.season !is null) {
                 seasonNameEdit = selectedType.season.name;
                 @m_getMapPackRequest = API::Get(Setting_BaseURL+"/admin/season/"+selectedType.season.id+"/mappack");

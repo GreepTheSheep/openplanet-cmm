@@ -88,6 +88,8 @@ class HistoryTab : Tab {
             for (uint i = 0; i < json["history"].Length; i++){
                 historyMatches.InsertLast(MatchHistory(json["history"][i]));
             }
+            isError = false;
+            errorMsg = "";
         }
     }
 

@@ -61,6 +61,8 @@ class ConnectedPlayersDevTab : Tab {
                 Player@ player = Player(json["connected"][i]);
                 connectedPlayers.InsertLast(player);
             }
+            isError = false;
+            errorMsg = "";
         }
     }
 

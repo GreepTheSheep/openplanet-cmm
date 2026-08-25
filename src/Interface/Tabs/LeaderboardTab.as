@@ -85,6 +85,7 @@ class LeaderboardTab : Tab {
             }
 
             isError = false;
+            errorMsg = "";
 
             for (uint i = 0; i < json["leaderboard"].Length; i++){
                 leaderboardEntries.InsertLast(MatchmakingLeaderboard(json["leaderboard"][i]));
