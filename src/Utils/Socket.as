@@ -149,15 +149,24 @@ class TcpSocketClient {
     void dataListener() {
         while (socket !is null && socket.IsReady()) {
             string rawReceivedData;
-            if (socket.IsHungUp()) {
-                hangUp = true;
-                Log::Error("Socket hang up. Waiting for next health check to reconnect.");
-                disconnect();
-                return;
-            }
-            if (socket.ReadLine(rawReceivedData)) {
-                lastRead = rawReceivedData.Trim();
-                onDataReceived();
+            try {
+                if (socket.ReadLine(rawReceivedData)) {
+                    lastRead = rawReceivedData.Trim();
+                    Log::Trace(lastRead);
+                    if (lastRead.StartsWith("HTTP")) {
+                        // Sockets not handled by the server (mostly because of Cloudflare proxy), we need to disconnect
+                        disconnect();
+                        return;
+                    }
+                    onDataReceived();
+                }
+            } catch {
+                if (socket.IsHungUp()) {
+                    hangUp = true;
+                    Log::Error("Socket hang up. Waiting for next health check to reconnect.");
+                    disconnect();
+                    return;
+                }
             }
             yield();
         }
