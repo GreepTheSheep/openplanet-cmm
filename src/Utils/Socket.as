@@ -73,9 +73,8 @@ class TcpSocketClient {
     }
 
     void disconnect() {
-        if (socket is null || !connected) return;
+        if (socket is null) return;
         connected = false;
-        socket.Close();
         @socket = null;
     }
 
