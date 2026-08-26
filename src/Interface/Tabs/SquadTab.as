@@ -4,7 +4,7 @@ class SquadTab : Tab {
     bool isError = false;
     bool hideInviteCode = true;
     string errorMsg = "";
-    string newSquadName = g_connectedPlayer.displayName + "'s squad";
+    string newSquadName = Setting_SquadName.ToLower() == "squad" ? g_connectedPlayer.displayName + "'s squad" : Setting_SquadName;
     string squadChatMessage = "";
     string squadJoinCode = "";
     string playerAccountIdActions = "";
@@ -93,6 +93,9 @@ class SquadTab : Tab {
     void CreateSquad() {
         LeaveSquad(); // leave squad (even if player don't have one)
 
+        // "squad" alone is not permitted by design, so we'll use the name of the player who created the squad
+        if (newSquadName.ToLower() == "squad") newSquadName = g_connectedPlayer.displayName + "'s squad";
+
         Json::Value@ postJson = Json::Object();
         postJson["name"] = newSquadName;
         Json::Value@ newSquad = API::PostAsync(Setting_BaseURL+"/squad/new", Json::Write(postJson));
@@ -113,6 +116,7 @@ class SquadTab : Tab {
         }
 
         isError = false;
+        Setting_SquadName = newSquadName;
         @g_activeSquad = Squad(newSquad["squad"]);
         if (Squad::squadFetchLoopCoroutine is null || !Squad::squadFetchLoopCoroutine.IsRunning()) @Squad::squadFetchLoopCoroutine = startnew(Squad::fetchSquadLoop);
 

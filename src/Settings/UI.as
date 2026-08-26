@@ -7,6 +7,9 @@ string Setting_MatchFoundAudio = Audio::MatchFoundSounds.GetKeys()[0];
 [Setting hidden]
 uint Setting_LastSelectedMatchmakingIndex = 0;
 
+[Setting hidden]
+string Setting_SquadName = "squad";
+
 [SettingsTab name="UI" icon="Cog" order="1"]
 void RenderUISettingsTab() {
     if (UI::TreeNode(Icons::Kenney::SoundOn + " Audio", UI::TreeNodeFlags::Framed | UI::TreeNodeFlags::DefaultOpen)) {
