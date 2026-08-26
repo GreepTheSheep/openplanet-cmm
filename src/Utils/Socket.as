@@ -153,7 +153,7 @@ class TcpSocketClient {
             try {
                 if (socket.ReadLine(rawReceivedData)) {
                     lastRead = rawReceivedData.Trim();
-                    Log::Trace(lastRead);
+                    if (Meta::IsDeveloperMode()) Log::Trace("Socket data received: " + lastRead);
                     if (lastRead.StartsWith("HTTP")) {
                         // Sockets not handled by the server (mostly because of Cloudflare proxy), we need to disconnect
                         disconnect();
