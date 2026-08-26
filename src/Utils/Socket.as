@@ -49,6 +49,7 @@ class TcpSocketClient {
         }
 
         startnew(CoroutineFunc(dataListener));
+        sleep(100);
 
         // Send the player token to initalize the socket to the player.
         // Server will handle this token and will assign to the player.
