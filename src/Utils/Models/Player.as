@@ -12,6 +12,8 @@ class Player {
     string lastIpAddress;
     bool isTrustedDeveloper;
     Group@ group;
+    int featuredBadgeId;
+    array<PlayerBadge@> badges;
 
     Player(const Json::Value &in json) {
         id = json["id"];
@@ -30,6 +32,12 @@ class Player {
         if (json.HasKey("lastIpAddress") && json["lastIpAddress"].GetType() != Json::Type::Null) lastIpAddress = json["lastIpAddress"];
         isTrustedDeveloper = json["isTrustedDeveloper"];
         if (json.HasKey("group") && json["group"].GetType() != Json::Type::Null) @group = Group(json["group"]);
+        if (json.HasKey("featuredBadgeId") && json["featuredBadgeId"].GetType() != Json::Type::Null) featuredBadgeId = json["featuredBadgeId"];
+        if (json.HasKey("badges") && json["badges"].GetType() == Json::Type::Array) {
+            for (uint b = 0; b < json["badges"].Length; b++){
+                badges.InsertLast(PlayerBadge(json["badges"][b]));
+            }
+        }
     }
 
     bool hasPermission(const string &in permissionName) {
