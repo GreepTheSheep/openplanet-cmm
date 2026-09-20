@@ -14,7 +14,7 @@ class DevPlayerBadgesModalDialog : ModalDialog
     {
         super(Icons::Kenney::BadgeAlt + " \\$zBadges for "+player.displayName+"###DevPlayerBadgesModalDialog");
         @playerToManageBadges = player;
-        m_size = vec2(500, 500);
+        m_size = vec2(400, 300);
     }
 
     void Reload() {
@@ -146,6 +146,8 @@ class DevPlayerBadgesModalDialog : ModalDialog
             UI::Text("Update badges for player: " + playerToManageBadges.displayName);
             UI::SameLine();
             if (UI::GreenButton(Icons::FloppyO + " Update badges")) startnew(CoroutineFunc(UpdatePlayerBadges));
+            UI::NewLine();
+            UI::BeginChild("BadgeList");
 
             for (uint b = 0; b < m_allBadges.Length; b++) {
                 UI::PushID("SelectBadge"+m_allBadges[b].id);
@@ -178,9 +180,11 @@ class DevPlayerBadgesModalDialog : ModalDialog
                 if (!badgeEdit && selectedBadgesId.Find(m_allBadges[b].id) >= 0) selectedBadgesId.RemoveAt(selectedBadgesId.Find(m_allBadges[b].id));
                 UI::PopID();
             }
+            UI::EndChild();
         } else {
             UI::Text("Active badges for player: " + playerToManageBadges.displayName);
             UI::NewLine();
+            UI::BeginChild("BadgeList");
 
             for (uint b = 0; b < m_playerBadges.Length; b++) {
                 auto img = Images::CachedFromURL(Setting_BaseURL+m_playerBadges[b].badge.iconUrl);
@@ -188,11 +192,12 @@ class DevPlayerBadgesModalDialog : ModalDialog
                 UI::AlignTextToFramePadding();
                 if (img.m_texture !is null) {
                     vec2 thumbSize = img.m_texture.GetSize();
-                    float width = 30;
+                    float width = 28;
                     UI::Image(img.m_texture, vec2(
                         width,
                         thumbSize.y / (thumbSize.x / width)
                     ));
+                    UI::BadgeTooltip(m_allBadges[b]);
                 } else if (!img.m_error) {
                     UI::Text(Icons::AnimatedHourglass);
                 } else if (img.m_notFound) {
@@ -202,14 +207,9 @@ class DevPlayerBadgesModalDialog : ModalDialog
                     UI::Text(Icons::Times);
                     UI::SetPreviousTooltip("Error while loading avatar badge icon");
                 }
-                UI::SameLine();
-                UI::Text(m_playerBadges[b].badge.name);
-                if (m_playerBadges[b].badge.description.Length > 0) UI::SetPreviousTooltip(m_playerBadges[b].badge.description);
+                if (b != m_playerBadges.Length - 1) UI::SameLine();
             }
+            UI::EndChild();
         }
-
-        UI::BeginChild("BadgeList");
-
-        UI::EndChild();
     }
 }
