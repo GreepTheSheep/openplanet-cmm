@@ -53,6 +53,7 @@ class Player {
             hasPermission("list_players") ||
             hasPermission("list_all_players") ||
             hasPermission("list_groups") ||
+            hasPermission("manage_badges") ||
             hasPermission("edit_mmtype") ||
             hasPermission("broadcast_messages") ||
             hasPermission("edit_user_notice");
