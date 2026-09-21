@@ -156,25 +156,7 @@ class DevPlayerBadgesModalDialog : ModalDialog
                 bool badgeEdit = selectedBadgesId.Find(m_allBadges[b].id) >= 0;
                 badgeEdit = UI::Checkbox("###SelectBadge"+m_allBadges[b].id, badgeEdit);
                 UI::SameLine();
-                auto img = Images::CachedFromURL(Setting_BaseURL+m_allBadges[b].iconUrl);
-
-                if (img.m_texture !is null) {
-                    vec2 thumbSize = img.m_texture.GetSize();
-                    float width = 28;
-                    UI::Image(img.m_texture, vec2(
-                        width,
-                        thumbSize.y / (thumbSize.x / width)
-                    ));
-                    UI::BadgeTooltip(m_allBadges[b]);
-                } else if (!img.m_error) {
-                    UI::Text(Icons::AnimatedHourglass);
-                } else if (img.m_notFound) {
-                    UI::Text("\\$fc0" + Icons::ExclamationTriangle);
-                    UI::SetPreviousTooltip("Badge icon not found");
-                } else {
-                    UI::Text(Icons::Times);
-                    UI::SetPreviousTooltip("Error while loading avatar badge icon");
-                }
+                UI::BadgeImage(m_allBadges[b], 24, true, true);
 
                 if (badgeEdit && selectedBadgesId.Find(m_allBadges[b].id) == -1) selectedBadgesId.InsertLast(m_allBadges[b].id);
                 if (!badgeEdit && selectedBadgesId.Find(m_allBadges[b].id) >= 0) selectedBadgesId.RemoveAt(selectedBadgesId.Find(m_allBadges[b].id));
@@ -186,28 +168,16 @@ class DevPlayerBadgesModalDialog : ModalDialog
             UI::NewLine();
             UI::BeginChild("BadgeList");
 
+            int newLineEvery = 4;
+            int badgeIndexLine = 0;
             for (uint b = 0; b < m_playerBadges.Length; b++) {
-                auto img = Images::CachedFromURL(Setting_BaseURL+m_playerBadges[b].badge.iconUrl);
-
-                UI::AlignTextToFramePadding();
-                if (img.m_texture !is null) {
-                    vec2 thumbSize = img.m_texture.GetSize();
-                    float width = 28;
-                    UI::Image(img.m_texture, vec2(
-                        width,
-                        thumbSize.y / (thumbSize.x / width)
-                    ));
-                    UI::BadgeTooltip(m_allBadges[b]);
-                } else if (!img.m_error) {
-                    UI::Text(Icons::AnimatedHourglass);
-                } else if (img.m_notFound) {
-                    UI::Text("\\$fc0" + Icons::ExclamationTriangle);
-                    UI::SetPreviousTooltip("Badge icon not found");
+                UI::BadgeImage(m_playerBadges[b].badge, 24, true, true);
+                if (badgeIndexLine == newLineEvery) {
+                    badgeIndexLine = 0;
                 } else {
-                    UI::Text(Icons::Times);
-                    UI::SetPreviousTooltip("Error while loading avatar badge icon");
+                    if (b != m_playerBadges.Length - 1) UI::SameLine();
+                    badgeIndexLine++;
                 }
-                if (b != m_playerBadges.Length - 1) UI::SameLine();
             }
             UI::EndChild();
         }

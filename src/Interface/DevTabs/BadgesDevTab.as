@@ -157,25 +157,7 @@ class BadgesDevTab : Tab {
                     UI::TableNextRow();
 
                     UI::TableSetColumnIndex(0);
-                    auto img = Images::CachedFromURL(Setting_BaseURL+badge.iconUrl);
-
-                    if (img.m_texture !is null) {
-                        vec2 thumbSize = img.m_texture.GetSize();
-                        float width = 28;
-                        UI::Image(img.m_texture, vec2(
-                            width,
-                            thumbSize.y / (thumbSize.x / width)
-                        ));
-                        UI::BadgeTooltip(badge);
-                    } else if (!img.m_error) {
-                        UI::Text(Icons::AnimatedHourglass);
-                    } else if (img.m_notFound) {
-                        UI::Text("\\$fc0" + Icons::ExclamationTriangle);
-                        UI::SetPreviousTooltip("Badge icon not found");
-                    } else {
-                        UI::Text(Icons::Times);
-                        UI::SetPreviousTooltip("Error while loading avatar badge icon");
-                    }
+                    UI::BadgeImage(badge, 24, true, true);
 
                     UI::TableSetColumnIndex(1);
                     UI::Text(badge.name);
