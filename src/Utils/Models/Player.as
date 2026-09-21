@@ -13,6 +13,7 @@ class Player {
     bool isTrustedDeveloper;
     Group@ group;
     int featuredBadgeId;
+    Badge@ featuredBadge;
     array<PlayerBadge@> badges;
 
     Player(const Json::Value &in json) {
@@ -38,6 +39,7 @@ class Player {
                 badges.InsertLast(PlayerBadge(json["badges"][b]));
             }
         }
+        if (json.HasKey("featuredBadge") && json["featuredBadge"].GetType() == Json::Type::Object) @featuredBadge = Badge(json["featuredBadge"]);
     }
 
     bool hasPermission(const string &in permissionName) {
