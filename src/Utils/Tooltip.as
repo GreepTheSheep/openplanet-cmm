@@ -1,5 +1,38 @@
 namespace UI
 {
+    void PlayerInfoTooltip(Player@ player) {
+        if (UI::BeginItemTooltip()) {
+            UI::PushFont(Fonts::Header);
+            if (player.group !is null) UI::Text(player.group.iconWithColor + "  " + player.displayName);
+            else UI::Text(player.displayName);
+            if (player.featuredBadge !is null) {
+                UI::SameLine();
+                UI::BadgeImage(player.featuredBadge, 28, false);
+            }
+            UI::PopFont();
+            if (player.group !is null) UI::Text(player.group.nameWithColor);
+            UI::Separator();
+
+            // Badges
+            int newLineEvery = 4;
+            int badgeIndexLine = 0;
+            for (uint b = 0; b < player.badges.Length; b++) {
+                UI::PushID("PlayerBadge"+player.badges[b].id);
+                UI::AlignTextToFramePadding();
+                UI::BadgeImage(player.badges[b].badge, 20, false);
+                UI::PopID();
+                if (badgeIndexLine == newLineEvery) {
+                    badgeIndexLine = 0;
+                } else {
+                    UI::SameLine();
+                    badgeIndexLine++;
+                }
+            }
+
+            UI::EndTooltip();
+        }
+    }
+
     void BadgeTooltip(Badge@ badge, const bool &in showLargeImage = false, const bool &in showTitle = true, const bool &in showDescription = true) {
         if ((showLargeImage || showTitle || (showDescription && badge.description.Length > 0)) && UI::BeginItemTooltip()) {
             if (showLargeImage) {
