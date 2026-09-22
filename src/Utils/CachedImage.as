@@ -8,8 +8,8 @@ class CachedImage
 
     void DownloadFromURLAsync()
     {
-        Log::Trace("Loading texture: " + m_url);
-        auto req = API::Get(m_url);
+        if (Meta::IsDeveloperMode()) Log::Trace("Loading texture: " + m_url);
+        auto req = API::Get(m_url, false);
 
         while (!req.Finished()) {
             yield();
