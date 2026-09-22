@@ -25,6 +25,17 @@ class UserTab : Tab {
         if (g_connectedPlayer.featuredBadge !is null) {
             UI::SameLine();
             UI::BadgeImage(g_connectedPlayer.featuredBadge);
+            if (UI::BeginPopupContextItem("PlayerFeaturedBadge")) {
+                UI::AlignTextToFramePadding();
+                UI::BadgeImage(g_connectedPlayer.featuredBadge, 26, false);
+                UI::SameLine();
+                UI::Text(g_connectedPlayer.featuredBadge.name);
+                if (UI::MenuItem("Remove featured")) {
+                    badgeIdToSetFeatured = 0;
+                    startnew(CoroutineFunc(SetPlayerFeaturedBadgeAsync));
+                }
+                UI::EndPopup();
+            }
         }
 
         if (
