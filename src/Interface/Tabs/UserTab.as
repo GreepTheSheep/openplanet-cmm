@@ -24,7 +24,7 @@ class UserTab : Tab {
         UI::PopFont();
         if (g_connectedPlayer.featuredBadge !is null) {
             UI::SameLine();
-            UI::BadgeImage(g_connectedPlayer.featuredBadge);
+            UI::BadgeImage(g_connectedPlayer.featuredBadge, 24);
             if (UI::BeginPopupContextItem("PlayerFeaturedBadge")) {
                 UI::AlignTextToFramePadding();
                 UI::BadgeImage(g_connectedPlayer.featuredBadge, 26, false);

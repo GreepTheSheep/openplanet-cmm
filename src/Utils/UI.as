@@ -34,7 +34,7 @@ namespace UI
         return Math::Lerp(vec3(K.x,K.x,K.x), Math::Clamp(p - vec3(K.x,K.x,K.x), 0.0, 1.0), c.y) * c.z;
     }
 
-    void BadgeImage(Badge@ badge, const float &in width = 24, const bool &in showTooltip = true, const bool &in showTooltipLargeImage = false, const bool &in showTooltipTitle = true, const bool &in showTooltipDescription = true) {
+    void BadgeImage(Badge@ badge, const float &in width = 19, const bool &in showTooltip = true, const bool &in showTooltipLargeImage = false, const bool &in showTooltipTitle = true, const bool &in showTooltipDescription = true) {
         auto img = Images::CachedFromURL(Setting_BaseURL+badge.iconUrl);
 
         if (img.m_texture !is null) {
