@@ -314,11 +314,27 @@ class SquadTab : Tab {
             for (uint p = 0; p < g_activeSquad.players.Length; p++) {
                 Player@ player = g_activeSquad.players[p];
                 UI::Text("- " + player.displayName);
+                UI::PlayerInfoTooltip(player);
                 if (UI::BeginPopupContextItem("SquadPlayer"+player.id)) {
                     if (player.accountId == g_activeSquad.ownerPlayer)
                         UI::Text("\\$ff0" + Icons::IdBadge + " \\$zSquad host");
-                    if (player.group.icon.Length > 0)
-                        UI::Text(player.group.iconWithColor + " " + player.group.nameWithColor);
+                    if (player.badges.Length > 0) {
+                        UI::Separator();
+                        int newLineEvery = 4;
+                        int badgeIndexLine = 0;
+                        for (uint b = 0; b < player.badges.Length; b++) {
+                            UI::PushID("PlayerBadge"+player.badges[b].id);
+                            UI::AlignTextToFramePadding();
+                            UI::BadgeImage(player.badges[b].badge);
+                            UI::PopID();
+                            if (badgeIndexLine == newLineEvery) {
+                                badgeIndexLine = 0;
+                            } else {
+                                UI::SameLine();
+                                badgeIndexLine++;
+                            }
+                        }
+                    }
 
                     if (g_connectedPlayer.accountId == g_activeSquad.ownerPlayer && player.accountId != g_activeSquad.ownerPlayer) {
                         UI::Separator();
@@ -333,10 +349,9 @@ class SquadTab : Tab {
                     }
                     UI::EndPopup();
                 }
-                if (player.group.icon.Length > 0) {
+                if (player.featuredBadge !is null) {
                     UI::SameLine();
-                    UI::Text(player.group.iconWithColor);
-                    UI::SetPreviousTooltip(player.group.name);
+                    UI::BadgeImage(player.featuredBadge);
                 }
                 if (player.accountId == g_activeSquad.ownerPlayer) {
                     UI::SameLine();
