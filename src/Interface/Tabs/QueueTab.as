@@ -252,7 +252,7 @@ class QueueTab : Tab {
 
         if (g_selectedMatchmakingType is null) {
             UI::BeginDisabled();
-            queueButtonMsg = Icons::Hourglass + " Loading";
+            queueButtonMsg = Icons::AnimatedHourglass + " Loading";
             UI::GrayButton(queueButtonMsg);
             UI::EndDisabled();
             return;
@@ -318,7 +318,7 @@ class QueueTab : Tab {
             if (g_activeSquad.matchmakingTypeId == -1) {
                 bool isOwner = (g_connectedPlayer !is null && g_connectedPlayer.accountId == g_activeSquad.ownerPlayer);
                 UI::BeginDisabled();
-                queueButtonMsg = isOwner ? (Icons::ArrowUp + " Select a type above") : (Icons::Hourglass + " Waiting for squad host...");
+                queueButtonMsg = isOwner ? (Icons::ArrowUp + " Select a type above") : (Icons::AnimatedHourglass + " Waiting for squad host...");
                 UI::GrayButton(queueButtonMsg);
                 UI::EndDisabled();
                 return;

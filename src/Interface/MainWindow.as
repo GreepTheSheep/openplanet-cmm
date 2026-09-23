@@ -75,11 +75,8 @@ class MainWindow : Window {
         CheckRequest();
         CheckRequestMMType();
 
-        int HourGlassValue = Time::Stamp % 3;
-        string Hourglass = (HourGlassValue == 0 ? Icons::HourglassStart : (HourGlassValue == 1 ? Icons::HourglassHalf : Icons::HourglassEnd));
-
         if (isLoading) {
-            UI::Text(Hourglass + " Loading...");
+            UI::Text(Icons::AnimatedHourglass + " Loading...");
             return;
         }
 
@@ -93,7 +90,7 @@ class MainWindow : Window {
         }
 
         vec2 BasePos = UI::GetCursorPos();
-        if (isLoadingMMType) UI::Text(Hourglass);
+        if (isLoadingMMType) UI::Text(Icons::AnimatedHourglass);
         else {
             // Add tooltip if the season will have a end date
             string seasonTooltipText = "";
@@ -113,7 +110,7 @@ class MainWindow : Window {
                 if (seasonTooltipText.Length > 0) UI::SetPreviousTooltip(seasonTooltipText);
             } else UI::Text(g_selectedMatchmakingType.name);
         }
-        if (isLoadingMMType) UI::Text(Hourglass);
+        if (isLoadingMMType) UI::Text(Icons::AnimatedHourglass);
         else {
             if (g_selectedMatchmakingType.season !is null) {
                 if (g_selectedMatchmakingType.season.isActive) {

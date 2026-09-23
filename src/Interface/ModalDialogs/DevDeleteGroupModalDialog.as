@@ -39,9 +39,7 @@ class DevDeleteGroupModalDialog : ModalDialog
         UI::SameLine();
         if (m_request !is null) {
             UI::SetCursorPos(vec2(UI::GetWindowSize().x - 90 * scale, UI::GetCursorPos().y));
-            int HourGlassValue = Time::Stamp % 3;
-            string Hourglass = (HourGlassValue == 0 ? Icons::HourglassStart : (HourGlassValue == 1 ? Icons::HourglassHalf : Icons::HourglassEnd));
-            UI::Text(Hourglass);
+            UI::Text(Icons::AnimatedHourglass);
             UI::SameLine();
         }
         UI::SetCursorPos(vec2(UI::GetWindowSize().x - 70 * scale, UI::GetCursorPos().y));

@@ -161,9 +161,7 @@ class GroupsDevTab : Tab {
         CheckRequest();
 
         if (isLoading) {
-            int HourGlassValue = Time::Stamp % 3;
-            string Hourglass = (HourGlassValue == 0 ? Icons::HourglassStart : (HourGlassValue == 1 ? Icons::HourglassHalf : Icons::HourglassEnd));
-            UI::Text(Hourglass + " Loading...");
+            UI::Text(Icons::AnimatedHourglass + " Loading...");
             return;
         }
 
