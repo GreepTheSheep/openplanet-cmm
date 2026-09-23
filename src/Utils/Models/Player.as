@@ -23,8 +23,7 @@ class Player {
         accountId = json["accountId"];
         displayName = json["displayName"];
         for (uint mt = 0; mt < json["matchmakingTypes"].Length; mt++){
-            PlayerMatchmakingType@ matchmakingType = PlayerMatchmakingType(json["matchmakingTypes"][mt]);
-            matchmakingTypes.InsertLast(matchmakingType);
+            matchmakingTypes.InsertLast(PlayerMatchmakingType(json["matchmakingTypes"][mt]));
         }
         groupId = json["groupId"];
         firstLogon = json["firstLogon"];
