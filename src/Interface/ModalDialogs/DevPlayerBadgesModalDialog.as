@@ -9,6 +9,8 @@ class DevPlayerBadgesModalDialog : ModalDialog
     array<int> selectedBadgesId;
     array<Badge@> m_allBadges;
     array<PlayerBadge@> m_playerBadges;
+    string u_search;
+    uint64 u_typingStart;
 
     DevPlayerBadgesModalDialog(Player@ player)
     {
@@ -18,6 +20,7 @@ class DevPlayerBadgesModalDialog : ModalDialog
     }
 
     void Reload() {
+        m_allBadges.RemoveRange(0, m_allBadges.Length);
         m_playerBadges.RemoveRange(0, m_playerBadges.Length);
         StartRequest();
     }
@@ -98,34 +101,60 @@ class DevPlayerBadgesModalDialog : ModalDialog
             Reload();
         }
 
-        if (m_userBadgesRequest !is null) {
+        if (m_userBadgesRequest !is null) return;
+
+        if (u_typingStart == 0) {
             return;
+        }
+
+        if (Time::Now > u_typingStart + 1000) {
+            u_typingStart = 0;
+            Reload();
         }
     }
 
     void StartRequest()
     {
         m_requestIsLoading = true;
-        string url = Setting_BaseURL+"/admin/badges";
+        string adminBadgesUrl = Setting_BaseURL+"/admin/badges";
         string userBadgesUrl = Setting_BaseURL+"/user/badges";
-        string urlParams = "";
-        dictionary params;
-        params.Set("playerId", playerToManageBadges.id);
 
-        if (!params.IsEmpty()) {
-            auto keys = params.GetKeys();
+        string adminBadgesUrlParams = "";
+        dictionary adminBadgesParams;
+        if (u_search.Length > 2) {
+            adminBadgesParams.Set("s", u_search);
+        }
+
+        if (!adminBadgesParams.IsEmpty()) {
+            auto keys = adminBadgesParams.GetKeys();
             for (uint i = 0; i < keys.Length; i++) {
                 string key = keys[i];
                 string value;
-                params.Get(key, value);
+                adminBadgesParams.Get(key, value);
 
-                urlParams += (i == 0 ? "?" : "&");
-                urlParams += key + "=" + Net::UrlEncode(value);
+                adminBadgesUrlParams += (i == 0 ? "?" : "&");
+                adminBadgesUrlParams += key + "=" + Net::UrlEncode(value);
             }
         }
 
-        @m_request = API::Get(url);
-        @m_userBadgesRequest = API::Get(userBadgesUrl + urlParams);
+        string userBadgesUrlParams = "";
+        dictionary userBadgesParams;
+        userBadgesParams.Set("playerId", tostring(playerToManageBadges.id));
+
+        if (!userBadgesParams.IsEmpty()) {
+            auto keys = userBadgesParams.GetKeys();
+            for (uint i = 0; i < keys.Length; i++) {
+                string key = keys[i];
+                string value;
+                userBadgesParams.Get(key, value);
+
+                userBadgesUrlParams += (i == 0 ? "?" : "&");
+                userBadgesUrlParams += key + "=" + Net::UrlEncode(value);
+            }
+        }
+
+        @m_request = API::Get(adminBadgesUrl + adminBadgesUrlParams);
+        @m_userBadgesRequest = API::Get(userBadgesUrl + userBadgesUrlParams);
     }
 
     void UpdatePlayerBadges() {
@@ -141,31 +170,54 @@ class DevPlayerBadgesModalDialog : ModalDialog
     void RenderDialog() override
     {
         CheckRequest();
+        if (m_requestIsLoading) {
+            UI::Text(Icons::AnimatedHourglass + " Loading");
+            return;
+        }
         if (g_connectedPlayer.hasPermission("manage_badges")) {
             UI::AlignTextToFramePadding();
             UI::Text("Update badges for player: " + playerToManageBadges.displayName);
             UI::SameLine();
             if (UI::GreenButton(Icons::FloppyO + " Update badges")) startnew(CoroutineFunc(UpdatePlayerBadges));
-            UI::NewLine();
+
+            bool changed = false;
+            u_search = UI::InputText("Search badge##PlayerToManageBadgesSearch", u_search, changed);
+            if (changed) u_typingStart = Time::Now;
+
             UI::BeginChild("BadgeList");
+            if (UI::BeginTable("allBadgesListToPlayerManage", 3, UI::TableFlags(UI::TableFlags::Resizable | UI::TableFlags::NoSavedSettings | UI::TableFlags::SizingStretchProp | UI::TableFlags::ScrollY))) {
+                UI::TableSetupScrollFreeze(0, 1);
+                UI::TableSetupColumn("Badge", UI::TableColumnFlags::WidthFixed, 60);
+                UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthStretch);
+                UI::TableSetupColumn("Attribute", UI::TableColumnFlags::WidthFixed, 80);
+                UI::TableHeadersRow();
 
-            for (uint b = 0; b < m_allBadges.Length; b++) {
-                UI::PushID("SelectBadge"+m_allBadges[b].id);
-                UI::AlignTextToFramePadding();
+                UI::ListClipper clipper(m_allBadges.Length);
+                while(clipper.Step()) {
+                    for(int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
+                    {
+                        UI::PushID("ResCoManagePlayerBadge"+i);
+                        UI::TableNextRow();
 
-                bool badgeEdit = selectedBadgesId.Find(m_allBadges[b].id) >= 0;
-                badgeEdit = UI::Checkbox("###SelectBadge"+m_allBadges[b].id, badgeEdit);
-                UI::SameLine();
-                UI::BadgeImage(m_allBadges[b], 24, true, true);
+                        UI::TableSetColumnIndex(0);
+                        UI::BadgeImage(m_allBadges[i], 24, true, true);
 
-                if (badgeEdit && selectedBadgesId.Find(m_allBadges[b].id) == -1) selectedBadgesId.InsertLast(m_allBadges[b].id);
-                if (!badgeEdit && selectedBadgesId.Find(m_allBadges[b].id) >= 0) selectedBadgesId.RemoveAt(selectedBadgesId.Find(m_allBadges[b].id));
-                UI::PopID();
+                        UI::TableSetColumnIndex(1);
+                        UI::Text(m_allBadges[i].name);
+
+                        UI::TableSetColumnIndex(2);
+                        bool badgeEdit = selectedBadgesId.Find(m_allBadges[i].id) >= 0;
+                        badgeEdit = UI::Checkbox("###SelectBadge"+m_allBadges[i].id, badgeEdit);
+                        if (badgeEdit && selectedBadgesId.Find(m_allBadges[i].id) == -1) selectedBadgesId.InsertLast(m_allBadges[i].id);
+                        if (!badgeEdit && selectedBadgesId.Find(m_allBadges[i].id) >= 0) selectedBadgesId.RemoveAt(selectedBadgesId.Find(m_allBadges[i].id));
+                        UI::PopID();
+                    }
+                }
+                UI::EndTable();
             }
             UI::EndChild();
         } else {
             UI::Text("Active badges for player: " + playerToManageBadges.displayName);
-            UI::NewLine();
             UI::BeginChild("BadgeList");
 
             int newLineEvery = 4;
