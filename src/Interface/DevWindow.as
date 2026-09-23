@@ -4,6 +4,7 @@ class DevWindow : Window {
         AddTab(ConnectedPlayersDevTab());
         AddTab(AllPlayersDevTab());
         AddTab(GroupsDevTab());
+        AddTab(BadgesDevTab());
         AddTab(BroadcastNotificationDevTab());
         AddTab(NoticeDevTab());
         AddTab(MMTypeDevTab());

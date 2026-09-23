@@ -4,9 +4,15 @@ namespace Squad {
     void fetchSquadLoop() {
         if (!g_tcpSocket.connected)
             while(!g_tcpSocket.connected && g_activeSquad !is null) {
-                sleep(1500);
-                fetchSquadAsync(false);
+                sleep(uint64(Math::Rand(1000, 2000)));
+                fetchSquadAsync();
             }
+        else while(g_activeSquad !is null) {
+            for (uint p = 0; p < g_activeSquad.players.Length; p++) {
+                g_activeSquad.players[p].fetchBadgesAsync();
+            }
+            sleep(uint64(Math::Rand(10000, 15000)));
+        }
     }
 
     void handleSocketData(const string &in dataType, const Json::Value &in data) {
@@ -96,6 +102,9 @@ namespace Squad {
         if (res.HasKey("isSearching")) {
             squad.isSearching = bool(res["isSearching"]);
         }
+        for (uint p = 0; p < squad.players.Length; p++) {
+            squad.players[p].fetchBadgesAsync();
+        }
     }
 
     void handleSearchStateChanged() {
@@ -153,9 +162,9 @@ namespace Squad {
         }
     }
 
-    void fetchSquadAsync(const bool &in postLog = true) {
+    void fetchSquadAsync() {
         if (g_selectedMatchmakingType !is null && g_selectedMatchmakingType.allowSquad) {
-            Json::Value@ res = API::GetAsync(Setting_BaseURL+"/squad", postLog);
+            Json::Value@ res = API::GetAsync(Setting_BaseURL+"/squad", false);
 
             if (res.GetType() == Json::Type::Null) {
                 Log::Error("Error while loading squad");

@@ -248,6 +248,13 @@ class AllPlayersDevTab : Tab {
                     } else UI::Text("ID: " + player.groupId);
 
                     UI::TableSetColumnIndex(5);
+                    if (g_connectedPlayer.hasPermission("manage_badges")) {
+                        if (UI::Button(Icons::Kenney::BadgeAlt)) {
+                            Renderables::Add(DevPlayerBadgesModalDialog(player));
+                        }
+                        UI::SetPreviousTooltip("Manage their badges");
+                        UI::SameLine();
+                    }
                     if (g_connectedPlayer.hasPermission("ban_player")) {
                         if (UI::RedButton(Icons::Ban)) {
                             Renderables::Add(DevBanPlayerModalDialog(player));

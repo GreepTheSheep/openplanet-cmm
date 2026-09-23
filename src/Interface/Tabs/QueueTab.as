@@ -189,19 +189,44 @@ class QueueTab : Tab {
                         UI::Text(Text::OpenplanetFormatCodes("$" + g_matchInfo.teams[t].colorTM + g_matchInfo.teams[t].name));
                         UI::Separator();
                         for (uint p = 0; p < g_matchInfo.teams[t].players.Length; p++) {
-                            UI::Text("- " + g_matchInfo.teams[t].players[p].displayName);
-                            if (g_matchInfo.teams[t].players[p].group.icon.Length > 0) {
-                                UI::SameLine();
-                                UI::Text(g_matchInfo.teams[t].players[p].group.iconWithColor);
-                                UI::SetPreviousTooltip(g_matchInfo.teams[t].players[p].group.name);
+                            Player@ player = g_matchInfo.teams[t].players[p];
+                            UI::Text("- " + player.displayName);
+                            UI::PlayerInfoTooltip(player);
+                            if (UI::BeginPopupContextItem("MatchPlayer"+player.id)) {
+                                if (player.badges.Length > 0) {
+                                    int newLineEvery = 4;
+                                    int badgeIndexLine = 0;
+                                    for (uint b = 0; b < player.badges.Length; b++) {
+                                        UI::PushID("PlayerBadge"+player.badges[b].id);
+                                        UI::AlignTextToFramePadding();
+                                        UI::BadgeImage(player.badges[b].badge);
+                                        UI::PopID();
+                                        if (badgeIndexLine == newLineEvery) {
+                                            badgeIndexLine = 0;
+                                        } else {
+                                            UI::SameLine();
+                                            badgeIndexLine++;
+                                        }
+                                    }
+                                }
+                                UI::EndPopup();
                             }
-                            for (uint mt = 0; mt < g_matchInfo.teams[t].players[p].matchmakingTypes.Length; mt++) {
+                            if (player.featuredBadge !is null) {
+                                UI::SameLine();
+                                UI::BadgeImage(player.featuredBadge);
+                            }
+                            if (player.group.icon.Length > 0) {
+                                UI::SameLine();
+                                UI::Text(player.group.iconWithColor);
+                                UI::SetPreviousTooltip(player.group.name);
+                            }
+                            for (uint mt = 0; mt < player.matchmakingTypes.Length; mt++) {
                                 if (
-                                    g_matchInfo.teams[t].players[p].matchmakingTypes[mt].matchmakingTypeId == g_selectedMatchmakingType.id &&
-                                    g_matchInfo.teams[t].players[p].matchmakingTypes[mt].matchesPlayed >= g_selectedMatchmakingType.placementMatches
+                                    player.matchmakingTypes[mt].matchmakingTypeId == g_selectedMatchmakingType.id &&
+                                    player.matchmakingTypes[mt].matchesPlayed >= g_selectedMatchmakingType.placementMatches
                                 ) {
                                     UI::SameLine();
-                                    UI::Text(tostring(g_matchInfo.teams[t].players[p].matchmakingTypes[mt].points));
+                                    UI::Text(tostring(player.matchmakingTypes[mt].points));
                                 }
                             }
                         }
