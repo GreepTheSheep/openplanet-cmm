@@ -137,30 +137,7 @@ class QueueTab : Tab {
                 UI::Separator();
             }
 
-            if (g_selectedPlayerMatchmakingType !is null && g_selectedPlayerMatchmakingType.matchesPlayed >= g_selectedMatchmakingType.placementMatches) {
-                vec2 posTop = UI::GetCursorPos();
-                array<float> recentMatchesPoints;
-                for (uint rm = 0; rm < g_selectedPlayerMatchmakingType.recentMatches.Length; rm++) {
-                    recentMatchesPoints.InsertLast(g_selectedPlayerMatchmakingType.recentMatches[rm].ratingAfter);
-                }
-                UI::PushStyleColor(UI::Col::FrameBg, vec4(0,0,0,0));
-                UI::PushStyleColor(UI::Col::PlotLines, vec4(1,1,1,0.2));
-                UI::PushStyleColor(UI::Col::PlotLinesHovered, vec4(1,1,1,0.4));
-                UI::PushStyleColor(UI::Col::Text, vec4(0,0,0,0));
-                UI::PushStyleColor(UI::Col::PopupBg, vec4(0,0,0,0));
-                UI::SetNextItemWidth(UI::GetWindowSize().x + (4 * UI::GetScale()));
-                UI::PlotLines("##recentMatchesPointsGraph", recentMatchesPoints, 0, UI::GetWindowSize().y - 100);
-                UI::PopStyleColor(5);
-                if (UI::IsItemHovered()) {
-                    vec4 graphRect = UI::GetItemRect();
-                    vec2 mousePos = UI::GetMousePos();
-                    mousePos = vec2(mousePos.x - graphRect.x, mousePos.y - graphRect.y);
-                    mousePos = vec2(mousePos.x / graphRect.z, mousePos.y / graphRect.w);
-                    uint index = uint(mousePos.x * g_selectedPlayerMatchmakingType.recentMatches.Length);
-                    UI::SetCursorPos(posTop);
-                    UI::TextDisabled(g_selectedPlayerMatchmakingType.recentMatches[index].ratingAfter + "pts");
-                }
-            }
+            RenderSquadView();
 
             RenderQueueButton();
 
@@ -241,6 +218,76 @@ class QueueTab : Tab {
                 }
             }
         }
+    }
+
+    void RenderSquadView() {
+        if (g_activeSquad is null) {
+            RenderPlayerView(g_connectedPlayer);
+        } else {
+            UI::Columns(g_activeSquad.players.Length, "QueueTabPlayersView", false);
+            for (uint i = 0; i < g_activeSquad.players.Length; i++) {
+                UI::BeginChild("QueueTabPlayerView"+i);
+                if (g_activeSquad.players[i].id == g_connectedPlayer.id) RenderPlayerView(g_connectedPlayer); // use full stats for the connected player
+                else RenderPlayerView(g_activeSquad.players[i]);
+                UI::EndChild();
+                UI::NextColumn();
+            }
+            UI::Columns(1);
+        }
+    }
+
+    void RenderPlayerView(Player@ player) {
+        PlayerMatchmakingType@ selectedPlayerMatchmakingType;
+        for (uint p = 0; p < player.matchmakingTypes.Length; p++) {
+            if (g_selectedMatchmakingType !is null && player.matchmakingTypes[p].matchmakingTypeId == g_selectedMatchmakingType.id) {
+                @selectedPlayerMatchmakingType = player.matchmakingTypes[p];
+                break;
+            }
+        }
+        vec2 posTop = UI::GetCursorPos();
+        if (selectedPlayerMatchmakingType !is null && selectedPlayerMatchmakingType.matchesPlayed >= g_selectedMatchmakingType.placementMatches) {
+            array<float> recentMatchesPoints;
+            for (uint rm = 0; rm < selectedPlayerMatchmakingType.recentMatches.Length; rm++) {
+                recentMatchesPoints.InsertLast(selectedPlayerMatchmakingType.recentMatches[rm].ratingAfter);
+            }
+            UI::PushStyleColor(UI::Col::FrameBg, vec4(0,0,0,0));
+            UI::PushStyleColor(UI::Col::PlotLines, vec4(1,1,1,0.2));
+            UI::PushStyleColor(UI::Col::PlotLinesHovered, vec4(1,1,1,0.4));
+            UI::PushStyleColor(UI::Col::Text, vec4(0,0,0,0));
+            UI::PushStyleColor(UI::Col::PopupBg, vec4(0,0,0,0));
+            UI::SetNextItemWidth(UI::GetWindowSize().x + (4 * UI::GetScale()));
+            UI::PlotLines("##recentMatchesPointsGraph", recentMatchesPoints, 0, UI::GetWindowSize().y - 100);
+            UI::PopStyleColor(5);
+            if (UI::IsItemHovered()) {
+                vec4 graphRect = UI::GetItemRect();
+                vec2 mousePos = UI::GetMousePos();
+                mousePos = vec2(mousePos.x - graphRect.x, mousePos.y - graphRect.y);
+                mousePos = vec2(mousePos.x / graphRect.z, mousePos.y / graphRect.w);
+                uint index = uint(mousePos.x * selectedPlayerMatchmakingType.recentMatches.Length);
+                UI::SetCursorPos(posTop);
+                UI::TextDisabled(selectedPlayerMatchmakingType.recentMatches[index].ratingAfter + "pts");
+            }
+        }
+
+        vec2 playerNameSize = UI::MeasureString(player.displayName);
+        UI::SetCursorPos(vec2(
+            (UI::GetWindowSize().x - playerNameSize.x) / 2,
+            UI::GetWindowSize().y / 2 - (14 * UI::GetScale())
+        ));
+        UI::Text(player.displayName);
+        if (selectedPlayerMatchmakingType !is null && selectedPlayerMatchmakingType.matchesPlayed < g_selectedMatchmakingType.placementMatches) {
+            int remaining = g_selectedMatchmakingType.placementMatches - selectedPlayerMatchmakingType.matchesPlayed;
+            string matchesLeftString = tostring(remaining) + " matches left to get "+(player.id == g_connectedPlayer.id ? "your":"their")+" ELO";
+            if (remaining == 1) matchesLeftString = "Last placement match!";
+            vec2 matchesLeftSize = UI::MeasureString(matchesLeftString);
+
+            UI::SetCursorPos(vec2(
+                (UI::GetWindowSize().x - matchesLeftSize.x) / 2,
+                UI::GetCursorPos().y
+            ));
+            UI::Text(matchesLeftString);
+        }
+        UI::SetCursorPos(posTop);
     }
 
     void RenderQueueButton() {

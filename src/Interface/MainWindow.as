@@ -117,7 +117,8 @@ class MainWindow : Window {
                     // Don't show points until player has done placement matches
                     if (g_selectedPlayerMatchmakingType.matchesPlayed < g_selectedMatchmakingType.placementMatches) {
                         int remaining = g_selectedMatchmakingType.placementMatches - g_selectedPlayerMatchmakingType.matchesPlayed;
-                        UI::Text(Icons::ArrowCircleORight + " " + tostring(remaining) + " matches left to get your ELO");
+                        if (remaining == 1) UI::Text(Icons::ArrowCircleORight + " Last placement match!");
+                        else UI::Text(Icons::ArrowCircleORight + " " + tostring(remaining) + " matches left to get your ELO");
                     } else {
                         UI::Text("\\$900" + Icons::DotCircleO + " " + g_selectedPlayerMatchmakingType.points);
                     }
