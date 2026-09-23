@@ -198,13 +198,20 @@ void PingMatchmakingLoop() {
         }
 
         if (res["match"].GetType() == Json::Type::Object) {
+            @g_matchInfo = Match(res["match"]);
             if (!g_tcpSocket.connected) { // All data will be handled by the TCP socket at this point, only if the socket is connected
                 g_inMatch = true;
-                @g_matchInfo = Match(res["match"]);
                 if (g_matchInfo.tmServer !is null && g_matchInfo.tmServer.quickJoinLink != "") {
                     if (!g_connectedToMatchGameServer && g_matchInfo.status.ToLower().StartsWith("waiting for players")) {
                         TM::JoinServer(g_matchInfo.tmServer.quickJoinLink);
                     }
+                }
+            }
+            for (uint t = 0; t < g_matchInfo.teams.Length; t++) {
+                for (uint tp = 0; tp < g_matchInfo.teams[t].players.Length; tp++) {
+                    // For each players in the match, fetch their badges
+                    // (safeguard with their private propriety NextFetchBadgesTimestamp)
+                    g_matchInfo.teams[t].players[tp].fetchBadgesAsync();
                 }
             }
         } else if (res["match"].GetType() == Json::Type::Null) {
