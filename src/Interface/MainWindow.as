@@ -192,8 +192,7 @@ class MainWindow : Window {
             UI::Text(Icons::Users + " " + g_connectedPlayerCount);
             UI::SetPreviousTooltip("Number of players connected into " + PLUGIN_NAME_SHORT);
         } else {
-            string userIcon = Time::Stamp % 2 == 0 ? Icons::User : Icons::UserO;
-            UI::Text(userIcon + " " + g_queuePlayersCount);
+            UI::Text(Icons::BlinkingUser + " " + g_queuePlayersCount);
             UI::SetPreviousTooltip("Number of players queuing for " + g_selectedMatchmakingType.name);
         }
 

@@ -11,4 +11,15 @@ namespace Icons {
                 return Icons::HourglassEnd;
         }
     }
+
+    string get_BlinkingUser() {
+        int index = Time::Stamp % 2;
+
+        switch (index) {
+            case 0:
+                return Icons::User;
+            default:
+                return Icons::UserO;
+        }
+    }
 }
