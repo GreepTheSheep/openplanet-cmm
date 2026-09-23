@@ -319,7 +319,7 @@ class SquadTab : Tab {
                     if (player.accountId == g_activeSquad.ownerPlayer)
                         UI::Text("\\$ff0" + Icons::IdBadge + " \\$zSquad host");
                     if (player.badges.Length > 0) {
-                        UI::Separator();
+                        if (player.accountId == g_activeSquad.ownerPlayer) UI::Separator();
                         int newLineEvery = 4;
                         int badgeIndexLine = 0;
                         for (uint b = 0; b < player.badges.Length; b++) {
@@ -330,7 +330,7 @@ class SquadTab : Tab {
                             if (badgeIndexLine == newLineEvery) {
                                 badgeIndexLine = 0;
                             } else {
-                                UI::SameLine();
+                                if (b != player.badges.Length - 1) UI::SameLine();
                                 badgeIndexLine++;
                             }
                         }

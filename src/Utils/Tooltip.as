@@ -11,9 +11,9 @@ namespace UI
             }
             UI::PopFont();
             if (player.group !is null) UI::Text(player.group.nameWithColor);
-            UI::Separator();
 
             // Badges
+            if (player.badges.Length > 0) UI::Separator();
             int newLineEvery = 4;
             int badgeIndexLine = 0;
             for (uint b = 0; b < player.badges.Length; b++) {
