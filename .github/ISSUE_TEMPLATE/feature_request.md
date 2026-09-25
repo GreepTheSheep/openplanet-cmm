@@ -1,10 +1,8 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
-title: ''
-labels: enhancement
-assignees: ''
-
+about: Suggest an idea for CMM
+labels: [enhancement, triage]
+type: Feature
 ---
 
 **Is your feature request related to a problem? Please describe.**

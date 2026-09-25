@@ -1,0 +1,86 @@
+name: Issue report
+description: File an issue report
+labels: [bug, triage]
+type: Bug
+body:
+  - type: checkboxes
+    id: agreement
+    attributes:
+      label: "This issue respects the following points:"
+      options:
+        - label: This is a **bug**, not a question or a configuration issue.
+          required: true
+        - label: This issue is **not** already reported on [GitHub](https://github.com/GreepTheSheep/openplanet-cmm/issues?q=is%3Aopen+is%3Aissue) _(I've searched it)_.
+          required: true
+        - label: This report addresses only a single issue; If you encounter multiple issues, kindly create separate reports for each one.
+          required: true
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Description of the bug
+      description: Please provide a detailed description on the bug you encountered, in a readable and comprehensible way.
+      placeholder: |
+        After updating to version x.y.z, the matchmaking on "FlagRush 3v3" can't make it. It appears to me that it is related to this newest season happened a week ago. My friends does have the same issue. It might be a regression from pull request #x. I have tried rebooting the plugin and even the game. This makes me believe it is a server side issue.
+    validations:
+      required: true
+  - type: textarea
+    id: repro-steps
+    attributes:
+      label: Reproduction steps
+      description: Reproduction steps should be complete and self-contained. Anyone can reproduce this issue by following these steps. Furthermore, the steps should be clear and easy to follow.
+      placeholder: |
+        1. After being connected to the CMM server, open the window and queue for a "FlagRush 3v3" match
+        2. Wait until a match is found
+        3. When the match is being created, check the match status
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: What is the expected _correct_ behavior?
+      description: Write down the correct expected behavior that is supposed to happen after following the reproduction steps.
+      placeholder: |
+        The server should be created and the map should be played.
+    validations:
+      required: true
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: What is the current _bug_ behavior?
+      description: Write down the incorrect behavior that currently happens after following the reproduction steps.
+      placeholder: |
+        The match status is stuck on "Creating server..."
+    validations:
+      required: true
+  - type: textarea
+    id: build-info
+    attributes:
+      label: Paste the CMM build info here
+      description: To get the build info, click on the version number on the bottom right of the CMM window. It should copy a long text having the plugin version, the running system, the running server version and infos.
+      placeholder: |
+        ============================
+        Community Matchmaking v0.1.0
+        ============================
+
+        * BuildType: Zip
+        * DevBuild: False
+
+        ...
+    validations:
+      required: true
+  - type: textarea
+    id: plugin-logs
+    attributes:
+      label: Relevant logs
+      description: Please copy and paste any relevant log output. This can be found in Openplanet > Logs. To copy-paste, you can open the log file in a notepad
+      render: shell
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Relevant screenshots or videos
+      description: Attach relevant screenshots or videos related to this report.
+  - type: textarea
+    id: additional-information
+    attributes:
+      label: Additional information
+      description: Any additional information that might be useful to this issue.
