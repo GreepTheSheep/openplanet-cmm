@@ -57,6 +57,7 @@ body:
     attributes:
       label: Paste the CMM build info here
       description: To get the build info, click on the version number on the bottom right of the CMM window. It should copy a long text having the plugin version, the running system, the running server version and infos.
+      render: shell
       placeholder: |
         ============================
         Community Matchmaking v0.1.0
