@@ -295,7 +295,7 @@ class QueueTab : Tab {
     void RenderQueueButton() {
         UI::SetCursorPos(vec2((UI::GetWindowSize().x*.5) - (UI::MeasureString(queueButtonMsg).x/2), UI::GetWindowSize().y - 25));
 
-        if (g_selectedMatchmakingType is null) {
+        if (cmmMainWindow.isLoadingMMType || g_selectedMatchmakingType is null) {
             UI::BeginDisabled();
             queueButtonMsg = Icons::AnimatedHourglass + " Loading";
             UI::GrayButton(queueButtonMsg);

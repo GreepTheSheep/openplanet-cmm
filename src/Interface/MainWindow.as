@@ -85,12 +85,8 @@ class MainWindow : Window {
             return;
         }
 
-        if (isLoadingMMType) {
-            if (g_selectedMatchmakingType !is null && g_selectedPlayerMatchmakingType !is null) isLoadingMMType = false;
-        }
-
         vec2 BasePos = UI::GetCursorPos();
-        if (isLoadingMMType) UI::Text(Icons::AnimatedHourglass);
+        if (isLoadingMMType) UI::Text(Icons::AnimatedHourglass + " Loading...");
         else {
             // Add tooltip if the season will have a end date
             string seasonTooltipText = "";
@@ -110,7 +106,7 @@ class MainWindow : Window {
                 if (seasonTooltipText.Length > 0) UI::SetPreviousTooltip(seasonTooltipText);
             } else UI::Text(g_selectedMatchmakingType.name);
         }
-        if (isLoadingMMType) UI::Text(Icons::AnimatedHourglass);
+        if (isLoadingMMType) UI::Text(Icons::AnimatedHourglass + " Loading...");
         else {
             if (g_selectedMatchmakingType.season !is null) {
                 if (g_selectedMatchmakingType.season.isActive) {
@@ -131,7 +127,7 @@ class MainWindow : Window {
 
         UI::SetCursorPos(vec2(UI::GetWindowSize().x - 215, BasePos.y + 12));
 
-        UI::BeginDisabled(g_queueJoin || g_inMatch || (g_activeSquad !is null && g_connectedPlayer !is null && g_connectedPlayer.accountId != g_activeSquad.ownerPlayer));
+        UI::BeginDisabled(isLoadingMMType || g_queueJoin || g_inMatch || (g_activeSquad !is null && g_connectedPlayer !is null && g_connectedPlayer.accountId != g_activeSquad.ownerPlayer));
         UI::SetNextItemWidth(200);
         if (isLoadingMMType) {
             if (UI::BeginCombo("##MatchmakingTypeSelect", "Loading...")) UI::EndCombo();
@@ -244,7 +240,6 @@ class MainWindow : Window {
 
     void CheckRequestMMType() {
         if (m_getMMTypeRequest !is null && m_getMMTypeRequest.Finished()) {
-            isLoadingMMType = false;
             // Parse the response
             string res = m_getMMTypeRequest.String();
             if (Meta::IsDeveloperMode()) trace("HomePageTab::CheckRequest(MMType): " + res);
@@ -265,6 +260,8 @@ class MainWindow : Window {
                 g_activeSquad.matchmakingTypeId = g_selectedMatchmakingType.id;
                 startnew(Squad::setMatchmakingType);
             }
+
+            isLoadingMMType = false;
         }
     }
 }
