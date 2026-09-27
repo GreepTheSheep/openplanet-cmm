@@ -5,7 +5,11 @@ class Window {
     Tab@ activeTab;
     Tab@ selectedTab;
     Tab@ c_lastActiveTab;
-    // Tab@ m_YourProfileTab;
+
+    int MinWidth() { return 550; }
+    int MinHeight() { return 520; }
+    int MaxWidth() { return 7860; }
+    int MaxHeight() { return 2160; }
 
     string GetWindowId() { return PLUGIN_NAME_SHORT+"DefaultWindow"; }
     string GetWindowName() { return ICON_COL + PLUGIN_NAME; }
@@ -28,7 +32,8 @@ class Window {
     void Render(){
         if(!isOpened) return;
 
-        UI::SetNextWindowSize(520,360, UI::Cond::Once);
+        UI::SetNextWindowSize(MinWidth(),MinHeight(), UI::Cond::Once);
+        UI::SetNextWindowSizeConstraints(MinWidth(),MinHeight(),MaxWidth(),MaxHeight()); // Set min and max window size
         if(UI::Begin(GetWindowName()+"###"+GetWindowId(), isOpened)){
             RenderHeader();
             // Push the last active tab style so that the separator line is colored (this is drawn in BeginTabBar)
