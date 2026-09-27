@@ -222,7 +222,9 @@ class QueueTab : Tab {
 
     void RenderSquadView() {
         if (g_activeSquad is null) {
+            UI::BeginChild("QueueTabCurrentPlayerView");
             RenderPlayerView(g_connectedPlayer);
+            UI::EndChild();
         } else {
             UI::Columns(g_activeSquad.players.Length, "QueueTabPlayersView", false);
             for (uint i = 0; i < g_activeSquad.players.Length; i++) {
