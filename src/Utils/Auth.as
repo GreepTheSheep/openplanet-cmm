@@ -69,7 +69,6 @@ namespace Auth
         if (srvConnected) {
             string srvDisplayName = serverRes["displayName"];
             Log::Log("Connected! Display name: " + srvDisplayName, Meta::IsDeveloperMode());
-            g_connectedPlayerCount++;
             connectionError = false;
             connected = true;
             checkPlayerAsync();

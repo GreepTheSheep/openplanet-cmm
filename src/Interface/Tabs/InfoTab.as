@@ -5,6 +5,12 @@ class InfoTab : Tab {
     vec4 GetColor() override { return vec4(0.47f, 0.47f, 0.47f, 1); }
 
     void Render() override {
+        if (UI::GreenButton(Icons::Patreon + " \\$zSupport " + PLUGIN_NAME_SHORT)) OpenBrowserURL("https://patreon.com/Greep");
+        UI::SameLine();
+        if (UI::Button(Icons::DiscordAlt + " Discord")) OpenBrowserURL("https://greep.fr/#/discord");
+        UI::SameLine();
+        if (UI::Button(Icons::Heartbeat + " Plugin Home")) OpenBrowserURL("https://openplanet.dev/plugin/" + Meta::ExecutingPlugin().ID);
+
         UI::PushFont(Fonts::Header);
         UI::SeparatorText(Icons::Plug + " \\$z Plugin");
         UI::PopFont();
@@ -34,21 +40,28 @@ class InfoTab : Tab {
         UI::Text(Icons::Glass + " \\$777Wine compatibility layer detected");
 #endif
 
-        if (UI::GreenButton(Icons::Patreon + " \\$zSupport " + PLUGIN_NAME_SHORT)) OpenBrowserURL("https://patreon.com/Greep");
-        UI::SameLine();
-        if (UI::Button(Icons::DiscordAlt + " Discord")) OpenBrowserURL("https://greep.fr/#/discord");
-        UI::SameLine();
-        if (UI::Button(Icons::Heartbeat + " Plugin Home")) OpenBrowserURL("https://openplanet.dev/plugin/" + Meta::ExecutingPlugin().SiteID);
+        UI::PushFont(Fonts::Header);
+        UI::PushStyleColor(UI::Col::Separator, COLOR_VEC);
+        UI::SeparatorText(COLOR_STR + PLUGIN_ICON + " \\$z Server");
+        UI::PopStyleColor();
+        UI::PopFont();
+        if (g_serverInfo !is null) {
+            UI::Text(g_serverInfo.name + " \\$777" + g_serverInfo.version + " (" + g_serverInfo.gitCommit + ", " + Time::FormatString("%F %X", g_serverInfo.gitCommitTimestamp) + ")");
+            UI::Text("Started \\$777" + Time::FormatString("%F %X", g_serverInfo.startTimestamp));
+            UI::Text("Environment \\$777" + g_serverInfo.nodeEnv);
+        }
 
         UI::PushFont(Fonts::Header);
         UI::PushStyleColor(UI::Col::Separator, COLOR_VEC);
-        UI::SeparatorText(Icons::User + " Connected Player:");
+        UI::SeparatorText(Icons::User + " Player");
         UI::PopStyleColor();
         UI::PopFont();
-        UI::Text(g_connectedPlayer.displayName + " \\$777(" + g_connectedPlayer.accountId + ")");
-        UI::Text("First connexion \\$777" + Time::FormatString("%F %X", g_connectedPlayer.firstLogonTimestamp));
-        UI::Text("Connected \\$777" + Time::FormatString("%F %X", g_connectedPlayer.lastLogonTimestamp));
-        UI::Text("Group \\$777" + g_connectedPlayer.group.nameWithIconColor);
+        if (g_connectedPlayer !is null) {
+            UI::Text(g_connectedPlayer.displayName + " \\$777(" + g_connectedPlayer.accountId + ")");
+            UI::Text("First connexion \\$777" + Time::FormatString("%F %X", g_connectedPlayer.firstLogonTimestamp));
+            UI::Text("Connected \\$777" + Time::FormatString("%F %X", g_connectedPlayer.lastLogonTimestamp));
+            UI::Text("Group \\$777" + g_connectedPlayer.group.nameWithIconColor);
+        }
 
         UI::PushFont(Fonts::Header);
         UI::PushStyleColor(UI::Col::Separator, vec4(1, 0.24f, 0.66f, 1));

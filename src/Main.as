@@ -7,9 +7,8 @@ array<MatchmakingType@> g_matchmakingTypes;
 Squad@ g_activeSquad;
 MatchmakingType@ g_selectedMatchmakingType;
 PlayerMatchmakingType@ g_selectedPlayerMatchmakingType;
-uint g_connectedPlayerCount = 0;
+ServerInfo@ g_serverInfo;
 uint g_queuePlayersCount = 0;
-int64 g_serverBootTimestamp;
 UserNotice@ g_userNotice;
 int64 stampServerRetry = -1;
 bool g_queueJoin = false;
@@ -97,9 +96,8 @@ bool CheckServer()
     if (res.GetType() == Json::Type::Null) {
         if (!isServerAlive) Log::Error("Server is not responding.", false);
     } else if (res.GetType() == Json::Type::Object) {
-        g_connectedPlayerCount = res["connectedPlayers"];
+        @g_serverInfo = ServerInfo(res);
         @g_userNotice = UserNotice(res["notice"]);
-        g_serverBootTimestamp = res["startTimestamp"];
 
         return true;
     }

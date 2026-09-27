@@ -186,8 +186,10 @@ class MainWindow : Window {
         }
 
         if (!g_queueJoin) {
-            UI::Text(Icons::Users + " " + g_connectedPlayerCount);
-            UI::SetPreviousTooltip("Number of players connected into " + PLUGIN_NAME_SHORT);
+            if (g_serverInfo !is null) {
+                UI::Text(Icons::Users + " " + g_serverInfo.connectedPlayers);
+                UI::SetPreviousTooltip("Number of players connected into " + PLUGIN_NAME_SHORT);
+            }
         } else {
             UI::Text(Icons::BlinkingUser + " " + g_queuePlayersCount);
             UI::SetPreviousTooltip("Number of players queuing for " + g_selectedMatchmakingType.name);

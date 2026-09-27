@@ -83,7 +83,15 @@ namespace CMMBuildInfo {
         for (int i = 0; i < serverHeader.Length; i++) serverHeaderDelimiter.InsertLast("-");
         buildReportStr += serverHeader + "\n" + Text::Join(serverHeaderDelimiter,"") + "\n\n";
         buildReportStr += "* URL: " + Setting_BaseURL + "\n";
-        buildReportStr += "* StartTime: " + Time::FormatString("%F %X", g_serverBootTimestamp);
+        if (g_serverInfo !is null) {
+                buildReportStr += "* Name: " + g_serverInfo.name + "\n";
+                buildReportStr += "* Version: " + g_serverInfo.version + "\n";
+                buildReportStr += "* StartTime: " + Time::FormatString("%F %X", g_serverInfo.startTimestamp) + "\n";
+                buildReportStr += "* Commit: " + g_serverInfo.gitCommit + "\n";
+                buildReportStr += "* CommitTime: " + Time::FormatString("%F %X", g_serverInfo.gitCommitTimestamp) + "\n";
+                buildReportStr += "* Environ: " + g_serverInfo.nodeEnv + "\n";
+                buildReportStr += "* Dev: " + tostring(g_serverInfo.isDev);
+        }
 
         return buildReportStr;
     }
