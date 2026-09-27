@@ -369,13 +369,13 @@ class SquadTab : Tab {
             UI::BeginChild("SquadChat");
             UI::SetNextItemWidth(UI::GetWindowSize().x-200);
             bool pressedEnterChat = false;
-            squadChatMessage = UI::InputText("##SquadChatMessage", squadChatMessage, pressedEnterChat, UI::InputTextFlags::EnterReturnsTrue | UI::InputTextFlags::NoHorizontalScroll);
+            squadChatMessage = UI::InputText("##SquadChatMessage", squadChatMessage, pressedEnterChat, UI::InputTextFlags::EnterReturnsTrue);
             UI::SameLine();
             if (UI::BlueButton(Icons::PaperPlane + " Chat") || pressedEnterChat) startnew(CoroutineFunc(PostSquadMessage));
             for (uint i = 0; i < g_activeSquad.messages.Length; i++) {
                 SquadMessage@ msg = g_activeSquad.messages[i];
-                if (msg.accountId == "system") UI::Text("\\$555[" + Time::FormatString("%T", msg.timestamp) + "] \\$z"+ COLOR_STR + Icons::Server + " " + msg.playerName + "\\$z " + msg.message);
-                else UI::Text("\\$555[" + Time::FormatString("%T", msg.timestamp) + "] \\$4f4" + Icons::User + " \\$a60" + msg.playerName + "\\$z " + msg.message);
+                if (msg.accountId == "system") UI::TextWrapped("\\$555[" + Time::FormatString("%T", msg.timestamp) + "] \\$z"+ COLOR_STR + Icons::Server + " " + msg.playerName + "\\$z " + msg.message);
+                else UI::TextWrapped("\\$555[" + Time::FormatString("%T", msg.timestamp) + "] \\$4f4" + Icons::User + " \\$a60" + msg.playerName + "\\$z " + msg.message);
             }
             UI::EndChild(); // SquadChat
         }
