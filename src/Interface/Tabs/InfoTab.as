@@ -46,8 +46,8 @@ class InfoTab : Tab {
         UI::PopStyleColor();
         UI::PopFont();
         if (g_serverInfo !is null) {
-            UI::Text(g_serverInfo.name + " \\$777" + g_serverInfo.version + " (" + g_serverInfo.gitCommit + ", " + Time::FormatString("%F %X", g_serverInfo.gitCommitTimestamp) + ")");
-            UI::Text("Started \\$777" + Time::FormatString("%F %X", g_serverInfo.startTimestamp));
+            UI::Text("v" + g_serverInfo.version + " \\$777(" + g_serverInfo.gitCommit + ", " + Time::FormatString("%F", g_serverInfo.gitCommitTimestamp) + ")");
+            UI::Text("Started \\$777" + Time::FormatString("%F %T", g_serverInfo.startTimestamp));
             UI::Text("Environment \\$777" + g_serverInfo.nodeEnv);
         }
 
