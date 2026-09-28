@@ -3,6 +3,7 @@ class UserTab : Tab {
     string GetLabel() override { return Icons::User; }
     string GetTooltip() override { return g_connectedPlayer.displayName; }
     vec4 GetColor() override { return vec4(0.72, 0, 0.515, 1); }
+    bool IsVisible() override { return g_connectedPlayer.badges.Length > 0; }
 
     int badgeIdToSetFeatured;
 
