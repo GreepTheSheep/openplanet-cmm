@@ -42,13 +42,12 @@ class InfoTab : Tab {
 
         UI::PushFont(Fonts::Header);
         UI::PushStyleColor(UI::Col::Separator, COLOR_VEC);
-        UI::SeparatorText(COLOR_STR + PLUGIN_ICON + " \\$z Server");
+        UI::SeparatorText(COLOR_STR + PLUGIN_ICON + " \\$zServer");
         UI::PopStyleColor();
         UI::PopFont();
         if (g_serverInfo !is null) {
-            UI::Text("v" + g_serverInfo.version + " \\$777(" + g_serverInfo.gitCommit + ", " + Time::FormatString("%F", g_serverInfo.gitCommitTimestamp) + ")");
+            UI::Text("Version \\$777" + g_serverInfo.version + " (" + g_serverInfo.deployement + ", " + g_serverInfo.gitCommit + ", " + Time::FormatString("%F", g_serverInfo.gitCommitTimestamp) + ")");
             UI::Text("Started \\$777" + Time::FormatString("%F %T", g_serverInfo.startTimestamp));
-            UI::Text("Deployement \\$777" + g_serverInfo.deployement);
         }
 
         UI::PushFont(Fonts::Header);
@@ -65,7 +64,7 @@ class InfoTab : Tab {
 
         UI::PushFont(Fonts::Header);
         UI::PushStyleColor(UI::Col::Separator, vec4(1, 0.24f, 0.66f, 1));
-        UI::SeparatorText("\\$f39" + Icons::Heartbeat + " \\$z Openplanet");
+        UI::SeparatorText("\\$f39" + Icons::Heartbeat + " \\$zOpenplanet");
         UI::PopStyleColor();
         UI::PopFont();
         UI::Text("Version \\$777" + Meta::OpenplanetBuildInfo());
