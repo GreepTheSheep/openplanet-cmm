@@ -45,6 +45,7 @@ namespace Squad {
                 g_activeSquad.readyStates.DeleteAll();
             } else if (dataType == "squadSearching") {
                 g_activeSquad.isSearching = data["isSearching"];
+                handleSearchStateChanged();
             } else if (dataType == "squadPlayerJoined") {
                 // Double same player prevention by checking its accountId
                 string playerJoinedAccountId = data["player"]["accountId"];
