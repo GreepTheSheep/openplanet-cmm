@@ -4,7 +4,7 @@
 string Setting_BaseURL = URL_PROD;
 
 #if CMM_ALLOW_CHANGE_SETTINGS || CMM_DEV_BUILD || SIG_DEVELOPER
-[SettingsTab name="Advanced" icon="Wrench" order="2"]
+[SettingsTab name="Advanced" icon="Wrench" order="1"]
 void RenderAdvancedSettingsTab() {
     bool changed = false;
     uint64 typingStart;

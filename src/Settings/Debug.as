@@ -1,7 +1,7 @@
 #if CMM_DEV_BUILD || SIG_DEVELOPER
 string socketDataToSend;
 
-[SettingsTab name="Debug" icon="FileCodeO"]
+[SettingsTab name="Debug" icon="FileCodeO" order="2"]
 void RenderDebugSettingsTab() {
     if (stampServerRetry - Time::Stamp >= 0) UI::TextDisabled(Icons::Refresh + " Next server health check in " + Time::FormatString("%Ss", stampServerRetry - Time::Stamp));
     else UI::TextDisabled(Icons::Refresh + " A server health check is performed every minute" + (!isServerAlive ? ", but it appears there is a major error in the data being returned" : "") + ".");
