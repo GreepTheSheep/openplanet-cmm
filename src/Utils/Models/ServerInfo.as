@@ -4,8 +4,8 @@ class ServerInfo {
     string gitCommit;
     string gitCommitDate;
     int64 gitCommitTimestamp;
-    string nodeEnv;
-    bool isDev;
+    string deployement;
+    bool isDevMode;
     int64 startTimestamp;
     uint connectedPlayers;
     string userAgent;
@@ -17,8 +17,8 @@ class ServerInfo {
         gitCommit = json["gitCommit"];
         gitCommitDate = json["gitCommitDate"];
         gitCommitTimestamp = json["gitCommitTimestamp"];
-        nodeEnv = json["nodeEnv"];
-        isDev = json["isDev"];
+        deployement = json["deployement"];
+        isDevMode = json["isDevMode"];
         startTimestamp = json["startTimestamp"];
         connectedPlayers = json["connectedPlayers"];
         userAgent = json["user-agent"];

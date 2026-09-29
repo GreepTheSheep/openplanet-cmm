@@ -92,8 +92,8 @@ namespace CMMBuildInfo {
             buildReportStr += "* StartTime: " + Time::FormatString("%F %X", g_serverInfo.startTimestamp) + "\n";
             buildReportStr += "* Commit: " + g_serverInfo.gitCommit + "\n";
             buildReportStr += "* CommitTime: " + Time::FormatString("%F %X", g_serverInfo.gitCommitTimestamp) + "\n";
-            buildReportStr += "* Environ: " + g_serverInfo.nodeEnv + "\n";
-            buildReportStr += "* Dev: " + tostring(g_serverInfo.isDev);
+            buildReportStr += "* Deployement: " + g_serverInfo.deployement + "\n";
+            buildReportStr += "* Dev: " + tostring(g_serverInfo.isDevMode);
         }
 
         return buildReportStr;
