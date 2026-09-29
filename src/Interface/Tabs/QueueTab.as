@@ -271,12 +271,17 @@ class QueueTab : Tab {
             }
         }
 
-        vec2 playerNameSize = UI::MeasureString(player.displayName);
+        vec2 playerNameSize = UI::MeasureString(player.displayName + (g_activeSquad !is null && g_activeSquad.isPlayerReady(player.accountId) ? ("   " + Icons::Check) : ""));
         UI::SetCursorPos(vec2(
             (UI::GetWindowSize().x - playerNameSize.x) / 2,
             UI::GetWindowSize().y / 2 - (14 * UI::GetScale())
         ));
         UI::Text(player.displayName);
+        if (g_activeSquad !is null && g_activeSquad.isPlayerReady(player.accountId)) {
+            UI::SameLine();
+            UI::Text("\\$0f0" + Icons::Check);
+            UI::SetPreviousTooltip("Ready");
+        }
         if (selectedPlayerMatchmakingType !is null && selectedPlayerMatchmakingType.matchesPlayed < g_selectedMatchmakingType.placementMatches) {
             int remaining = g_selectedMatchmakingType.placementMatches - selectedPlayerMatchmakingType.matchesPlayed;
             string matchesLeftString = tostring(remaining) + " matches left to get "+(player.id == g_connectedPlayer.id ? "your":"their")+" ELO";
