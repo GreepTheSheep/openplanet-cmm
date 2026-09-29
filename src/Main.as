@@ -32,16 +32,16 @@ void RenderMenu()
         UI::MenuItem("\\$f00" + Icons::TimesCircle + "\\$z "+PLUGIN_NAME_SHORT+": Connection Error", serverRefreshSeconds);
         return;
     }
-    if (!isServerAlive) {
-        UI::MenuItem("\\$f00" + Icons::TimesCircle + "\\$z "+PLUGIN_NAME_SHORT+": Server Unavailable", serverRefreshSeconds);
-        return;
-    }
     if (isCheckingServer) {
         UI::MenuItem(PLUGIN_ICON + " " + PLUGIN_NAME_SHORT+": Checking services...");
         return;
     }
     if (Auth::connectionInProgress) {
         UI::MenuItem(Icons::Server + " " + PLUGIN_NAME_SHORT+": Authenticating...");
+        return;
+    }
+    if (!isServerAlive) {
+        UI::MenuItem("\\$f00" + Icons::TimesCircle + "\\$z "+PLUGIN_NAME_SHORT+": Server Unavailable", serverRefreshSeconds);
         return;
     }
     if (!Auth::connected) return;
@@ -107,8 +107,10 @@ bool CheckServer()
 void CheckServerLoop() {
     if (Auth::connectionError) return;
     while(true) {
+        yield();
         bool alive = CheckServer();
         if (alive && !isServerAlive) {
+            isServerAlive = true;
             Auth::Login();
             if (Auth::connectionError) return;
             Matchmaking::getMatchmakingTypes();
@@ -116,6 +118,7 @@ void CheckServerLoop() {
             @cmmDevWindow = DevWindow();
         }
         if (isServerAlive && !alive) {
+            isServerAlive = false;
             @cmmMainWindow = null;
             @cmmDevWindow = null;
             g_matchmakingTypes.RemoveRange(0, g_matchmakingTypes.Length);
@@ -130,7 +133,6 @@ void CheckServerLoop() {
                 @g_tcpSocket = null;
             }
         }
-        isServerAlive = alive;
         stampServerRetry = Time::Stamp + 60;
         sleep(1 * 60 * 1000);
     }
