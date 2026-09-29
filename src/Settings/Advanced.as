@@ -1,7 +1,7 @@
 #if CMM_ALLOW_CHANGE_SETTINGS || CMM_DEV_BUILD || SIG_DEVELOPER
 [Setting hidden]
 #endif
-string Setting_BaseURL = "https://tm-communitymatchmaking-api.greep.fr";
+string Setting_BaseURL = "https://prod.trackmaniacommunitymatchmaking.com";
 
 #if CMM_ALLOW_CHANGE_SETTINGS || CMM_DEV_BUILD || SIG_DEVELOPER
 [SettingsTab name="Advanced" icon="Wrench" order="2"]
@@ -16,12 +16,12 @@ void RenderAdvancedSettingsTab() {
     UI::SetPreviousTooltip("When you make the change, the plugin will log you out and log you back in at the new URL during the next health check.");
 
     if (UI::GreenButton("Set to Production")) {
-        Setting_BaseURL = "https://tm-communitymatchmaking-api.greep.fr";
+        Setting_BaseURL = "https://prod.trackmaniacommunitymatchmaking.com";
         onChangeSettingBaseURL();
     }
     UI::SameLine();
-    if (UI::BlueButton("Set to Dev environment")) {
-        Setting_BaseURL = "https://tm-communitymatchmaking-api-dev-mer6bu6x.greep.fr";
+    if (UI::BlueButton("Set to Staging")) {
+        Setting_BaseURL = "https://staging.trackmaniacommunitymatchmaking.com";
         onChangeSettingBaseURL();
     }
     UI::SameLine();
