@@ -1,7 +1,7 @@
 #if CMM_ALLOW_CHANGE_SETTINGS || CMM_DEV_BUILD || SIG_DEVELOPER
 [Setting hidden]
 #endif
-string Setting_BaseURL = "https://prod.trackmaniacommunitymatchmaking.com";
+string Setting_BaseURL = URL_PROD;
 
 #if CMM_ALLOW_CHANGE_SETTINGS || CMM_DEV_BUILD || SIG_DEVELOPER
 [SettingsTab name="Advanced" icon="Wrench" order="2"]
@@ -15,20 +15,26 @@ void RenderAdvancedSettingsTab() {
     UI::TextDisabled(Icons::InfoCircle);
     UI::SetPreviousTooltip("When you make the change, the plugin will log you out and log you back in at the new URL during the next health check.");
 
+    UI::BeginDisabled(Setting_BaseURL == URL_PROD);
     if (UI::GreenButton("Set to Production")) {
-        Setting_BaseURL = "https://prod.trackmaniacommunitymatchmaking.com";
+        Setting_BaseURL = URL_PROD;
         onChangeSettingBaseURL();
     }
+    UI::EndDisabled();
     UI::SameLine();
+    UI::BeginDisabled(Setting_BaseURL == URL_STAGING);
     if (UI::BlueButton("Set to Staging")) {
-        Setting_BaseURL = "https://staging.trackmaniacommunitymatchmaking.com";
+        Setting_BaseURL = URL_STAGING;
         onChangeSettingBaseURL();
     }
+    UI::EndDisabled();
     UI::SameLine();
+    UI::BeginDisabled(Setting_BaseURL == URL_LOCALHOST);
     if (UI::GrayButton("Set to Localhost")) {
-        Setting_BaseURL = "http://localhost:3000";
+        Setting_BaseURL = URL_LOCALHOST;
         onChangeSettingBaseURL();
     }
+    UI::EndDisabled();
 
     if (changed) typingStart = Time::Now;
 
