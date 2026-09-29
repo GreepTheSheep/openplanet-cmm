@@ -160,6 +160,7 @@ class SquadTab : Tab {
         @g_activeSquad = Squad(newSquad["squad"]);
         squadJoinCode = "";
         if (Squad::squadFetchLoopCoroutine is null || !Squad::squadFetchLoopCoroutine.IsRunning()) @Squad::squadFetchLoopCoroutine = startnew(Squad::fetchSquadLoop);
+        Squad::SyncSquadMatchmakingType(g_activeSquad.matchmakingTypeId);
     }
 
     void PostSquadMessage() {

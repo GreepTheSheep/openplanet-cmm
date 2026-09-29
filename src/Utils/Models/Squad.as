@@ -21,6 +21,7 @@ class Squad {
             messages.InsertLast(msg);
         }
         readyStates = dictionary();
+        if (json.HasKey("matchmakingTypeId") && json["matchmakingTypeId"].GetType() == Json::Type::Number) matchmakingTypeId = json["matchmakingTypeId"];
     }
 
     bool isPlayerReady(const string &in accountId) {
