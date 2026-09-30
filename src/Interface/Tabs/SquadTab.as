@@ -246,6 +246,11 @@ class SquadTab : Tab {
         }
 
         if (g_activeSquad is null) {
+            if (isError) {
+                UI::Text("\\$f00" + Icons::ExclamationTriangle + " \\$z" + errorMsg);
+                UI::Separator();
+            }
+
             if (g_selectedMatchmakingType !is null && g_selectedMatchmakingType.allowSquad) {
                 UI::Text("Create a Squad and invite players on it to queue together.");
                 UI::SetNextItemWidth(300);
@@ -255,9 +260,10 @@ class SquadTab : Tab {
                 UI::BeginDisabled(newSquadName.Length == 0 || isJoiningInProgress);
                 if (pressedEnterCreate || UI::GreenButton("Create Squad")) startnew(CoroutineFunc(CreateSquad));
                 UI::EndDisabled();
-
-                UI::Separator();
+            } else {
+                UI::TextDisabled("To create a squad, please select a different matchmaking that accepts squads.");
             }
+            UI::Separator();
 
             UI::Text("Join a Squad:");
             UI::SetNextItemWidth(300);
@@ -269,11 +275,6 @@ class SquadTab : Tab {
             UI::BeginDisabled(squadJoinCode.Length != 6 || isJoiningInProgress);
             if (pressedEnterJoin || UI::GreenButton("Join Squad")) startnew(CoroutineFunc(JoinSquad));
             UI::EndDisabled();
-
-            if (isError) {
-                UI::Separator();
-                UI::Text("\\$f00" + Icons::ExclamationTriangle + " \\$z" + errorMsg);
-            }
         } else {
             float width = UI::GetWindowSize().x*0.4;
             vec2 posTop = UI::GetCursorPos();
