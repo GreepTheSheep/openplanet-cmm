@@ -136,15 +136,14 @@ class QueueTab : Tab {
                 UI::SetCursorPos(posDesc);
                 UI::Separator();
             }
-
-            RenderSquadView();
-
-            RenderQueueButton();
-
             if (isError) {
                 UI::Separator();
                 UI::Text("\\$f00" + Icons::ExclamationTriangle + " \\$z" + errorMsg);
             }
+
+            RenderSquadView();
+
+            RenderQueueButton();
         } else {
             if (g_matchInfo !is null) {
                 UI::Text(g_matchInfo.status);
