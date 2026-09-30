@@ -28,7 +28,7 @@ class InfoTab : Tab {
 #endif
 #if SIG_SCHOOL
         UI::SameLine();
-        UI::Text("\\$777(\\$0f0" + Icons::University + " \\$777School mode"+ (Meta::IsSchoolModeWhitelisted() ? (" \\$0f0"+Icons::CodeFork+" \\$777Whitelisted") : "") +")");
+        UI::Text("\\$777(\\$ff0" + Icons::University + " \\$777School mode"+ (Meta::IsSchoolModeWhitelisted() ? (" \\$0f0"+Icons::CodeFork+" \\$777Whitelisted") : "") +")");
 #endif
 #if WINDOWS
         UI::Text(Icons::Windows + " \\$777Windows");
