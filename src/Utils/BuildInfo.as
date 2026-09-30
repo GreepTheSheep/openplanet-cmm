@@ -75,8 +75,8 @@ namespace CMMBuildInfo {
             buildReportStr += "* ID: " + g_connectedPlayer.id + "\n";
             buildReportStr += "* Name: " + g_connectedPlayer.displayName + "\n";
             buildReportStr += "* AccountId: " + g_connectedPlayer.accountId + "\n";
-            buildReportStr += "* FirstLogon: " + Time::FormatString("%F %X", g_connectedPlayer.firstLogonTimestamp) + "\n";
-            buildReportStr += "* Connected: " + Time::FormatString("%F %X", g_connectedPlayer.lastLogonTimestamp) + "\n";
+            buildReportStr += "* FirstLogon: " + Time::FormatString("%F %T", g_connectedPlayer.firstLogonTimestamp) + "\n";
+            buildReportStr += "* Connected: " + Time::FormatString("%F %T", g_connectedPlayer.lastLogonTimestamp) + "\n";
             buildReportStr += "* Group: " + g_connectedPlayer.group.name;
         }
         buildReportStr += "\n\n";
@@ -89,9 +89,9 @@ namespace CMMBuildInfo {
         if (g_serverInfo !is null) {
             buildReportStr += "* Name: " + g_serverInfo.name + "\n";
             buildReportStr += "* Version: " + g_serverInfo.version + "\n";
-            buildReportStr += "* StartTime: " + Time::FormatString("%F %X", g_serverInfo.startTimestamp) + "\n";
+            buildReportStr += "* StartTime: " + Time::FormatString("%F %T", g_serverInfo.startTimestamp) + "\n";
             buildReportStr += "* Commit: " + g_serverInfo.gitCommit + "\n";
-            buildReportStr += "* CommitTime: " + Time::FormatString("%F %X", g_serverInfo.gitCommitTimestamp) + "\n";
+            buildReportStr += "* CommitTime: " + Time::FormatString("%F %T", g_serverInfo.gitCommitTimestamp) + "\n";
             buildReportStr += "* Deployement: " + g_serverInfo.deployement + "\n";
             buildReportStr += "* Dev: " + tostring(g_serverInfo.isDevMode);
         }

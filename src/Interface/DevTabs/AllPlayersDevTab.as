@@ -210,7 +210,7 @@ class AllPlayersDevTab : Tab {
                     }
 
                     UI::TableSetColumnIndex(1);
-                    UI::Text(Time::FormatString("%F %X", player.lastLogonTimestamp));
+                    UI::Text(Time::FormatString("%F %X (%Z)", player.lastLogonTimestamp));
 
                     UI::TableSetColumnIndex(2);
                     UI::Text(player.lastPluginVersion);

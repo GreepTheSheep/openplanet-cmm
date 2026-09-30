@@ -47,7 +47,7 @@ class InfoTab : Tab {
         UI::PopFont();
         if (g_serverInfo !is null) {
             UI::Text("Version \\$777" + g_serverInfo.version + " (" + g_serverInfo.deployement + ", " + g_serverInfo.gitCommit + ", " + Time::FormatString("%F", g_serverInfo.gitCommitTimestamp) + ")");
-            UI::Text("Started \\$777" + Time::FormatString("%F %T", g_serverInfo.startTimestamp));
+            UI::Text("Started \\$777" + Time::FormatString("%F %R", g_serverInfo.startTimestamp));
         }
 
         UI::PushFont(Fonts::Header);
@@ -57,8 +57,8 @@ class InfoTab : Tab {
         UI::PopFont();
         if (g_connectedPlayer !is null) {
             UI::Text(g_connectedPlayer.displayName + " \\$777(" + g_connectedPlayer.accountId + ")");
-            UI::Text("First connexion \\$777" + Time::FormatString("%F %X", g_connectedPlayer.firstLogonTimestamp));
-            UI::Text("Connected \\$777" + Time::FormatString("%F %X", g_connectedPlayer.lastLogonTimestamp));
+            UI::Text("First connexion \\$777" + Time::FormatString("%F %X (%Z)", g_connectedPlayer.firstLogonTimestamp));
+            UI::Text("Connected \\$777" + Time::FormatString("%F %X (%Z)", g_connectedPlayer.lastLogonTimestamp));
             UI::Text("Group \\$777" + g_connectedPlayer.group.nameWithIconColor);
         }
 
