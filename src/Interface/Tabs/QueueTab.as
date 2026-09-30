@@ -310,7 +310,7 @@ class QueueTab : Tab {
 #if SIG_SCHOOL
         if (!Meta::IsSchoolModeWhitelisted()) {
             UI::BeginDisabled();
-            queueButtonMsg = Icons::Times + " School Mode enabled";
+            queueButtonMsg = Icons::University + " School Mode enabled";
             UI::RedButton(queueButtonMsg);
             UI::EndDisabled();
             return;
@@ -318,14 +318,14 @@ class QueueTab : Tab {
 #endif
         if (g_selectedMatchmakingType.isDisabled) {
             UI::BeginDisabled();
-            queueButtonMsg = Icons::Times + " Disabled";
+            queueButtonMsg = Icons::TimesCircle + " Disabled";
             UI::GrayButton(queueButtonMsg);
             UI::EndDisabled();
             return;
         }
         if (g_selectedMatchmakingType.season is null) {
             UI::BeginDisabled();
-            queueButtonMsg = Icons::Times + " No season";
+            queueButtonMsg = Icons::TimesCircle + " No season";
             UI::GrayButton(queueButtonMsg);
             UI::EndDisabled();
             return;
@@ -342,14 +342,14 @@ class QueueTab : Tab {
 #if !CMM_FORCE_JOIN_MATCHMAKING
             if (!g_selectedMatchmakingType.allowSquad) {
                 UI::BeginDisabled();
-                queueButtonMsg = Icons::Times + " Squads not allowed";
+                queueButtonMsg = Icons::TimesCircle + " Squads not allowed";
                 UI::GrayButton(queueButtonMsg);
                 UI::EndDisabled();
                 return;
             }
             if (g_activeSquad.players.Length > g_selectedMatchmakingType.playersPerTeams) {
                 UI::BeginDisabled();
-                queueButtonMsg = Icons::Times + " Too many players in squad";
+                queueButtonMsg = Icons::TimesCircle + " Too many players in squad";
                 UI::GrayButton(queueButtonMsg);
                 UI::EndDisabled();
                 return;
