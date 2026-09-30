@@ -215,6 +215,7 @@ class MainWindow : Window {
             string report = CMMBuildInfo::CreateBuildReportText();
             Log::Log(report);
             IO::SetClipboard(report);
+            UI::ShowNotification(Icons::Clipboard + " Build Info copied to clipboard", 2000);
         }
     }
 
