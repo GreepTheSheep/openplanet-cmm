@@ -1,5 +1,7 @@
 class SquadTab : Tab {
     Net::HttpRequest@ m_squadGetRequest;
+    bool isJoiningInProgress = false;
+    bool isLeavingInProgress = false;
     bool isLoading = false;
     bool isError = false;
     bool hideInviteCode = true;
@@ -91,6 +93,7 @@ class SquadTab : Tab {
     }
 
     void CreateSquad() {
+        isJoiningInProgress = true;
         LeaveSquad(); // leave squad (even if player don't have one)
 
         // "squad" alone is not permitted by design, so we'll use the name of the player who created the squad
@@ -116,6 +119,7 @@ class SquadTab : Tab {
         }
 
         isError = false;
+        isJoiningInProgress = false;
         Setting_SquadName = newSquadName;
         @g_activeSquad = Squad(newSquad["squad"]);
         if (Squad::squadFetchLoopCoroutine is null || !Squad::squadFetchLoopCoroutine.IsRunning()) @Squad::squadFetchLoopCoroutine = startnew(Squad::fetchSquadLoop);
@@ -128,13 +132,16 @@ class SquadTab : Tab {
     }
 
     void LeaveSquad() {
+        isLeavingInProgress = true;
         API::PostAsync(Setting_BaseURL+"/squad/leave");
         @g_activeSquad = null;
+        isLeavingInProgress = false;
         @Squad::squadFetchLoopCoroutine = null;
         if (g_queueJoin && !g_inMatch) g_queueJoin = false;
     }
 
     void JoinSquad() {
+        isJoiningInProgress = true;
         LeaveSquad(); // leave squad (even if player don't have one)
 
         Json::Value@ postJson = Json::Object();
@@ -157,6 +164,7 @@ class SquadTab : Tab {
         }
 
         isError = false;
+        isJoiningInProgress = false;
         @g_activeSquad = Squad(newSquad["squad"]);
         squadJoinCode = "";
         if (Squad::squadFetchLoopCoroutine is null || !Squad::squadFetchLoopCoroutine.IsRunning()) @Squad::squadFetchLoopCoroutine = startnew(Squad::fetchSquadLoop);
@@ -259,7 +267,7 @@ class SquadTab : Tab {
                 bool pressedEnterCreate = false;
                 newSquadName = UI::InputText("Set squad name##squadNameCreate", newSquadName, pressedEnterCreate, UI::InputTextFlags::EnterReturnsTrue);
 
-                UI::BeginDisabled(newSquadName.Length == 0);
+                UI::BeginDisabled(newSquadName.Length == 0 || isJoiningInProgress);
                 if (pressedEnterCreate || UI::GreenButton("Create Squad")) startnew(CoroutineFunc(CreateSquad));
                 UI::EndDisabled();
 
@@ -273,7 +281,7 @@ class SquadTab : Tab {
             if (squadJoinCode.Length > 6) squadJoinCode = squadJoinCode.SubStr(0,6);
 
             hideInviteCode = UI::Checkbox("Hide Invite Code", hideInviteCode);
-            UI::BeginDisabled(squadJoinCode.Length != 6);
+            UI::BeginDisabled(squadJoinCode.Length != 6 || isJoiningInProgress);
             if (pressedEnterJoin || UI::GreenButton("Join Squad")) startnew(CoroutineFunc(JoinSquad));
             UI::EndDisabled();
 
@@ -298,7 +306,9 @@ class SquadTab : Tab {
             hideInviteCode = UI::Checkbox("Hide Invite Code", hideInviteCode);
 
             UI::NewLine();
+            UI::BeginDisabled(isLeavingInProgress);
             if (UI::RedButton("Leave Squad")) startnew(CoroutineFunc(LeaveSquad));
+            UI::EndDisabled();
 
             if (isError) {
                 UI::Separator();
