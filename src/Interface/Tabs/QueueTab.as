@@ -267,7 +267,7 @@ class QueueTab : Tab {
             }
         }
 
-        vec2 playerNameSize = UI::MeasureString(player.displayName + (g_activeSquad !is null && g_activeSquad.isPlayerReady(player.accountId) ? ("   " + Icons::Check) : ""));
+        vec2 playerNameSize = UI::MeasureString(player.displayName + (g_activeSquad !is null && g_activeSquad.isPlayerReady(player.accountId) ? ("  " + Icons::Check) : ""));
         UI::SetCursorPos(vec2(
             (UI::GetWindowSize().x - playerNameSize.x) / 2,
             UI::GetWindowSize().y / 2 - (14 * UI::GetScale())
@@ -282,10 +282,9 @@ class QueueTab : Tab {
             int remaining = g_selectedMatchmakingType.placementMatches - selectedPlayerMatchmakingType.matchesPlayed;
             string matchesLeftString = tostring(remaining) + " matches left to get "+(player.id == g_connectedPlayer.id ? "your":"their")+" ELO";
             if (remaining == 1) matchesLeftString = "Last placement match!";
-            vec2 matchesLeftSize = UI::MeasureString(matchesLeftString);
 
             UI::SetCursorPos(vec2(
-                (UI::GetWindowSize().x - matchesLeftSize.x) / 2,
+                (UI::GetWindowSize().x - UI::MeasureString(matchesLeftString).x) / 2,
                 UI::GetCursorPos().y
             ));
             UI::Text(matchesLeftString);
@@ -294,7 +293,10 @@ class QueueTab : Tab {
     }
 
     void RenderQueueButton() {
-        UI::SetCursorPos(vec2((UI::GetWindowSize().x*.5) - (UI::MeasureString(queueButtonMsg).x/2), UI::GetWindowSize().y - 25));
+        UI::SetCursorPos(vec2(
+            (UI::GetWindowSize().x - UI::MeasureString(queueButtonMsg).x - 8) / 2,
+            UI::GetWindowSize().y - 28
+        ));
 
         if (cmmMainWindow.isLoadingMMType || g_selectedMatchmakingType is null) {
             UI::BeginDisabled();
