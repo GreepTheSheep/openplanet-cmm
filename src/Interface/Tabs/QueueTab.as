@@ -140,9 +140,7 @@ class QueueTab : Tab {
                 UI::Separator();
                 UI::Text("\\$f00" + Icons::ExclamationTriangle + " \\$z" + errorMsg);
             }
-
             RenderSquadView();
-
             RenderQueueButton();
         } else {
             if (g_matchInfo !is null) {
@@ -152,12 +150,9 @@ class QueueTab : Tab {
                         UI::Text("Map: " + Text::OpenplanetFormatCodes(g_matchInfo.map.Name));
                         UI::Separator();
                     }
-                    float width = UI::GetWindowSize().x / g_matchInfo.teams.Length;
-                    float posX = 0;
-                    vec2 posTop = UI::GetCursorPos();
+                    UI::Columns(g_matchInfo.teams.Length, "QueueTabMatchView", false);
                     for (uint t = 0; t < g_matchInfo.teams.Length; t++) {
-                        if (t > 0) UI::SetCursorPos(posTop + vec2(posX, 0));
-                        UI::BeginChild("MatchTeam"+t, vec2(width,0));
+                        UI::BeginChild("MatchTeam"+t);
                         UI::Text(Text::OpenplanetFormatCodes("$" + g_matchInfo.teams[t].colorTM + g_matchInfo.teams[t].name));
                         UI::Separator();
                         for (uint p = 0; p < g_matchInfo.teams[t].players.Length; p++) {
@@ -199,12 +194,14 @@ class QueueTab : Tab {
                                 ) {
                                     UI::SameLine();
                                     UI::Text(tostring(player.matchmakingTypes[mt].points));
+                                    break;
                                 }
                             }
                         }
-                        posX = posX + UI::GetWindowSize().x + 8;
                         UI::EndChild();
+                        UI::NextColumn();
                     }
+                    UI::Columns(1);
                     if ((
                             g_matchInfo.status.ToLower().StartsWith("waiting for players") ||
                             g_matchInfo.status.ToLower().StartsWith("match in progress")
