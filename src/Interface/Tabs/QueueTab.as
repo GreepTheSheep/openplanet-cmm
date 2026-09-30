@@ -298,11 +298,14 @@ class QueueTab : Tab {
             UI::GetWindowSize().y - 28
         ));
 
+        UI::BeginChild("QueueTabButtonView");
+
         if (cmmMainWindow.isLoadingMMType || g_selectedMatchmakingType is null) {
             UI::BeginDisabled();
             queueButtonMsg = Icons::AnimatedHourglass + " Loading";
             UI::GrayButton(queueButtonMsg);
             UI::EndDisabled();
+            UI::EndChild();
             return;
         }
 
@@ -313,6 +316,7 @@ class QueueTab : Tab {
             queueButtonMsg = Icons::University + " School Mode enabled";
             UI::RedButton(queueButtonMsg);
             UI::EndDisabled();
+            UI::EndChild();
             return;
         }
 #endif
@@ -321,6 +325,7 @@ class QueueTab : Tab {
             queueButtonMsg = Icons::TimesCircle + " Disabled";
             UI::GrayButton(queueButtonMsg);
             UI::EndDisabled();
+            UI::EndChild();
             return;
         }
         if (g_selectedMatchmakingType.season is null) {
@@ -328,6 +333,7 @@ class QueueTab : Tab {
             queueButtonMsg = Icons::TimesCircle + " No season";
             UI::GrayButton(queueButtonMsg);
             UI::EndDisabled();
+            UI::EndChild();
             return;
         }
         if (!g_selectedMatchmakingType.season.isActive) {
@@ -335,6 +341,7 @@ class QueueTab : Tab {
             queueButtonMsg = Icons::Stop + " Season ended";
             UI::GrayButton(queueButtonMsg);
             UI::EndDisabled();
+            UI::EndChild();
             return;
         }
 #endif
@@ -345,6 +352,7 @@ class QueueTab : Tab {
                 queueButtonMsg = Icons::TimesCircle + " Squads not allowed";
                 UI::GrayButton(queueButtonMsg);
                 UI::EndDisabled();
+                UI::EndChild();
                 return;
             }
             if (g_activeSquad.players.Length > g_selectedMatchmakingType.playersPerTeams) {
@@ -352,6 +360,7 @@ class QueueTab : Tab {
                 queueButtonMsg = Icons::TimesCircle + " Too many players in squad";
                 UI::GrayButton(queueButtonMsg);
                 UI::EndDisabled();
+                UI::EndChild();
                 return;
             }
 #endif
@@ -359,6 +368,7 @@ class QueueTab : Tab {
             if (g_activeSquad.isSearching) {
                 queueButtonMsg = Icons::Times + " Unready";
                 if (UI::RedButton(queueButtonMsg)) startnew(CoroutineFunc(SquadSetUnready));
+                UI::EndChild();
                 return;
             }
 
@@ -369,6 +379,7 @@ class QueueTab : Tab {
                 queueButtonMsg = isOwner ? (Icons::ArrowUp + " Select a type above") : (Icons::AnimatedHourglass + " Waiting for squad host...");
                 UI::GrayButton(queueButtonMsg);
                 UI::EndDisabled();
+                UI::EndChild();
                 return;
             }
 
@@ -397,6 +408,7 @@ class QueueTab : Tab {
                 UI::EndDisabled();
             }
         }
+        UI::EndChild();
     }
 
     void SquadSetReady() { SquadToggleReady(true); }
