@@ -39,21 +39,6 @@ class SquadTab : Tab {
         Squad::applySquadExtras(g_activeSquad, json);
     }
 
-    void HandleSearchStateChanged() {
-        if (g_activeSquad is null) return;
-        if (g_activeSquad.isSearching) {
-            if (!g_queueJoin && !g_inMatch) {
-                g_queueJoin = true;
-                g_queueJoinTime = Time::Now;
-                startnew(PingMatchmakingLoop);
-            }
-        } else {
-            if (g_queueJoin && !g_inMatch) {
-                g_queueJoin = false;
-            }
-        }
-    }
-
     void CheckRequest()
     {
         CheckStartRequest();
@@ -88,7 +73,7 @@ class SquadTab : Tab {
             @g_activeSquad = Squad(json["squad"]);
             ApplySquadExtrasFromJson(json);
             if (Squad::squadFetchLoopCoroutine is null || !Squad::squadFetchLoopCoroutine.IsRunning()) @Squad::squadFetchLoopCoroutine = startnew(Squad::fetchSquadLoop);
-            HandleSearchStateChanged();
+            Squad::handleSearchStateChanged();
         }
     }
 
