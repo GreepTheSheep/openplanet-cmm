@@ -28,13 +28,6 @@ jobs:
         with:
           file: info.toml
 
-      - name: Cleanup info.toml
-        uses: cssnr/toml-action@v2
-        with:
-          file: info.toml
-          path: $
-          value: ${{ fromJson(steps.toml.outputs.data) }}
-
       - name: Add CMM_ALLOW_CHANGE_SETTINGS define on info.toml
         if: ${{ inputs.append_allow_change_settings }}
         uses: cssnr/toml-action@v2
