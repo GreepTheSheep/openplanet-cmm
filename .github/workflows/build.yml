@@ -1,10 +1,19 @@
 name: Build plugin
 
 on:
-  create:
+  push:
     tags:
       - v*
   workflow_dispatch:
+    inputs:
+      dev_build:
+        description: 'Dev build'
+        default: false
+        type: boolean
+      append_allow_change_settings:
+        description: 'Add CMM_ALLOW_CHANGE_SETTINGS define'
+        default: false
+        type: boolean
 
 jobs:
   build:
@@ -19,7 +28,15 @@ jobs:
         with:
           file: info.toml
 
+      - name: Cleanup info.toml
+        uses: cssnr/toml-action@v2
+        with:
+          file: info.toml
+          path: $
+          value: ${{ fromJson(steps.toml.outputs.data) }}
+
       - name: Add CMM_ALLOW_CHANGE_SETTINGS define on info.toml
+        if: ${{ inputs.append_allow_change_settings }}
         uses: cssnr/toml-action@v2
         with:
           file: info.toml
@@ -27,15 +44,54 @@ jobs:
           value: "CMM_ALLOW_CHANGE_SETTINGS"
           append: true
 
+      - name: Edit name on info.toml
+        if: ${{ inputs.dev_build }}
+        uses: cssnr/toml-action@v2
+        with:
+          file: info.toml
+          path: $.meta.name
+          value: ${{ fromJSON(steps.toml.outputs.data).meta.name }} [DEV]
+
+
+      - name: Get build date
+        if: ${{ inputs.dev_build }}
+        id: date
+        run: echo "date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+
+      - name: Edit version number on info.toml
+        if: ${{ inputs.dev_build }}
+        uses: cssnr/toml-action@v2
+        with:
+          file: info.toml
+          path: $.meta.version
+          value: ${{ fromJSON(steps.toml.outputs.data).meta.version }}.${{ steps.date.outputs.date }}
+
+      - name: Edit module name on info.toml
+        if: ${{ inputs.dev_build }}
+        uses: cssnr/toml-action@v2
+        with:
+          file: info.toml
+          path: $.script.module
+          value: ${{ fromJSON(steps.toml.outputs.data).script.module }}-DEV
+
+      - name: Add CMM_DEV_BUILD define on info.toml
+        if: ${{ inputs.dev_build }}
+        uses: cssnr/toml-action@v2
+        with:
+          file: info.toml
+          path: $.script.defines
+          value: "CMM_DEV_BUILD"
+          append: true
+
       - name: Build .op
         run: |
-          name="${{ fromJSON(steps.toml.outputs.data).script.module }}"
+          name="${{ fromJSON(steps.toml.outputs.data).script.module }}${{ case(inputs.dev_build, '-DEV', '') }}"
           [ -f "$name.op" ] && rm -f "$name.op"
           zip -r "$name.op" info.toml src
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ fromJSON(steps.toml.outputs.data).script.module }}
-          path: ${{ fromJSON(steps.toml.outputs.data).script.module }}.op
+          name: ${{ fromJSON(steps.toml.outputs.data).script.module }}${{ case(inputs.dev_build, '-DEV', '') }}
+          path: ${{ fromJSON(steps.toml.outputs.data).script.module }}${{ case(inputs.dev_build, '-DEV', '') }}.op
           archive: false
