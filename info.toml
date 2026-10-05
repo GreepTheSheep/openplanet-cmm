@@ -4,8 +4,7 @@ author = "Greep"
 category = "Matchmaking"
 perms = "paid"
 siteid = 424
-
-version = "0.0.10.20260826"
+version = "0.1.0"
 
 [script]
 module = "CMM"
