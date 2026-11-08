@@ -13,6 +13,7 @@ class MMTypeDevTab : Tab {
     bool typeDisableEdit;
     string typeNameEdit;
     bool typeAllowSquadEdit;
+    uint seasonNumberEdit;
     string seasonNameEdit;
     int seasonMapPackIdEdit;
     string seasonMapPackSecretEdit;
@@ -87,6 +88,7 @@ class MMTypeDevTab : Tab {
             isError = false;
             errorMsg = "";
             if (selectedType.season !is null) {
+                seasonNumberEdit = selectedType.season.number;
                 seasonNameEdit = selectedType.season.name;
                 @m_getMapPackRequest = API::Get(Setting_BaseURL+"/admin/season/"+selectedType.season.id+"/mappack");
             }
@@ -254,32 +256,58 @@ class MMTypeDevTab : Tab {
 
         UI::SetCursorPos(posTop + vec2(width + 8, 0));
         UI::BeginChild("Season", vec2(widthRight - 8, 185));
-
+        UI::Columns(2, "MMTypeDevTabSeasonView", false);
+        UI::BeginChild("ActiveSeason");
         if (selectedType.season !is null) {
-            UI::Text((selectedType.season.isActive ? "\\$0f0Active\\$z " : "\\$949Last\\$z ") + "Season info:");
-            UI::Text("Season #" + selectedType.season.number);
-            UI::SameLine();
-            UI::Text((selectedType.season.isActive ? "\\$0f0" : "\\$949") + selectedType.season.name);
+            UI::Text((selectedType.season.isActive ? "\\$0f0Active\\$z " : (selectedType.season.isUpcoming ? "\\$7fcUpcoming\\$z " : "\\$949Last\\$z ")) + "Season info:");
             UI::SameLine();
             UI::TextDisabled("(ID: " + selectedType.season.id + ")");
+            UI::Text("Season #");
+            UI::SameLine();
+            UI::SetNextItemWidth(100);
+            seasonNumberEdit = UI::InputUint("##seasonNumberEdit", seasonNumberEdit);
+            UI::Text("Name");
+            UI::SameLine();
+            UI::SetNextItemWidth(200);
+            seasonNameEdit = UI::InputText("##seasonNameEdit", seasonNameEdit);
+
+            // TODO: Date picker for season start date (https://github.com/openplanet-nl/issues/issues/625)
             UI::Text("Start date: " + (selectedType.season.startDateTimestamp != 0 ? Time::FormatString("%c", selectedType.season.startDateTimestamp) : "undefined"));
+
+            // TODO: Date picker for season end date (https://github.com/openplanet-nl/issues/issues/625)
             UI::Text("End date: " + (selectedType.season.endDateTimestamp != 0 ? Time::FormatString("%c", selectedType.season.endDateTimestamp) : "undefined"));
 
+            if (UI::Button("Edit")) Log::Error("Not implemented"); // TODO: implement PUT /admin/season/:id
+            UI::SameLine();
             if (selectedType.season.isActive && UI::RedButton("End this season")) startnew(CoroutineFunc(PostEndSeason));
-        } else UI::Text("\\$f00Active season is null, check server");
-
-        if (selectedType.season is null || !selectedType.season.isActive) {
-            UI::NewLine();
-            UI::Text("Create new season");
-            UI::SetNextItemWidth(250);
+        } else UI::Text("\\$f00Error: This matchmaking does not have any seasons at all");
+        UI::EndChild();
+        UI::NextColumn();
+        UI::BeginChild("NextSeason");
+        if (selectedType.season !is null) {
+            if (!selectedType.season.isActive && selectedType.season.isUpcoming) {
+                UI::Text("The next season will be available soon.");
+                UI::Text("You can't create any more until the next season is underway.");
+            } else {
+                // TODO: Check if there's already a next season (GET /admin/season/next?matchmakingId=<id> added on 08c96dd11c)
+                UI::Text("Create "+(selectedType.season.isActive ? "next" : "new")+" season:");
+            }
+        } else {
+            UI::Text("Create new season:");
+        }
+        if (selectedType.season is null || (selectedType.season.isActive && !selectedType.season.isUpcoming)) {
+            UI::SetNextItemWidth(200);
             seasonNameEdit = UI::InputText("Set name##seasonNameEdit", seasonNameEdit);
-            UI::SetNextItemWidth(250);
+            // TODO: Date picker for next season start date (https://github.com/openplanet-nl/issues/issues/625)
+            // TODO: Date picker for next season end date (https://github.com/openplanet-nl/issues/issues/625)
+            UI::SetNextItemWidth(200);
             seasonMapPackIdEdit = UI::InputInt("Set Map Pack ID##seasonMapPackIdEdit", seasonMapPackIdEdit);
-            UI::SetNextItemWidth(250);
+            UI::SetNextItemWidth(200);
             seasonMapPackSecretEdit = UI::InputText("Set Map Pack Secret (API key, if any)##seasonMapPackSecretEdit", seasonMapPackSecretEdit, UI::InputTextFlags::CharsNoBlank);
             if (UI::GreenButton("New season")) startnew(CoroutineFunc(PostNewSeason));
         }
-
+        UI::EndChild();
+        UI::Columns(1);
         UI::EndChild();
 
         posTop = posBottom;
