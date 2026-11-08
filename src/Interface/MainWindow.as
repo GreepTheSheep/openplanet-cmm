@@ -85,6 +85,8 @@ class MainWindow : Window {
             return;
         }
 
+        CheckMMTypeUpcomingSeason();
+
         vec2 BasePos = UI::GetCursorPos();
         if (isLoadingMMType) UI::Text(Icons::AnimatedHourglass + " Loading...");
         else {
@@ -93,16 +95,10 @@ class MainWindow : Window {
             if (g_selectedMatchmakingType.season !is null) {
                 if (g_selectedMatchmakingType.season.endDateTimestamp != 0) {
                     if (g_selectedMatchmakingType.season.isActive) {
-                        int64 timestampLeft = g_selectedMatchmakingType.season.endDateTimestamp - Time::Stamp;
-                        Time::Info timeLeft = Time::Parse(timestampLeft);
-                        string timeLeftString = "";
-                        if (timeLeft.Month > 1) timeLeftString += tostring(timeLeft.Month) + " months, ";
-                        if (timeLeft.Day > 1) timeLeftString += tostring(timeLeft.Day) + " days and ";
-                        timeLeftString += Time::FormatString("%T", timestampLeft);
-                        seasonTooltipText += "This season will end in " + timeLeftString;
+                        seasonTooltipText += "This season will end in " + Time::displayTimeLeft(g_selectedMatchmakingType.season.endDateTimestamp, true);
                     } else seasonTooltipText += "This season has ended on " + Time::FormatString("%c", g_selectedMatchmakingType.season.endDateTimestamp);
                 }
-                UI::Text((g_selectedMatchmakingType.season.isActive ? "" : "\\$555") + g_selectedMatchmakingType.season.name + (seasonTooltipText.Length > 0 ? " " + Icons::InfoCircle : ""));
+                UI::Text((g_selectedMatchmakingType.season.isActive ? "" : (g_selectedMatchmakingType.season.isUpcoming ? "\\$365" : "\\$777")) + g_selectedMatchmakingType.season.name + (seasonTooltipText.Length > 0 ? " \\$555" + Icons::InfoCircle : ""));
                 if (seasonTooltipText.Length > 0) UI::SetPreviousTooltip(seasonTooltipText);
             } else UI::Text(g_selectedMatchmakingType.name);
         }
@@ -119,7 +115,9 @@ class MainWindow : Window {
                         UI::Text("\\$900" + Icons::DotCircleO + " " + g_selectedPlayerMatchmakingType.points);
                     }
                 } else {
-                    UI::Text("\\$949"+ Icons::Stop +" Season ended");
+                    if (g_selectedMatchmakingType.season.isUpcoming) {
+                        UI::Text("\\$7fc"+ Icons::ClockO +" Season starts in " + Time::displayTimeLeft(g_selectedMatchmakingType.season.startDateTimestamp));
+                    } else UI::Text("\\$949"+ Icons::Stop +" Season ended");
                 }
             } else UI::Text("\\$f00" + Icons::Times + " \\$zNo active or last season.");
         }
@@ -265,6 +263,24 @@ class MainWindow : Window {
             }
 
             isLoadingMMType = false;
+        }
+    }
+
+    void CheckMMTypeUpcomingSeason() {
+        if (m_getMMTypeRequest !is null) return;
+        if (g_selectedMatchmakingType !is null && g_selectedMatchmakingType.season !is null) {
+            if (!g_selectedMatchmakingType.season.isActive) {
+                if (g_selectedMatchmakingType.season.isUpcoming) {
+                    int64 timeLeftStart = g_selectedMatchmakingType.season.startDateTimestamp - Time::Stamp;
+                    if (timeLeftStart < 0) SelectMatchmakingType(g_selectedMatchmakingType);
+                    // This will refresh the selected matchmaking type when the countdown has reached 0
+                }
+            } else {
+                if (g_selectedMatchmakingType.season.endDateTimestamp != 0) {
+                    int64 timeLeftEnd = g_selectedMatchmakingType.season.endDateTimestamp - Time::Stamp;
+                    if (timeLeftEnd < 0) SelectMatchmakingType(g_selectedMatchmakingType);
+                }
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ class MatchmakingTypeSeason {
     uint number;
     string name;
     bool isActive;
+    bool isUpcoming;
     string startDate;
     int64 startDateTimestamp;
     string endDate;
@@ -13,6 +14,8 @@ class MatchmakingTypeSeason {
         number = json["number"];
         name = json["name"];
         isActive = json["isActive"];
+        if (json.HasKey("isUpcoming") && json["isUpcoming"].GetType() == Json::Type::Boolean) isUpcoming = json["isUpcoming"];
+        else isUpcoming = false;
         if (json.HasKey("startDate") && json["startDate"].GetType() != Json::Type::Null) startDate = json["startDate"];
         if (json.HasKey("startDateTimestamp") && json["startDateTimestamp"].GetType() != Json::Type::Null) startDateTimestamp = json["startDateTimestamp"];
         if (json.HasKey("endDate") && json["endDate"].GetType() != Json::Type::Null) endDate = json["endDate"];
