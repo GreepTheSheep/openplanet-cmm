@@ -278,16 +278,25 @@ class QueueTab : Tab {
             UI::Text("\\$0f0" + Icons::Check);
             UI::SetPreviousTooltip("Ready");
         }
-        if (selectedPlayerMatchmakingType !is null && selectedPlayerMatchmakingType.matchesPlayed < g_selectedMatchmakingType.placementMatches) {
-            int remaining = g_selectedMatchmakingType.placementMatches - selectedPlayerMatchmakingType.matchesPlayed;
-            string matchesLeftString = tostring(remaining) + " matches left to get "+(player.id == g_connectedPlayer.id ? "your":"their")+" ELO";
-            if (remaining == 1) matchesLeftString = "Last placement match!";
+        if (g_selectedMatchmakingType !is null && g_selectedMatchmakingType.season !is null && g_selectedMatchmakingType.season.isActive) {
+            if (selectedPlayerMatchmakingType !is null && selectedPlayerMatchmakingType.matchesPlayed < g_selectedMatchmakingType.placementMatches) {
+                int remaining = g_selectedMatchmakingType.placementMatches - selectedPlayerMatchmakingType.matchesPlayed;
+                string matchesLeftString = tostring(remaining) + " matches left to get "+(player.id == g_connectedPlayer.id ? "your":"their")+" ELO";
+                if (remaining == 1) matchesLeftString = "Last placement match!";
 
-            UI::SetCursorPos(vec2(
-                (UI::GetWindowSize().x - UI::MeasureString(matchesLeftString).x) / 2,
-                UI::GetCursorPos().y
-            ));
-            UI::Text(matchesLeftString);
+                UI::SetCursorPos(vec2(
+                    (UI::GetWindowSize().x - UI::MeasureString(matchesLeftString).x) / 2,
+                    UI::GetCursorPos().y
+                ));
+                UI::Text(matchesLeftString);
+            } else {
+                string playerPoints = tostring(selectedPlayerMatchmakingType.points) + " pts";
+                UI::SetCursorPos(vec2(
+                    (UI::GetWindowSize().x - UI::MeasureString(playerPoints).x) / 2,
+                    UI::GetCursorPos().y
+                ));
+                UI::Text(playerPoints);
+            }
         }
         UI::SetCursorPos(posTop);
     }
