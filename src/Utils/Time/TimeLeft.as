@@ -1,4 +1,8 @@
 namespace Time {
+    /*
+     * Displays time left from a future timestamp in the format "MM DD hh:mm:ss"
+     * If the timestamp is in the past, an empty string is returned.
+    */
     string displayTimeLeft(const int64 &in timestamp = Time::Stamp, const bool &in fullText = false) {
         int64 timestampLeft = timestamp - Time::Stamp;
         if (timestampLeft == 0) return "00:00:00";
