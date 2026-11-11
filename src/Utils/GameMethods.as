@@ -10,4 +10,9 @@ namespace TM {
         app.ManiaPlanetScriptAPI.OpenLink(joinLink, CGameManiaPlanetScriptAPI::ELinkType::ManialinkBrowser);
         g_connectedToMatchGameServer = true;
     }
+
+    void FlashWindow() {
+        CTrackMania@ app = cast<CTrackMania>(GetApp());
+        app.ManiaPlanetScriptAPI.FlashWindow();
+    }
 }
