@@ -15,6 +15,9 @@ class MMTypeDevTab : Tab {
     bool typeAllowSquadEdit;
     uint seasonNumberEdit;
     string seasonNameEdit;
+    Time::Info seasonStartDateEdit = Time::ParseUTC(Time::Stamp);
+    bool seasonEndDateEnable = false;
+    Time::Info seasonEndDateEdit = Time::ParseUTC(Time::Stamp);
     int seasonMapPackIdEdit;
     string seasonMapPackSecretEdit;
     bool matchmakingTypeSelectChanged = false;
@@ -90,6 +93,9 @@ class MMTypeDevTab : Tab {
             if (selectedType.season !is null) {
                 seasonNumberEdit = selectedType.season.number;
                 seasonNameEdit = selectedType.season.name;
+                seasonStartDateEdit = Time::ParseUTC(selectedType.season.startDateTimestamp);
+                seasonEndDateEnable = selectedType.season.endDateTimestamp != 0;
+                if (seasonEndDateEnable) seasonEndDateEdit = Time::ParseUTC(selectedType.season.endDateTimestamp);
                 @m_getMapPackRequest = API::Get(Setting_BaseURL+"/admin/season/"+selectedType.season.id+"/mappack");
             }
         }
@@ -146,6 +152,8 @@ class MMTypeDevTab : Tab {
         postJson["name"] = seasonNameEdit;
         postJson["mxMapPackId"] = seasonMapPackIdEdit;
         postJson["mxMapPackSecret"] = seasonMapPackSecretEdit;
+
+        //TODO: Add start and end dates
 
         Json::Value@ resPost = API::PostAsync(Setting_BaseURL+"/admin/season", Json::Write(postJson));
         @selectedType.season = MatchmakingTypeSeason(resPost["season"]);
@@ -241,7 +249,7 @@ class MMTypeDevTab : Tab {
         float widthRight = UI::GetWindowSize().x-width;
         vec2 posTop = UI::GetCursorPos();
 
-        UI::BeginChild("Edit Type Infos", vec2(width, 185));
+        UI::BeginChild("Edit Type Infos", vec2(width, 230));
 
         typeDisableEdit = UI::Checkbox("Disable##typeDisableEdit", typeDisableEdit);
         typeAllowSquadEdit = UI::Checkbox("Allow Squads##typeAllowSquadEdit", typeAllowSquadEdit);
@@ -255,27 +263,28 @@ class MMTypeDevTab : Tab {
         vec2 posBottom = UI::GetCursorPos();
 
         UI::SetCursorPos(posTop + vec2(width + 8, 0));
-        UI::BeginChild("Season", vec2(widthRight - 8, 185));
+        UI::BeginChild("Season", vec2(widthRight - 8, 230));
         UI::Columns(2, "MMTypeDevTabSeasonView", false);
         UI::BeginChild("ActiveSeason");
         if (selectedType.season !is null) {
             UI::Text((selectedType.season.isActive ? "\\$0f0Active\\$z " : (selectedType.season.isUpcoming ? "\\$7fcUpcoming\\$z " : "\\$949Last\\$z ")) + "Season info:");
             UI::SameLine();
             UI::TextDisabled("(ID: " + selectedType.season.id + ")");
+            UI::AlignTextToFramePadding();
             UI::Text("Season #");
             UI::SameLine();
-            UI::SetNextItemWidth(100);
+            UI::SetNextItemWidth(150);
             seasonNumberEdit = UI::InputUint("##seasonNumberEdit", seasonNumberEdit);
-            UI::Text("Name");
-            UI::SameLine();
-            UI::SetNextItemWidth(200);
-            seasonNameEdit = UI::InputText("##seasonNameEdit", seasonNameEdit);
-
-            // TODO: Date picker for season start date (https://github.com/openplanet-nl/issues/issues/625)
-            UI::Text("Start date: " + (selectedType.season.startDateTimestamp != 0 ? Time::FormatString("%c", selectedType.season.startDateTimestamp) : "undefined"));
-
-            // TODO: Date picker for season end date (https://github.com/openplanet-nl/issues/issues/625)
-            UI::Text("End date: " + (selectedType.season.endDateTimestamp != 0 ? Time::FormatString("%c", selectedType.season.endDateTimestamp) : "undefined"));
+            UI::SetNextItemWidth(220);
+            seasonNameEdit = UI::InputText("Name##seasonNameEdit", seasonNameEdit);
+            UI::SetNextItemWidth(220);
+            seasonStartDateEdit = UI::DateTimePicker("Start Date (UTC)##seasonStartDateEdit", seasonStartDateEdit, false, 5, false);
+            seasonEndDateEnable = UI::Checkbox((seasonEndDateEnable ? "" : "End Date")+"##seasonEndDateEnable", seasonEndDateEnable);
+            if (seasonEndDateEnable) {
+                UI::SameLine();
+                UI::SetNextItemWidth(187);
+                seasonEndDateEdit = UI::DateTimePicker("End Date (UTC)##seasonEndDateEdit", seasonEndDateEdit, false, 5, false);
+            }
 
             if (UI::Button("Edit")) Log::Error("Not implemented"); // TODO: implement PUT /admin/season/:id
             UI::SameLine();
@@ -295,15 +304,28 @@ class MMTypeDevTab : Tab {
         } else {
             UI::Text("Create new season:");
         }
-        if (selectedType.season is null || (selectedType.season.isActive && !selectedType.season.isUpcoming)) {
-            UI::SetNextItemWidth(200);
-            seasonNameEdit = UI::InputText("Set name##seasonNameEdit", seasonNameEdit);
+        if (selectedType.season is null || !selectedType.season.isActive || (selectedType.season.isActive && !selectedType.season.isUpcoming)) {
+            UI::AlignTextToFramePadding();
+            UI::Text("Season #");
+            UI::SameLine();
+            UI::SetNextItemWidth(150);
+            seasonNumberEdit = UI::InputUint("##seasonNumberEdit", seasonNumberEdit);
+            UI::SetNextItemWidth(220);
+            seasonNameEdit = UI::InputText("Name##seasonNameEdit", seasonNameEdit);
             // TODO: Date picker for next season start date (https://github.com/openplanet-nl/issues/issues/625)
             // TODO: Date picker for next season end date (https://github.com/openplanet-nl/issues/issues/625)
-            UI::SetNextItemWidth(200);
-            seasonMapPackIdEdit = UI::InputInt("Set Map Pack ID##seasonMapPackIdEdit", seasonMapPackIdEdit);
-            UI::SetNextItemWidth(200);
-            seasonMapPackSecretEdit = UI::InputText("Set Map Pack Secret (API key, if any)##seasonMapPackSecretEdit", seasonMapPackSecretEdit, UI::InputTextFlags::CharsNoBlank);
+            UI::SetNextItemWidth(220);
+            seasonMapPackIdEdit = UI::InputInt("Map Pack ID##seasonMapPackIdEdit", seasonMapPackIdEdit);
+            UI::SetNextItemWidth(220);
+            seasonMapPackSecretEdit = UI::InputText("Map Pack Secret (API key, if any)##seasonMapPackSecretEdit", seasonMapPackSecretEdit, UI::InputTextFlags::CharsNoBlank);
+            UI::SetNextItemWidth(220);
+            seasonStartDateEdit = UI::DateTimePicker("Start Date (UTC)##seasonStartDateEdit", seasonStartDateEdit, false, 5, false);
+            seasonEndDateEnable = UI::Checkbox((seasonEndDateEnable ? "" : "End Date")+"##seasonEndDateEnable", seasonEndDateEnable);
+            if (seasonEndDateEnable) {
+                UI::SameLine();
+                UI::SetNextItemWidth(187);
+                seasonEndDateEdit = UI::DateTimePicker("End Date (UTC)##seasonEndDateEdit", seasonEndDateEdit, false, 5, false);
+            }
             if (UI::GreenButton("New season")) startnew(CoroutineFunc(PostNewSeason));
         }
         UI::EndChild();
