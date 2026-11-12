@@ -267,6 +267,9 @@ namespace UI {
 
         PopItemWidth();
 
+        UI::Text("In your timezone: " + Time::FormatString("%Z (%z)", Time::ParseFormatInfo(time)));
+        UI::Text(Time::FormatString("%X", Time::ParseFormatInfo(time)));
+
         return time;
     }
 }
