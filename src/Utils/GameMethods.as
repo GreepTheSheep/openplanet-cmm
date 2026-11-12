@@ -8,7 +8,6 @@ namespace TM {
         if (!hasPermissions()) return;
         CTrackMania@ app = cast<CTrackMania>(GetApp());
         app.ManiaPlanetScriptAPI.OpenLink(joinLink, CGameManiaPlanetScriptAPI::ELinkType::ManialinkBrowser);
-        g_connectedToMatchGameServer = true;
     }
 
     void FlashWindow() {

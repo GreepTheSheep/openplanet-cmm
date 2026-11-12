@@ -205,6 +205,7 @@ void PingMatchmakingLoop() {
                 if (g_matchInfo.tmServer !is null && g_matchInfo.tmServer.quickJoinLink != "") {
                     if (!g_connectedToMatchGameServer && g_matchInfo.status.ToLower().StartsWith("waiting for players")) {
                         TM::JoinServer(g_matchInfo.tmServer.quickJoinLink);
+                        g_connectedToMatchGameServer = true;
                     }
                 }
             }
