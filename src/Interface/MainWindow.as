@@ -206,7 +206,14 @@ class MainWindow : Window {
             UI::SameLine();
         }
 
-        string versionString = "\\$666v"+Meta::ExecutingPlugin().Version;
+        string versionString = "\\$666v"+Meta::ExecutingPlugin().Version+"\\$z";
+#if SIG_DEVELOPER
+        versionString += " \\$f39"+Icons::Code+"\\$z";
+#else if SIG_SCHOOL
+        versionString += (Meta::IsSchoolModeWhitelisted() ? " \\$0f0"+Icons::CodeFork : " \\$ff0"+Icons::University)+"\\$z";
+#else if CMM_DEV_BUILD
+        versionString += " \\$f00"+Icons::CodeFork+"\\$z";
+#endif
         UI::SetCursorPos(vec2(UI::GetWindowSize().x-UI::MeasureString(versionString).x-10, posOrig.y));
         UI::Text(versionString);
         if (UI::IsItemClicked()) {
@@ -215,6 +222,13 @@ class MainWindow : Window {
             IO::SetClipboard(report);
             UI::ShowNotification(Icons::Clipboard + " Build Info copied to clipboard", 2000);
         }
+#if SIG_DEVELOPER
+        UI::SetItemTooltip("Openplanet Developer signature enabled");
+#else if SIG_SCHOOL
+        UI::SetItemTooltip("Openplanet School signature "+(Meta::IsSchoolModeWhitelisted() ? " Whitelisted" : " enabled"));
+#else if CMM_DEV_BUILD
+        UI::SetItemTooltip("Dev Build enabled");
+#endif
     }
 
     void SelectMatchmakingType(MatchmakingType@ matchmakingType) {
