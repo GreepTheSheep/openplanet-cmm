@@ -38,23 +38,34 @@ namespace Time {
         DateAndTime
     }
 
-    string InfoToLongString(const Info &in time, const InfoToLongStringContents content = InfoToLongStringContents::DateAndTime, const bool &in timeIncludeSeconds = true) {
+    string InfoToLongString(const Info &in time, const InfoToLongStringContents content = InfoToLongStringContents::DateAndTime, const bool &in timeIncludeSeconds = true, const bool &in toTimezone = false) {
 
         // We need to add zeros prefixes if any numbers are below 10 for Month, Day, Hour, Minute and Second
         //string monthStr = time.Month < 10 ? ("0" + time.Month) : tostring(time.Month);
+        string yearStr = tostring(time.Year);
         string monthStr = monthsString[time.Month - 1];
         string dayStr = time.Day < 10 ? ("0" + time.Day) : tostring(time.Day);
         string hourStr = time.Hour < 10 ? ("0" + time.Hour) : tostring(time.Hour);
         string minuteStr = time.Minute < 10 ? ("0" + time.Minute) : tostring(time.Minute);
         string secondStr = time.Second < 10 ? ("0" + time.Second) : tostring(time.Second);
 
+        if (toTimezone) {
+            int64 infoStamp = ParseFormatInfo(time);
+            yearStr = FormatString("%Y", infoStamp);
+            monthStr = FormatString("%B", infoStamp);
+            dayStr = FormatString("%d", infoStamp);
+            hourStr = FormatString("%H", infoStamp);
+            minuteStr = FormatString("%M", infoStamp);
+            secondStr = FormatString("%S", infoStamp);
+        }
+
         switch (content) {
             case InfoToLongStringContents::DateOnly:
-            return dayStr+" "+monthStr+" "+time.Year;
+                return dayStr+" "+monthStr+" "+yearStr;
             case InfoToLongStringContents::TimeOnly:
-            return hourStr+":"+minuteStr+(timeIncludeSeconds ? ":"+secondStr : "");
+                return hourStr+":"+minuteStr+(timeIncludeSeconds ? ":"+secondStr : "");
             default:
-            return dayStr+" "+monthStr+" "+time.Year+" "+hourStr+":"+minuteStr+(timeIncludeSeconds ? ":"+secondStr : "");
+                return dayStr+" "+monthStr+" "+yearStr+" "+hourStr+":"+minuteStr+(timeIncludeSeconds ? ":"+secondStr : "");
         }
     }
 
