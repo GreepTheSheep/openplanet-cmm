@@ -148,7 +148,6 @@ namespace UI {
                     if (day != 0) {
                         PushStyleVar(StyleVar::FrameRounding, 20.0f);
 
-                        const bool todaySelect = day == today.Day && month == today.Month && year == today.Year;
                         const bool selected = day == time.Day;
                         if (!selected) {
                             PushStyleColor(Col::Button, vec4(0.0f, 0.0f, 0.0f, 0.0f));
@@ -159,7 +158,6 @@ namespace UI {
                             time.Day = day;
                             time.Month = month;
                             time.Year = year;
-                            CloseCurrentPopup(); // a voir
                         }
 
                         if (!selected) PopStyleColor(2);
