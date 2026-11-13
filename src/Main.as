@@ -44,7 +44,12 @@ void RenderMenu()
         UI::MenuItem("\\$f00" + Icons::TimesCircle + "\\$z "+PLUGIN_NAME_SHORT+": Server Unavailable", serverRefreshSeconds);
         return;
     }
-    if (!Auth::connected) return;
+    if (!Auth::connected) {
+        if (UI::MenuItem(ICON_COL + PLUGIN_NAME_SHORT + ": Register to beta test")) {
+            OpenBrowserURL("https://forms.gle/xFo3XBK3DTNHyqv6A");
+        }
+        return;
+    };
     if (cmmMainWindow !is null && UI::MenuItem(ICON_COL + PLUGIN_NAME, "", cmmMainWindow.isOpened)) {
         cmmMainWindow.isOpened = !cmmMainWindow.isOpened;
     }
