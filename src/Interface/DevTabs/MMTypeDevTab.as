@@ -137,6 +137,7 @@ class MMTypeDevTab : Tab {
     }
 
     void PostEndSeason() {
+        // TODO: Move to a confirmation dialog
         Json::Value@ postJson = Json::Object();
         postJson["seasonId"] = selectedType.season.id;
 
@@ -149,16 +150,22 @@ class MMTypeDevTab : Tab {
     void PostNewSeason() {
         Json::Value@ postJson = Json::Object();
         postJson["matchmakingTypeId"] = selectedType.id;
+        postJson["number"] = seasonNumberEdit;
         postJson["name"] = seasonNameEdit;
         postJson["mxMapPackId"] = seasonMapPackIdEdit;
         postJson["mxMapPackSecret"] = seasonMapPackSecretEdit;
-
-        //TODO: Add start and end dates
+        if (Time::ParseFormatInfo(seasonStartDateEdit) != 0) postJson["startDate"] = Time::FormatInfoISO(seasonStartDateEdit);
+        if (seasonEndDateEnable && Time::ParseFormatInfo(seasonEndDateEdit) != 0) postJson["endDate"] = Time::FormatInfoISO(seasonEndDateEdit);
 
         Json::Value@ resPost = API::PostAsync(Setting_BaseURL+"/admin/season", Json::Write(postJson));
         @selectedType.season = MatchmakingTypeSeason(resPost["season"]);
         g_matchmakingTypes.RemoveAt(selectedTypeIndex);
         g_matchmakingTypes.InsertAt(selectedTypeIndex, selectedType);
+    }
+
+    void PutSeason() {
+        // TODO: implement PUT /admin/season/:id
+        Log::Error("Not implemented");
     }
 
     void PostMMTypeModeSettings() {
@@ -286,7 +293,7 @@ class MMTypeDevTab : Tab {
                 seasonEndDateEdit = UI::DateTimePicker("End Date (UTC)##seasonEndDateEdit", seasonEndDateEdit, false, 5, false);
             }
 
-            if (UI::Button("Edit")) Log::Error("Not implemented"); // TODO: implement PUT /admin/season/:id
+            if (UI::Button("Edit")) startnew(CoroutineFunc(PutSeason));
             UI::SameLine();
             if (selectedType.season.isActive && UI::RedButton("End this season")) startnew(CoroutineFunc(PostEndSeason));
         } else UI::Text("\\$f00Error: This matchmaking does not have any seasons at all");
@@ -312,8 +319,6 @@ class MMTypeDevTab : Tab {
             seasonNumberEdit = UI::InputUint("##seasonNumberEdit", seasonNumberEdit);
             UI::SetNextItemWidth(220);
             seasonNameEdit = UI::InputText("Name##seasonNameEdit", seasonNameEdit);
-            // TODO: Date picker for next season start date (https://github.com/openplanet-nl/issues/issues/625)
-            // TODO: Date picker for next season end date (https://github.com/openplanet-nl/issues/issues/625)
             UI::SetNextItemWidth(220);
             seasonMapPackIdEdit = UI::InputInt("Map Pack ID##seasonMapPackIdEdit", seasonMapPackIdEdit);
             UI::SetNextItemWidth(220);
