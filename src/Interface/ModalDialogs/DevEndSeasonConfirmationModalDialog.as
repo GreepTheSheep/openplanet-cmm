@@ -2,7 +2,7 @@ class DevEndSeasonConfirmationModalDialog : ModalDialog
 {
     MatchmakingType@ matchmakingTypeWithSeasonToEnd;
 
-    DevEndSeasonConfirmationModalDialog(const MatchmakingType &in matchmakingType)
+    DevEndSeasonConfirmationModalDialog(MatchmakingType@ matchmakingType)
     {
         super(Icons::TimesCircle + " End season###DevEndSeaosnModalDialog");
         @matchmakingTypeWithSeasonToEnd = matchmakingType;
