@@ -136,17 +136,6 @@ class MMTypeDevTab : Tab {
         g_matchmakingTypes.InsertAt(selectedTypeIndex, MatchmakingType(resPost));
     }
 
-    void PostEndSeason() {
-        // TODO: Move to a confirmation dialog
-        Json::Value@ postJson = Json::Object();
-        postJson["seasonId"] = selectedType.season.id;
-
-        Json::Value@ resPost = API::PostAsync(Setting_BaseURL+"/admin/season/end", Json::Write(postJson));
-        @selectedType.season = MatchmakingTypeSeason(resPost["season"]);
-        g_matchmakingTypes.RemoveAt(selectedTypeIndex);
-        g_matchmakingTypes.InsertAt(selectedTypeIndex, selectedType);
-    }
-
     void PostNewSeason() {
         Json::Value@ postJson = Json::Object();
         postJson["matchmakingTypeId"] = selectedType.id;
@@ -293,9 +282,11 @@ class MMTypeDevTab : Tab {
                 seasonEndDateEdit = UI::DateTimePicker("End Date (UTC)##seasonEndDateEdit", seasonEndDateEdit, false, 5, false);
             }
 
-            if (UI::Button("Edit")) startnew(CoroutineFunc(PutSeason));
+            if (UI::Button(Icons::Pencil + " Edit")) startnew(CoroutineFunc(PutSeason));
             UI::SameLine();
-            if (selectedType.season.isActive && UI::RedButton("End this season")) startnew(CoroutineFunc(PostEndSeason));
+            if (selectedType.season.isActive && UI::RedButton(Icons::TimesCircle + " End this season")) {
+                Renderables::Add(DevEndSeasonConfirmationModalDialog(selectedType));
+            }
         } else UI::Text("\\$f00Error: This matchmaking does not have any seasons at all");
         UI::EndChild();
         UI::NextColumn();
