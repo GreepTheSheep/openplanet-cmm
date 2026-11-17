@@ -2,6 +2,7 @@ class MMTypeDevTab : Tab {
     Net::HttpRequest@ m_getRequest;
     Net::HttpRequest@ m_getSettingsRequest;
     Net::HttpRequest@ m_getMapPackRequest;
+    Net::HttpRequest@ m_getNextSeasonRequest;
     bool isError = false;
     string errorMsg = "";
     bool isLoading = false;
@@ -13,6 +14,9 @@ class MMTypeDevTab : Tab {
     bool typeDisableEdit;
     string typeNameEdit;
     bool typeAllowSquadEdit;
+
+    int seasonToEdit;
+    bool useNextSeasonOnEdit = false;
     uint seasonNumberEdit;
     string seasonNameEdit;
     Time::Info seasonStartDateEdit = Time::ParseUTC(Time::Stamp);
@@ -20,6 +24,14 @@ class MMTypeDevTab : Tab {
     Time::Info seasonEndDateEdit = Time::ParseUTC(Time::Stamp);
     int seasonMapPackIdEdit;
     string seasonMapPackSecretEdit;
+    uint nextSeasonNumberEdit;
+    string nextSeasonNameEdit;
+    Time::Info nextSeasonStartDateEdit = Time::ParseUTC(Time::Stamp);
+    bool nextSeasonEndDateEnable = false;
+    Time::Info nextSeasonEndDateEdit = Time::ParseUTC(Time::Stamp);
+    int nextSeasonMapPackIdEdit;
+    string nextSeasonMapPackSecretEdit;
+
     bool matchmakingTypeSelectChanged = false;
 
     string GetLabel() override { return "Matchmaking Type"; }
@@ -98,6 +110,7 @@ class MMTypeDevTab : Tab {
                 if (seasonEndDateEnable) seasonEndDateEdit = Time::ParseUTC(selectedType.season.endDateTimestamp);
                 @m_getMapPackRequest = API::Get(Setting_BaseURL+"/admin/season/"+selectedType.season.id+"/mappack");
             }
+            @m_getNextSeasonRequest = API::Get(Setting_BaseURL+"/admin/season/next?matchmakingTypeId="+selectedType.id);
         }
         if (m_getSettingsRequest !is null && m_getSettingsRequest.Finished()) {
             string resSettings = m_getSettingsRequest.String();
@@ -115,6 +128,24 @@ class MMTypeDevTab : Tab {
             @selectedTypeSeasonMapPack = MatchmakingTypeSeasonMapPack(Json::Parse(resMapPack));
             seasonMapPackIdEdit = selectedTypeSeasonMapPack.mxMapPackId;
             seasonMapPackSecretEdit = selectedTypeSeasonMapPack.mxMapPackSecret;
+        }
+        if (m_getNextSeasonRequest !is null && m_getNextSeasonRequest.Finished()) {
+            string resNextSeason = m_getNextSeasonRequest.String();
+            if (Meta::IsDeveloperMode()) trace("MMTypeDevTab::m_getNextSeasonRequest::CheckRequest: " + resNextSeason);
+            @m_getNextSeasonRequest = null;
+            auto jsonNextSeason = Json::Parse(resNextSeason);
+            if (jsonNextSeason.HasKey("season") && jsonNextSeason["season"].GetType() == Json::Type::Object)
+                @selectedType.nextSeason = MatchmakingTypeSeason(jsonNextSeason["season"]);
+
+            if (selectedType.nextSeason !is null) {
+                nextSeasonNumberEdit = selectedType.nextSeason.number;
+                nextSeasonNameEdit = selectedType.nextSeason.name;
+                nextSeasonStartDateEdit = Time::ParseUTC(selectedType.nextSeason.startDateTimestamp);
+                nextSeasonMapPackIdEdit = selectedType.nextSeason.mxMapPackId;
+                nextSeasonMapPackSecretEdit = selectedType.nextSeason.mxMapPackSecret;
+                nextSeasonEndDateEnable = selectedType.nextSeason.endDateTimestamp != 0;
+                if (nextSeasonEndDateEnable) nextSeasonEndDateEdit = Time::ParseUTC(selectedType.nextSeason.endDateTimestamp);
+            }
         }
     }
 
@@ -139,22 +170,53 @@ class MMTypeDevTab : Tab {
     void PostNewSeason() {
         Json::Value@ postJson = Json::Object();
         postJson["matchmakingTypeId"] = selectedType.id;
-        postJson["number"] = seasonNumberEdit;
-        postJson["name"] = seasonNameEdit;
-        postJson["mxMapPackId"] = seasonMapPackIdEdit;
-        postJson["mxMapPackSecret"] = seasonMapPackSecretEdit;
-        if (Time::ParseFormatInfo(seasonStartDateEdit) != 0) postJson["startDate"] = Time::FormatInfoISO(seasonStartDateEdit);
-        if (seasonEndDateEnable && Time::ParseFormatInfo(seasonEndDateEdit) != 0) postJson["endDate"] = Time::FormatInfoISO(seasonEndDateEdit);
+        postJson["number"] = nextSeasonNumberEdit;
+        postJson["name"] = nextSeasonNameEdit;
+        postJson["mxMapPackId"] = nextSeasonMapPackIdEdit;
+        postJson["mxMapPackSecret"] = nextSeasonMapPackSecretEdit;
+        if (Time::ParseFormatInfo(nextSeasonStartDateEdit) != 0) postJson["startDate"] = Time::FormatInfoISO(nextSeasonStartDateEdit);
+        if (nextSeasonEndDateEnable && Time::ParseFormatInfo(nextSeasonEndDateEdit) != 0) postJson["endDate"] = Time::FormatInfoISO(nextSeasonEndDateEdit);
+        if (!nextSeasonEndDateEnable) postJson["endDate"] = Json::Parse("null");
 
         Json::Value@ resPost = API::PostAsync(Setting_BaseURL+"/admin/season", Json::Write(postJson));
-        @selectedType.season = MatchmakingTypeSeason(resPost["season"]);
-        g_matchmakingTypes.RemoveAt(selectedTypeIndex);
-        g_matchmakingTypes.InsertAt(selectedTypeIndex, selectedType);
+        if (resPost.HasKey("season") && resPost["season"].GetType() == Json::Type::Object) {
+            if (selectedType.season !is null && selectedType.season.isActive)
+                @selectedType.nextSeason = MatchmakingTypeSeason(resPost["season"]);
+            else
+                @selectedType.season = MatchmakingTypeSeason(resPost["season"]);
+            g_matchmakingTypes.RemoveAt(selectedTypeIndex);
+            g_matchmakingTypes.InsertAt(selectedTypeIndex, selectedType);
+        }
     }
 
     void PutSeason() {
-        // TODO: implement PUT /admin/season/:id
-        Log::Error("Not implemented");
+        Json::Value@ putJson = Json::Object();
+        if (useNextSeasonOnEdit) {
+            putJson["number"] = nextSeasonNumberEdit;
+            putJson["name"] = nextSeasonNameEdit;
+            putJson["mxMapPackId"] = nextSeasonMapPackIdEdit;
+            putJson["mxMapPackSecret"] = nextSeasonMapPackSecretEdit;
+            if (Time::ParseFormatInfo(nextSeasonStartDateEdit) != 0) putJson["startDate"] = Time::FormatInfoISO(nextSeasonStartDateEdit);
+            if (nextSeasonEndDateEnable && Time::ParseFormatInfo(nextSeasonEndDateEdit) != 0) putJson["endDate"] = Time::FormatInfoISO(nextSeasonEndDateEdit);
+            if (!nextSeasonEndDateEnable) putJson["endDate"] = Json::Parse("null");
+        } else {
+            putJson["number"] = seasonNumberEdit;
+            putJson["name"] = seasonNameEdit;
+            putJson["mxMapPackId"] = seasonMapPackIdEdit;
+            putJson["mxMapPackSecret"] = seasonMapPackSecretEdit;
+            if (Time::ParseFormatInfo(seasonStartDateEdit) != 0) putJson["startDate"] = Time::FormatInfoISO(seasonStartDateEdit);
+            if (seasonEndDateEnable && Time::ParseFormatInfo(seasonEndDateEdit) != 0) putJson["endDate"] = Time::FormatInfoISO(seasonEndDateEdit);
+            if (!seasonEndDateEnable) putJson["endDate"] = Json::Parse("null");
+        }
+
+        Json::Value@ resPut = API::PutAsync(Setting_BaseURL+"/admin/season/"+seasonToEdit, Json::Write(putJson));
+
+        if (resPut.HasKey("season") && resPut["season"].GetType() == Json::Type::Object) {
+            if (useNextSeasonOnEdit) @selectedType.nextSeason = MatchmakingTypeSeason(resPut["season"]);
+            else @selectedType.season = MatchmakingTypeSeason(resPut["season"]);
+            g_matchmakingTypes.RemoveAt(selectedTypeIndex);
+            g_matchmakingTypes.InsertAt(selectedTypeIndex, selectedType);
+        }
     }
 
     void PostMMTypeModeSettings() {
@@ -208,7 +270,7 @@ class MMTypeDevTab : Tab {
         Json::Value@ postJson = Json::Object();
         postJson["mxMapPackId"] = seasonMapPackIdEdit;
         postJson["mxMapPackSecret"] = seasonMapPackSecretEdit;
-        Json::Value@ resPost = API::PostAsync(Setting_BaseURL+"/admin/season/"+selectedType.season.id+"/mappack", Json::Write(postJson));
+        API::PostAsync(Setting_BaseURL+"/admin/season/"+selectedType.season.id+"/mappack", Json::Write(postJson));
         selectedTypeSeasonMapPack.mxMapPackId = seasonMapPackIdEdit;
         selectedTypeSeasonMapPack.mxMapPackSecret = seasonMapPackSecretEdit;
     }
@@ -241,11 +303,9 @@ class MMTypeDevTab : Tab {
         if (UI::IsItemClicked()) Reload();
 
         UI::Separator();
-        float width = UI::GetWindowSize().x*0.35;
-        float widthRight = UI::GetWindowSize().x-width;
-        vec2 posTop = UI::GetCursorPos();
+        UI::Columns(3, "MMTypeDevTabTypeSeasonView", false);
 
-        UI::BeginChild("Edit Type Infos", vec2(width, 230));
+        UI::BeginChild("EditTypeInfos");
 
         typeDisableEdit = UI::Checkbox("Disable##typeDisableEdit", typeDisableEdit);
         typeAllowSquadEdit = UI::Checkbox("Allow Squads##typeAllowSquadEdit", typeAllowSquadEdit);
@@ -253,14 +313,11 @@ class MMTypeDevTab : Tab {
         typeNameEdit = UI::InputText("Set name##typeNameEdit", typeNameEdit);
 
         if (UI::GreenButton(Icons::FloppyO + " Save")) startnew(CoroutineFunc(PostMMType));
+        vec2 posBottom = UI::GetCursorPos() + 43;
 
         UI::EndChild();
 
-        vec2 posBottom = UI::GetCursorPos();
-
-        UI::SetCursorPos(posTop + vec2(width + 8, 0));
-        UI::BeginChild("Season", vec2(widthRight - 8, 230));
-        UI::Columns(2, "MMTypeDevTabSeasonView", false);
+        UI::NextColumn();
         UI::BeginChild("ActiveSeason");
         if (selectedType.season !is null) {
             UI::Text((selectedType.season.isActive ? "\\$0f0Active\\$z " : (selectedType.season.isUpcoming ? "\\$7fcUpcoming\\$z " : "\\$949Last\\$z ")) + "Season info:");
@@ -282,62 +339,99 @@ class MMTypeDevTab : Tab {
                 seasonEndDateEdit = UI::DateTimePicker("End Date (UTC)##seasonEndDateEdit", seasonEndDateEdit, false, 5, false);
             }
 
-            if (UI::Button(Icons::Pencil + " Edit")) startnew(CoroutineFunc(PutSeason));
+            if (UI::Button(Icons::Pencil + " Edit")) {
+                seasonToEdit = selectedType.season.id;
+                useNextSeasonOnEdit = false;
+                startnew(CoroutineFunc(PutSeason));
+            }
             UI::SameLine();
             if (selectedType.season.isActive && UI::RedButton(Icons::TimesCircle + " End this season")) {
                 Renderables::Add(DevEndSeasonConfirmationModalDialog(selectedType));
             }
         } else UI::Text("\\$f00Error: This matchmaking does not have any seasons at all");
+        posBottom.y = Math::Max(UI::GetCursorPos().y , posBottom.y) + 43;
         UI::EndChild();
         UI::NextColumn();
         UI::BeginChild("NextSeason");
-        if (selectedType.season !is null) {
-            if (!selectedType.season.isActive && selectedType.season.isUpcoming) {
-                UI::Text("The next season will be available soon.");
-                UI::Text("You can't create any more until the next season is underway.");
-            } else {
-                // TODO: Check if there's already a next season (GET /admin/season/next?matchmakingId=<id> added on 08c96dd11c)
-                UI::Text("Create "+(selectedType.season.isActive ? "next" : "new")+" season:");
-            }
-        } else {
-            UI::Text("Create new season:");
-        }
-        if (selectedType.season is null || !selectedType.season.isActive || (selectedType.season.isActive && !selectedType.season.isUpcoming)) {
+        bool canCreateNewSeason = (
+            selectedType.nextSeason is null &&
+            selectedType.season !is null &&
+            !selectedType.season.isActive &&
+            selectedType.season.isUpcoming
+        );
+
+        if (canCreateNewSeason) {
+            UI::Text("Create "+(selectedType.season.isActive ? "next" : "new")+" season:");
             UI::AlignTextToFramePadding();
             UI::Text("Season #");
             UI::SameLine();
             UI::SetNextItemWidth(150);
-            seasonNumberEdit = UI::InputUint("##seasonNumberEdit", seasonNumberEdit);
+            nextSeasonNumberEdit = UI::InputUint("##nextSeasonNumberEdit", nextSeasonNumberEdit);
             UI::SetNextItemWidth(220);
-            seasonNameEdit = UI::InputText("Name##seasonNameEdit", seasonNameEdit);
+            nextSeasonNameEdit = UI::InputText("Name##nextSeasonNameEdit", nextSeasonNameEdit);
             UI::SetNextItemWidth(220);
-            seasonMapPackIdEdit = UI::InputInt("Map Pack ID##seasonMapPackIdEdit", seasonMapPackIdEdit);
+            nextSeasonMapPackIdEdit = UI::InputInt("Map Pack ID##nextSeasonMapPackIdEdit", nextSeasonMapPackIdEdit);
             UI::SetNextItemWidth(220);
-            seasonMapPackSecretEdit = UI::InputText("Map Pack Secret (API key, if any)##seasonMapPackSecretEdit", seasonMapPackSecretEdit, UI::InputTextFlags::CharsNoBlank);
+            nextSeasonMapPackSecretEdit = UI::InputText("Map Pack Secret (API key, if any)##nextSeasonMapPackSecretEdit", nextSeasonMapPackSecretEdit, UI::InputTextFlags::CharsNoBlank);
             UI::SetNextItemWidth(220);
-            seasonStartDateEdit = UI::DateTimePicker("Start Date (UTC)##seasonStartDateEdit", seasonStartDateEdit, false, 5, false);
-            seasonEndDateEnable = UI::Checkbox((seasonEndDateEnable ? "" : "End Date")+"##seasonEndDateEnable", seasonEndDateEnable);
-            if (seasonEndDateEnable) {
+            nextSeasonStartDateEdit = UI::DateTimePicker("Start Date (UTC)##nextSeasonStartDateEdit", nextSeasonStartDateEdit, false, 5, false);
+            nextSeasonEndDateEnable = UI::Checkbox((nextSeasonEndDateEnable ? "" : "End Date")+"##seasonEndDateEnable", nextSeasonEndDateEnable);
+            if (nextSeasonEndDateEnable) {
                 UI::SameLine();
                 UI::SetNextItemWidth(187);
-                seasonEndDateEdit = UI::DateTimePicker("End Date (UTC)##seasonEndDateEdit", seasonEndDateEdit, false, 5, false);
+                nextSeasonEndDateEdit = UI::DateTimePicker("End Date (UTC)##nextSeasonEndDateEdit", nextSeasonEndDateEdit, false, 5, false);
             }
             if (UI::GreenButton("New season")) startnew(CoroutineFunc(PostNewSeason));
+        } else {
+            if (selectedType.nextSeason !is null && selectedType.season !is null && selectedType.season.isActive) {
+                UI::Text("\\$7fcUpcoming\\$z Season info:");
+                UI::SameLine();
+                UI::TextDisabled("(ID: " + selectedType.nextSeason.id + ")");
+                UI::AlignTextToFramePadding();
+                UI::Text("Season #");
+                UI::SameLine();
+                UI::SetNextItemWidth(150);
+                nextSeasonNumberEdit = UI::InputUint("##nextSeasonNumberEdit", nextSeasonNumberEdit);
+                UI::SetNextItemWidth(220);
+                nextSeasonNameEdit = UI::InputText("Name##nextSeasonNameEdit", nextSeasonNameEdit);
+                UI::SetNextItemWidth(220);
+                nextSeasonMapPackIdEdit = UI::InputInt("Map Pack ID##nextSeasonMapPackIdEdit", nextSeasonMapPackIdEdit);
+                UI::SetNextItemWidth(220);
+                nextSeasonMapPackSecretEdit = UI::InputText("Map Pack Secret (API key, if any)##nextSeasonMapPackSecretEdit", nextSeasonMapPackSecretEdit, UI::InputTextFlags::CharsNoBlank);
+                UI::SetNextItemWidth(220);
+                nextSeasonStartDateEdit = UI::DateTimePicker("Start Date (UTC)##nextSeasonStartDateEdit", nextSeasonStartDateEdit, false, 5, false);
+                nextSeasonEndDateEnable = UI::Checkbox((nextSeasonEndDateEnable ? "" : "End Date")+"##nextSeasonEndDateEnable", nextSeasonEndDateEnable);
+                if (nextSeasonEndDateEnable) {
+                    UI::SameLine();
+                    UI::SetNextItemWidth(187);
+                    nextSeasonEndDateEdit = UI::DateTimePicker("End Date (UTC)##nextSeasonEndDateEdit", nextSeasonEndDateEdit, false, 5, false);
+                }
+
+                if (UI::Button(Icons::Pencil + " Edit")) {
+                    seasonToEdit = selectedType.nextSeason.id;
+                    useNextSeasonOnEdit = true;
+                    startnew(CoroutineFunc(PutSeason));
+                }
+            } else {
+                if (selectedType.season !is null && !selectedType.season.isActive && selectedType.season.isUpcoming) {
+                    UI::Text("The next season will be available soon.");
+                    UI::Text("You can't create any more until the next season is underway.");
+                } else {
+                    UI::Text(Icons::AnimatedHourglass);
+                }
+            }
         }
+        posBottom.y = Math::Max(UI::GetCursorPos().y, posBottom.y) + 43;
         UI::EndChild();
         UI::Columns(1);
-        UI::EndChild();
 
-        posTop = posBottom;
-        UI::SetCursorPos(posTop);
+        UI::SetCursorPos(vec2(posBottom.x, posBottom.y));
 
         UI::Separator();
 
-        width = UI::GetWindowSize().x*0.45;
-        widthRight = UI::GetWindowSize().x-width;
-        posTop = UI::GetCursorPos();
+        UI::Columns(2, "MMTypeDevTabMappackSettingsView");
 
-        UI::BeginChild("Mappack", vec2(width,0));
+        UI::BeginChild("Mappack");
 
         if (selectedTypeSeasonMapPack !is null) {
             UI::AlignTextToFramePadding();
@@ -396,8 +490,8 @@ class MMTypeDevTab : Tab {
 
         UI::EndChild();
 
-        UI::SetCursorPos(posTop + vec2(width + 8, 0));
-        UI::BeginChild("ModeSettings", vec2(widthRight - 8, 0));
+        UI::NextColumn();
+        UI::BeginChild("ModeSettings");
         UI::AlignTextToFramePadding();
         UI::Text("ModeSettings");
         UI::SameLine();
@@ -446,5 +540,6 @@ class MMTypeDevTab : Tab {
         }
 
         UI::EndChild();
+        UI::Columns(1);
     }
 }
