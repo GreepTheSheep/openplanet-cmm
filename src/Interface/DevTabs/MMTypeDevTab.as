@@ -16,6 +16,8 @@ class MMTypeDevTab : Tab {
     bool typeAllowSquadEdit;
 
     int seasonToEdit;
+    bool seasonToEditInProgress = false;
+    bool seasonToEditCompleted = false;
     bool useNextSeasonOnEdit = false;
     uint seasonNumberEdit;
     string seasonNameEdit;
@@ -190,6 +192,8 @@ class MMTypeDevTab : Tab {
     }
 
     void PutSeason() {
+        seasonToEditCompleted = false;
+        seasonToEditInProgress = true;
         Json::Value@ putJson = Json::Object();
         if (useNextSeasonOnEdit) {
             putJson["number"] = nextSeasonNumberEdit;
@@ -217,6 +221,8 @@ class MMTypeDevTab : Tab {
             g_matchmakingTypes.RemoveAt(selectedTypeIndex);
             g_matchmakingTypes.InsertAt(selectedTypeIndex, selectedType);
         }
+        seasonToEditCompleted = true;
+        seasonToEditInProgress = false;
     }
 
     void PostMMTypeModeSettings() {
@@ -339,14 +345,19 @@ class MMTypeDevTab : Tab {
                 seasonEndDateEdit = UI::DateTimePicker("End Date (UTC)##seasonEndDateEdit", seasonEndDateEdit, false, 5, false);
             }
 
+            UI::BeginDisabled(seasonToEditInProgress);
             if (UI::Button(Icons::Pencil + " Edit")) {
                 seasonToEdit = selectedType.season.id;
                 useNextSeasonOnEdit = false;
                 startnew(CoroutineFunc(PutSeason));
             }
+            UI::EndDisabled();
             UI::SameLine();
             if (selectedType.season.isActive && UI::RedButton(Icons::TimesCircle + " End this season")) {
                 Renderables::Add(DevEndSeasonConfirmationModalDialog(selectedType));
+            }
+            if (seasonToEditCompleted && seasonToEdit == selectedType.season.id) {
+                UI::Text("\\$0f0"+Icons::Check+" \\$zEdit success");
             }
         } else UI::Text("\\$f00Error: This matchmaking does not have any seasons at all");
         posBottom.y = Math::Max(UI::GetCursorPos().y , posBottom.y) + 43;
@@ -407,10 +418,16 @@ class MMTypeDevTab : Tab {
                     nextSeasonEndDateEdit = UI::DateTimePicker("End Date (UTC)##nextSeasonEndDateEdit", nextSeasonEndDateEdit, false, 5, false);
                 }
 
+                UI::BeginDisabled(seasonToEditInProgress);
                 if (UI::Button(Icons::Pencil + " Edit")) {
                     seasonToEdit = selectedType.nextSeason.id;
                     useNextSeasonOnEdit = true;
                     startnew(CoroutineFunc(PutSeason));
+                }
+                UI::EndDisabled();
+                if (seasonToEditCompleted && seasonToEdit == selectedType.nextSeason.id) {
+                    UI::SameLine();
+                    UI::Text("\\$0f0"+Icons::Check+" \\$zEdit success");
                 }
             } else {
                 if (selectedType.season !is null && !selectedType.season.isActive && selectedType.season.isUpcoming) {
