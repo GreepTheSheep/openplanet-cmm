@@ -45,7 +45,8 @@ void RenderMenu()
         return;
     }
     if (!Auth::connected) {
-        if (UI::MenuItem(ICON_COL + PLUGIN_NAME_SHORT + ": Register to beta test")) {
+        // Menu Item to remove when beta test is done
+        if (UI::MenuItem(ICON_COL + PLUGIN_NAME_SHORT + ": Register to beta test", Icons::ExternalLink)) {
             OpenBrowserURL("https://forms.gle/xFo3XBK3DTNHyqv6A");
         }
         return;
