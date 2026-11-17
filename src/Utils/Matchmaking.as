@@ -19,6 +19,7 @@ namespace Matchmaking {
                 // Send match found notification
                 Log::Log("Match found !", true);
                 Audio::PlaySound(Audio::Sounds::MatchFound);
+                TM::FlashWindow();
             } else if (dataType == "matchmakingEnded") {
                 if (g_inMatch == true) {
                         // Refresh player points after the match
