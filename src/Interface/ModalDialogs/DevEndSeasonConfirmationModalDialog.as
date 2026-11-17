@@ -14,9 +14,9 @@ class DevEndSeasonConfirmationModalDialog : ModalDialog
         postJson["seasonId"] = matchmakingTypeWithSeasonToEnd.season.id;
 
         Json::Value@ resPost = API::PostAsync(Setting_BaseURL+"/admin/season/end", Json::Write(postJson));
-        @matchmakingTypeWithSeasonToEnd.season = MatchmakingTypeSeason(resPost["season"]);
         int mmTypeIndex = g_matchmakingTypes.FindByRef(matchmakingTypeWithSeasonToEnd);
         g_matchmakingTypes.RemoveAt(mmTypeIndex);
+        @matchmakingTypeWithSeasonToEnd.season = MatchmakingTypeSeason(resPost["season"]);
         g_matchmakingTypes.InsertAt(mmTypeIndex, matchmakingTypeWithSeasonToEnd);
         Close();
     }
