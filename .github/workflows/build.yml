@@ -18,6 +18,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # `inputs` n'existe que pour workflow_dispatch : sur un push de tag, on déduit
+      # dev_build du nom du tag (ex: v1.2.3-dev).
+      DEV_BUILD: ${{ (github.event_name == 'push' && contains(github.ref_name, '-dev')) || inputs.dev_build == true }}
+      ALLOW_CHANGE_SETTINGS: ${{ inputs.append_allow_change_settings == true }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -29,7 +34,7 @@ jobs:
           file: info.toml
 
       - name: Add CMM_ALLOW_CHANGE_SETTINGS define on info.toml
-        if: ${{ inputs.append_allow_change_settings }}
+        if: ${{ env.ALLOW_CHANGE_SETTINGS == 'true' }}
         uses: cssnr/toml-action@v2
         with:
           file: info.toml
@@ -38,7 +43,7 @@ jobs:
           append: true
 
       - name: Edit name on info.toml
-        if: ${{ inputs.dev_build }}
+        if: ${{ env.DEV_BUILD == 'true' }}
         uses: cssnr/toml-action@v2
         with:
           file: info.toml
@@ -47,12 +52,12 @@ jobs:
 
 
       - name: Get build date
-        if: ${{ inputs.dev_build }}
+        if: ${{ env.DEV_BUILD == 'true' }}
         id: date
         run: echo "date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
 
       - name: Edit version number on info.toml
-        if: ${{ inputs.dev_build }}
+        if: ${{ env.DEV_BUILD == 'true' }}
         uses: cssnr/toml-action@v2
         with:
           file: info.toml
@@ -60,7 +65,7 @@ jobs:
           value: ${{ fromJSON(steps.toml.outputs.data).meta.version }}.${{ steps.date.outputs.date }}
 
       - name: Edit module name on info.toml
-        if: ${{ inputs.dev_build }}
+        if: ${{ env.DEV_BUILD == 'true' }}
         uses: cssnr/toml-action@v2
         with:
           file: info.toml
@@ -68,7 +73,7 @@ jobs:
           value: ${{ fromJSON(steps.toml.outputs.data).script.module }}-DEV
 
       - name: Add CMM_DEV_BUILD define on info.toml
-        if: ${{ inputs.dev_build }}
+        if: ${{ env.DEV_BUILD == 'true' }}
         uses: cssnr/toml-action@v2
         with:
           file: info.toml
@@ -78,13 +83,13 @@ jobs:
 
       - name: Build .op
         run: |
-          name="${{ fromJSON(steps.toml.outputs.data).script.module }}${{ case(inputs.dev_build, '-DEV', '') }}"
+          name="${{ fromJSON(steps.toml.outputs.data).script.module }}${{ case(env.DEV_BUILD == 'true', '-DEV', '') }}"
           [ -f "$name.op" ] && rm -f "$name.op"
           zip -r "$name.op" info.toml src
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ fromJSON(steps.toml.outputs.data).script.module }}${{ case(inputs.dev_build, '-DEV', '') }}
-          path: ${{ fromJSON(steps.toml.outputs.data).script.module }}${{ case(inputs.dev_build, '-DEV', '') }}.op
+          name: ${{ fromJSON(steps.toml.outputs.data).script.module }}${{ case(env.DEV_BUILD == 'true', '-DEV', '') }}
+          path: ${{ fromJSON(steps.toml.outputs.data).script.module }}${{ case(env.DEV_BUILD == 'true', '-DEV', '') }}.op
           archive: false
