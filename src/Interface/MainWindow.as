@@ -170,7 +170,7 @@ class MainWindow : Window {
             string queueStatusMsg = "";
 
             if (Time::Now - Math::Max(g_lastPingQueue,g_lastPingQueueSent) < (g_queueJoin ? 10000 : 30000)) {
-                queueStatusMsg += UI::FormatOpenplanetColor(UI::hsv2rgb(vec3(0.33333 - Math::Abs(Time::Now - g_lastPingQueue) / 30000.0, 0.8, 1.0)));
+                queueStatusMsg += Text::FormatOpenplanetColor(UI::hsv2rgb(vec3(0.33333 - Math::Abs(Time::Now - g_lastPingQueue) / 30000.0, 0.8, 1.0)));
             } else {
                 queueStatusMsg += "\\$d00";
             }
