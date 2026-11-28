@@ -22,7 +22,7 @@ namespace Time {
         "Sa",
         "Su"
     };
-    const array<string> daysInMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    const array<int> daysInMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
     // Implements Zeller's Congruence to determine the day of week [1, 7](Mon-Sun) from the given parameters
     int DayOfWeek(int dayOfMonth, int month, int year) {
