@@ -29,7 +29,11 @@ void RenderMenu()
     if (serverRefreshSeconds == "<invalid>") serverRefreshSeconds = "";
 
     if (Auth::connectionError && !Auth::connectionInProgress) {
-        UI::MenuItem("\\$f00" + Icons::TimesCircle + "\\$z "+PLUGIN_NAME_SHORT+": Connection Error", serverRefreshSeconds);
+        // Menu Item to remove when beta test is done
+        if (UI::MenuItem(ICON_COL + PLUGIN_NAME_SHORT + ": Register to beta test", Icons::ExternalLink)) {
+            OpenBrowserURL("https://forms.gle/xFo3XBK3DTNHyqv6A");
+        }
+        //UI::MenuItem("\\$f00" + Icons::TimesCircle + "\\$z "+PLUGIN_NAME_SHORT+": Connection Error", serverRefreshSeconds);
         return;
     }
     if (isCheckingServer) {
@@ -44,13 +48,7 @@ void RenderMenu()
         UI::MenuItem("\\$f00" + Icons::TimesCircle + "\\$z "+PLUGIN_NAME_SHORT+": Server Unavailable", serverRefreshSeconds);
         return;
     }
-    if (!Auth::connected) {
-        // Menu Item to remove when beta test is done
-        if (UI::MenuItem(ICON_COL + PLUGIN_NAME_SHORT + ": Register to beta test", Icons::ExternalLink)) {
-            OpenBrowserURL("https://forms.gle/xFo3XBK3DTNHyqv6A");
-        }
-        return;
-    };
+    if (!Auth::connected) return;
     if (cmmMainWindow !is null && UI::MenuItem(ICON_COL + PLUGIN_NAME, "", cmmMainWindow.isOpened)) {
         cmmMainWindow.isOpened = !cmmMainWindow.isOpened;
     }
