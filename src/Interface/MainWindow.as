@@ -99,7 +99,7 @@ class MainWindow : Window {
                     } else seasonTooltipText += "This season has ended on " + Time::FormatString("%c", g_selectedMatchmakingType.season.endDateTimestamp);
                 }
                 UI::Text((g_selectedMatchmakingType.season.isActive ? "" : (g_selectedMatchmakingType.season.isUpcoming ? "\\$365" : "\\$777")) + g_selectedMatchmakingType.season.name + (seasonTooltipText.Length > 0 ? " \\$555" + Icons::InfoCircle : ""));
-                if (seasonTooltipText.Length > 0) UI::SetPreviousTooltip(seasonTooltipText);
+                if (seasonTooltipText.Length > 0) UI::SetItemTooltip(seasonTooltipText);
             } else UI::Text(g_selectedMatchmakingType.name);
         }
         if (isLoadingMMType) UI::Text(Icons::AnimatedHourglass + " Loading...");
@@ -140,7 +140,7 @@ class MainWindow : Window {
                     }
                 }
                 if (g_activeSquad !is null && g_connectedPlayer !is null && g_connectedPlayer.accountId != g_activeSquad.ownerPlayer)
-                    UI::SetPreviousTooltip("Only the squad host can change this");
+                    UI::SetItemTooltip("Only the squad host can change this");
                 UI::EndCombo();
             }
         }
@@ -170,7 +170,7 @@ class MainWindow : Window {
             string queueStatusMsg = "";
 
             if (Time::Now - Math::Max(g_lastPingQueue,g_lastPingQueueSent) < (g_queueJoin ? 10000 : 30000)) {
-                queueStatusMsg += UI::CreateColorCode(UI::hsv2rgb(vec3(0.33333 - Math::Abs(Time::Now - g_lastPingQueue) / 30000.0, 0.8, 1.0)));
+                queueStatusMsg += UI::FormatOpenplanetColor(UI::hsv2rgb(vec3(0.33333 - Math::Abs(Time::Now - g_lastPingQueue) / 30000.0, 0.8, 1.0)));
             } else {
                 queueStatusMsg += "\\$d00";
             }
@@ -186,11 +186,11 @@ class MainWindow : Window {
         if (!g_queueJoin) {
             if (g_serverInfo !is null) {
                 UI::Text(Icons::Users + " " + g_serverInfo.connectedPlayers);
-                UI::SetPreviousTooltip("Number of players connected into " + PLUGIN_NAME_SHORT);
+                UI::SetItemTooltip("Number of players connected into " + PLUGIN_NAME_SHORT);
             }
         } else {
             UI::Text(Icons::BlinkingUser + " " + g_queuePlayersCount);
-            UI::SetPreviousTooltip("Number of players queuing for " + g_selectedMatchmakingType.name);
+            UI::SetItemTooltip("Number of players queuing for " + g_selectedMatchmakingType.name);
         }
 
         UI::SameLine();
@@ -202,7 +202,7 @@ class MainWindow : Window {
                 if (g_activeSquad.players.Length == g_selectedMatchmakingType.playersPerTeams) textColor = "\\$060";
                 UI::Text(textColor + Icons::Kenney::Users + " " + g_activeSquad.players.Length + " / " + g_selectedMatchmakingType.playersPerTeams);
             } else UI::Text("\\$666" + Icons::Kenney::Users + " " + g_activeSquad.players.Length);
-            UI::SetPreviousTooltip(g_activeSquad.name);
+            UI::SetItemTooltip(g_activeSquad.name);
             UI::SameLine();
         }
 

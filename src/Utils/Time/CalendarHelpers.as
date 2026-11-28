@@ -22,6 +22,7 @@ namespace Time {
         "Sa",
         "Su"
     };
+    const array<string> daysInMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
     // Implements Zeller's Congruence to determine the day of week [1, 7](Mon-Sun) from the given parameters
     int DayOfWeek(int dayOfMonth, int month, int year) {
@@ -52,27 +53,10 @@ namespace Time {
     }
 
     int NumDaysInMonth(int month, int year) {
-        if (month == 2)
-            return IsLeapYear(year) ? 29 : 28;
+        if ((month == 2) && IsLeapYear(year))
+            return 29;
 
-        // Month index paired to the number of days in that month excluding February
-        const dictionary monthDayMap = {
-            { tostring(1),  31 },
-            { tostring(3),  31 },
-            { tostring(4),  30 },
-            { tostring(5),  31 },
-            { tostring(6),  30 },
-            { tostring(7),  31 },
-            { tostring(8),  31 },
-            { tostring(9),  30 },
-            { tostring(10), 31 },
-            { tostring(11), 30 },
-            { tostring(12), 31 }
-        };
-
-        int monthDay = 31;
-        monthDayMap.Get(tostring(month), monthDay);
-        return monthDay;
+        return daysInMonth[month - 1];
     }
 
     // Returns the number of calendar weeks spanned by month in the specified year

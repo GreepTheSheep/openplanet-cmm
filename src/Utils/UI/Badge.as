@@ -17,12 +17,12 @@ namespace UI {
             UI::PushFont(Fonts::Header);
             UI::Text("\\$fc0" + Icons::ExclamationTriangle);
             UI::PopFont();
-            UI::SetPreviousTooltip("Badge icon not found");
+            UI::SetItemTooltip("Badge icon not found");
         } else {
             UI::PushFont(Fonts::Header);
             UI::TextDisabled(Icons::Times);
             UI::PopFont();
-            UI::SetPreviousTooltip("Error while loading badge icon");
+            UI::SetItemTooltip("Error while loading badge icon");
         }
     }
 }

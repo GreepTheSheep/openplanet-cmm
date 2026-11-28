@@ -76,7 +76,7 @@ namespace UI {
 
         year = InputInt("##IntYear_" + label, year);
         if (time.Year != year) {
-            time.Year = Math::Min(Math::Max(1970, year), 3000);
+            time.Year = Math::Clamp(year, 1970, 3000);
         }
 
         PopItemWidth();

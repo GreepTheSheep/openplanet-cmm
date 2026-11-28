@@ -203,7 +203,7 @@ class AllPlayersDevTab : Tab {
 
                     UI::TableSetColumnIndex(0);
                     UI::Text(player.displayName);
-                    UI::SetPreviousTooltip(player.accountId);
+                    UI::SetItemTooltip(player.accountId);
                     if (UI::IsItemClicked()) {
                         IO::SetClipboard(player.accountId);
                         UI::ShowNotification(Icons::Clipboard + " Account ID copied to clipboard");
@@ -241,7 +241,7 @@ class AllPlayersDevTab : Tab {
                                 permsStr += "- " + player.group.permissions[p].name + " (" + player.group.permissions[p].description + ")";
                                 if (p != player.group.permissions.Length) permsStr += "\n";
                             }
-                            UI::SetPreviousTooltip("ID: " + player.group.id + "\nPermissions:\n" + permsStr);
+                            UI::SetItemTooltip("ID: " + player.group.id + "\nPermissions:\n" + permsStr);
                         }
                     } else UI::Text("ID: " + player.groupId);
 
@@ -250,14 +250,14 @@ class AllPlayersDevTab : Tab {
                         if (UI::Button(Icons::Kenney::BadgeAlt)) {
                             Renderables::Add(DevPlayerBadgesModalDialog(player));
                         }
-                        UI::SetPreviousTooltip("Manage their badges");
+                        UI::SetItemTooltip("Manage their badges");
                         UI::SameLine();
                     }
                     if (g_connectedPlayer.hasPermission("ban_player")) {
                         if (UI::RedButton(Icons::Ban)) {
                             Renderables::Add(DevBanPlayerModalDialog(player));
                         }
-                        UI::SetPreviousTooltip("Ban Player");
+                        UI::SetItemTooltip("Ban Player");
                     }
 
                     UI::PopID();

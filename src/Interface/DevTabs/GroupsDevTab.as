@@ -220,7 +220,7 @@ class GroupsDevTab : Tab {
             for (uint p = 0; p < selectedGroup.permissions.Length; p++) {
                 if (selectedGroup.permissions[p].description.Length > 0) {
                     UI::Text("- " + selectedGroup.permissions[p].description);
-                    UI::SetPreviousTooltip(selectedGroup.permissions[p].name);
+                    UI::SetItemTooltip(selectedGroup.permissions[p].name);
                 } else UI::Text("- " + selectedGroup.permissions[p].name);
             }
         }
@@ -240,7 +240,7 @@ class GroupsDevTab : Tab {
                 bool permissionEdit = selectedGroupPermissionsId.Find(allPermissions[j].id) >= 0;
                 if (allPermissions[j].description.Length > 0) {
                     permissionEdit = UI::Checkbox(allPermissions[j].description, permissionEdit);
-                    UI::SetPreviousTooltip(allPermissions[j].name);
+                    UI::SetItemTooltip(allPermissions[j].name);
                 } else permissionEdit = UI::Checkbox(allPermissions[j].name, permissionEdit);
 
                 if (permissionEdit && selectedGroupPermissionsId.Find(allPermissions[j].id) == -1) selectedGroupPermissionsId.InsertLast(allPermissions[j].id);
@@ -253,7 +253,7 @@ class GroupsDevTab : Tab {
             for (uint p = 0; p < selectedGroup.permissions.Length; p++) {
                 if (selectedGroup.permissions[p].description.Length > 0) {
                     UI::Text("- " + selectedGroup.permissions[p].description);
-                    UI::SetPreviousTooltip(selectedGroup.permissions[p].name);
+                    UI::SetItemTooltip(selectedGroup.permissions[p].name);
                 } else UI::Text("- " + selectedGroup.permissions[p].name);
             }
         }

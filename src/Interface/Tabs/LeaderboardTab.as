@@ -126,7 +126,7 @@ class LeaderboardTab : Tab {
 
                     UI::TableSetColumnIndex(3);
                     UI::Text(tostring(leaderboardEntries[i].matchesPlayed));
-                    UI::SetPreviousTooltip(
+                    UI::SetItemTooltip(
                         (leaderboardEntries[i].matchesWin > 0 ? tostring(leaderboardEntries[i].matchesWin) + " W" : "") +
                         (leaderboardEntries[i].matchesWin > 0 && leaderboardEntries[i].matchesLoss > 0 ? " | " : "") +
                         (leaderboardEntries[i].matchesLoss > 0 ? tostring(leaderboardEntries[i].matchesLoss) + " L" : "") +

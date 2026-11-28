@@ -185,7 +185,7 @@ class QueueTab : Tab {
                             if (player.group.icon.Length > 0) {
                                 UI::SameLine();
                                 UI::Text(player.group.iconWithColor);
-                                UI::SetPreviousTooltip(player.group.name);
+                                UI::SetItemTooltip(player.group.name);
                             }
                             for (uint mt = 0; mt < player.matchmakingTypes.Length; mt++) {
                                 if (
@@ -279,7 +279,7 @@ class QueueTab : Tab {
         if (g_activeSquad !is null && g_activeSquad.isPlayerReady(player.accountId)) {
             UI::SameLine();
             UI::Text("\\$0f0" + Icons::Check);
-            UI::SetPreviousTooltip("Ready");
+            UI::SetItemTooltip("Ready");
         }
         if (g_selectedMatchmakingType !is null && g_selectedMatchmakingType.season !is null && g_selectedMatchmakingType.season.isActive) {
             if (selectedPlayerMatchmakingType !is null && selectedPlayerMatchmakingType.matchesPlayed < g_selectedMatchmakingType.placementMatches) {

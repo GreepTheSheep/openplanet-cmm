@@ -13,7 +13,7 @@ void RenderAdvancedSettingsTab() {
     Setting_BaseURL = UI::InputText("Base URL##BaseURLSettingBaseURLInputText", Setting_BaseURL, changed);
     UI::SameLine();
     UI::TextDisabled(Icons::InfoCircle);
-    UI::SetPreviousTooltip("When you make the change, the plugin will log you out and log you back in at the new URL during the next health check.");
+    UI::SetItemTooltip("When you make the change, the plugin will log you out and log you back in at the new URL during the next health check.");
 
     UI::BeginDisabled(Setting_BaseURL == URL_PROD);
     if (UI::GreenButton("Set to Production")) {

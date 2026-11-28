@@ -351,12 +351,12 @@ class SquadTab : Tab {
                 if (player.accountId == g_activeSquad.ownerPlayer) {
                     UI::SameLine();
                     UI::Text("\\$ff0" + Icons::IdBadge);
-                    UI::SetPreviousTooltip("Squad host");
+                    UI::SetItemTooltip("Squad host");
                 }
                 if (g_activeSquad.isPlayerReady(player.accountId)) {
                     UI::SameLine();
                     UI::Text("\\$0f0" + Icons::Check);
-                    UI::SetPreviousTooltip("Ready");
+                    UI::SetItemTooltip("Ready");
                 }
             }
             UI::EndChild(); // SquadPlayers

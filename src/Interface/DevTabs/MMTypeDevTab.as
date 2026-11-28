@@ -305,7 +305,7 @@ class MMTypeDevTab : Tab {
         UI::TextDisabled("Identifier: " + selectedType.id);
         UI::SameLine();
         UI::Text(Icons::Refresh);
-        UI::SetPreviousTooltip("Reload this type");
+        UI::SetItemTooltip("Reload this type");
         if (UI::IsItemClicked()) Reload();
 
         UI::Separator();

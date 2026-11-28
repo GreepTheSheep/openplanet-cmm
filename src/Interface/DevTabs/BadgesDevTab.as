@@ -118,7 +118,7 @@ class BadgesDevTab : Tab {
         }
 
         if (UI::GreenButton(Icons::Plus)) Renderables::Add(DevCreateBadgeModalDialog());
-        UI::SetPreviousTooltip("Create a new badge");
+        UI::SetItemTooltip("Create a new badge");
         UI::SameLine();
         if (UI::BlueButton(Icons::Refresh)) Reload();
 
@@ -169,12 +169,12 @@ class BadgesDevTab : Tab {
                     if (UI::Button(Icons::Pencil)) {
                         Renderables::Add(DevEditBadgeModalDialog(badge));
                     }
-                    UI::SetPreviousTooltip("Edit badge");
+                    UI::SetItemTooltip("Edit badge");
                     UI::SameLine();
                     if (UI::RedButton(Icons::Trash)) {
                         Renderables::Add(DevDeleteBadgeConfirmationModalDialog(badge));
                     }
-                    UI::SetPreviousTooltip("Delete badge");
+                    UI::SetItemTooltip("Delete badge");
                     UI::PopID();
                 }
             }

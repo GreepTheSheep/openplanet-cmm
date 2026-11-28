@@ -38,14 +38,14 @@ class DevEditBadgeModalDialog : ModalDialog
         nameEdit = UI::InputText("Set name##badgeNameEdit", nameEdit);
 
         notNullDescriptionEdit = UI::Checkbox("###notNullDescriptionEdit", notNullDescriptionEdit);
-        UI::SetPreviousTooltip("If checked, description set next will be used. If not checked, description will not being modified.");
+        UI::SetItemTooltip("If checked, description set next will be used. If not checked, description will not being modified.");
         UI::SameLine();
         UI::BeginDisabled(!notNullDescriptionEdit);
         descriptionEdit = UI::InputText("Set description##badgeDescriptionEdit", descriptionEdit);
         UI::EndDisabled();
 
         iconEdit = UI::InputText("Set Base64-encoded image##badgeIconEdit", iconEdit);
-        UI::SetPreviousTooltip("If empty, the image will not being modified.");
+        UI::SetItemTooltip("If empty, the image will not being modified.");
 
         UI::NewLine();
         if (UI::Button("Use a Image to Base64 converter")) OpenBrowserURL("https://base64.guru/converter/encode/image");
